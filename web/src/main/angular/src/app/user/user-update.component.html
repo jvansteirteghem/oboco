@@ -1,0 +1,29 @@
+<h2>USER UPDATE</h2>
+
+<div *ngIf="user">
+    <form [formGroup]="userForm" (ngSubmit)="userForm_onUpdate()" class="example-form">
+        <p>
+        <mat-form-field class="example-full-width">
+            <input type="text" formControlName="name" matInput placeholder="name">
+        </mat-form-field>
+        </p>
+    
+        <p>
+        <mat-form-field class="example-full-width">
+            <input type="password" formControlName="password" matInput placeholder="password">
+        </mat-form-field>
+        </p>
+
+        <p>
+        <mat-checkbox formControlName="roleAdministrator">ADMINISTRATOR</mat-checkbox>
+        <br>
+        <mat-checkbox formControlName="roleUser">USER</mat-checkbox>
+        </p>
+
+        <p>
+        <button [disabled]="userForm_loading" mat-raised-button color="primary">update</button>
+        <button mat-raised-button color="primary" (click)="userForm_onCancel()">cancel</button>
+        </p>
+        <mat-error *ngIf="userForm_error">{{userForm_error}}</mat-error>
+    </form>
+</div>

@@ -1,0 +1,36 @@
+<h2>BOOK</h2>
+
+<mat-error *ngIf="error">{{error}}</mat-error>
+
+<div *ngIf="book">
+    <button *ngIf="bookCollection" mat-raised-button (click)="bookCollection_onSelect(bookCollection)"><mat-icon>arrow_upward</mat-icon></button>
+    <br>
+    <p>
+    id: {{book.id}}<br>
+    name: {{book.name}}<br>
+    description: {{book.description}}<br>
+    numberOfPages: {{book.numberOfPages}}<br>
+    page: {{page}}
+    </p>
+    
+
+    <img [attr.src]="'/api/v1/books/' + this.book.id + '/pages/' + this.page + '.jpg' | download | async"/>
+
+    <div class="example-button-row">
+        <button mat-raised-button (click)="onFirstPage()"><mat-icon>first_page</mat-icon></button>
+        <button mat-raised-button (click)="onPreviousPage()"><mat-icon>chevron_left</mat-icon></button>
+        <button mat-raised-button (click)="onNextPage()"><mat-icon>chevron_right</mat-icon></button>
+        <button mat-raised-button (click)="onLastPage()"><mat-icon>last_page</mat-icon></button>
+        <button mat-raised-button (click)="bookMark_onMark()">mark</button>
+        <mat-error *ngIf="bookMark_error">{{bookMark_error}}</mat-error>
+    </div>
+</div>
+<div *ngIf="bookMark">
+    <p>
+    id: {{bookMark.id}}<br>
+    page: {{bookMark.page}}
+    </p>
+    <div class="example-button-row">
+        <button mat-raised-button (click)="bookMark_onGoToMark()">go to mark</button>
+    </div>
+</div>

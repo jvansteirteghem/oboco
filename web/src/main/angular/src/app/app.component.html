@@ -1,0 +1,16 @@
+<mat-toolbar>  
+    <mat-toolbar-row>
+        <span>{{title | uppercase}}</span>
+        <span class="example-spacer"></span>
+        <span class="example-icon"><a routerLink="/home">home</a></span>
+        <span class="example-icon"><a routerLink="/bookCollection">book collection</a></span>
+        <span class="example-icon"><a routerLink="/bookMark">book mark</a></span>
+        <span class="example-icon"><a routerLink="/bookScanner">book scanner</a></span>
+        <span class="example-icon"><a routerLink="/user">user</a></span>
+        <span class="example-icon"><a class="nav-item nav-link" (click)="logout()">log out</a></span>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+<div class="example-container">
+    <router-outlet></router-outlet>
+</div>

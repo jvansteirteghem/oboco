@@ -1,0 +1,13 @@
+﻿<h2>HOME</h2>
+
+<div>
+    <div *ngIf="userIdObservable">
+        userId.name: {{(userIdObservable | async)?.name}}
+        <br>
+        userId.roles: {{(userIdObservable | async)?.roles }}
+        <br>
+        userId.idToken: {{(userIdObservable | async)?.idToken}}
+        <br>
+        userId.refreshToken: {{(userIdObservable | async)?.refreshToken}}
+    </div>
+</div>

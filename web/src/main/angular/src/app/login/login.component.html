@@ -1,0 +1,25 @@
+﻿
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="example-form">
+    <p>
+    <mat-form-field class="example-full-width">
+        <input type="text" formControlName="name" matInput placeholder="name">
+    </mat-form-field>
+    <mat-error *ngIf="submitted && f.name.errors">
+        <div *ngIf="f.name.errors.required">name is required</div>
+    </mat-error>
+    </p>
+
+    <p>
+    <mat-form-field class="example-full-width">
+        <input type="password" formControlName="password" matInput placeholder="password">
+    </mat-form-field>
+    <mat-error *ngIf="submitted && f.password.errors">
+        <div *ngIf="f.password.errors.required">password is required</div>
+    </mat-error>
+    </p>
+
+    <p>
+    <button [disabled]="loading" mat-raised-button color="primary">log in</button>
+    <mat-error *ngIf="error">{{error}}</mat-error>
+    </p>
+</form>

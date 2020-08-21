@@ -1,0 +1,29 @@
+<div *ngIf="userId">
+    <h2>USER</h2>
+
+    <button mat-raised-button color="primary" (click)="user_updatePassword()">update password</button>
+</div>
+
+<div *ngIf="userId && userId.roles.includes('ADMINISTRATOR')">
+    <h2>USERS</h2>
+    
+    <button mat-raised-button color="primary" (click)="user_create()">create</button>
+
+    <div *ngIf="users && users.numberOfElements > 0">
+        <div class="example-button-row">
+            <button mat-raised-button (click)="users_onFirstPage()"><mat-icon>first_page</mat-icon></button>
+            <button mat-raised-button (click)="users_onPreviousPage()"><mat-icon>chevron_left</mat-icon></button>
+            <button mat-raised-button (click)="users_onNextPage()"><mat-icon>chevron_right</mat-icon></button>
+            <button mat-raised-button (click)="users_onLastPage()"><mat-icon>last_page</mat-icon></button>
+        </div>
+        <mat-list>
+            <mat-list-item *ngFor="let user of users.elements">
+                <p matLine>
+                    <span>{{user.name}}</span>
+                    <button mat-raised-button color="primary" (click)="user_update(user)">update</button>
+                    <button mat-raised-button color="primary" (click)="user_delete(user)">delete</button>
+                </p>
+            </mat-list-item>
+        </mat-list>
+    </div>
+</div>

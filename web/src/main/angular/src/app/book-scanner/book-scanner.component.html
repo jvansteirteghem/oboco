@@ -1,0 +1,17 @@
+<h2>BOOK SCANNER</h2>
+
+<mat-error *ngIf="error">{{error}}</mat-error>
+
+<div *ngIf="bookScanners && bookScanners.length > 0">
+    <mat-list>
+        <mat-list-item *ngFor="let bookScanner of bookScanners">
+            <p matLine>
+                <span>{{bookScanner.id}}</span>
+                <span>{{bookScanner.status}}</span>
+                <button mat-raised-button color="primary" (click)="onBookScannerStart(bookScanner)">start</button>
+                <button mat-raised-button color="primary" (click)="onBookScannerStop(bookScanner)">stop</button>
+                <button mat-raised-button color="primary" (click)="onBookScannerStatus(bookScanner)">status</button>
+            </p>
+        </mat-list-item>
+    </mat-list>
+</div>

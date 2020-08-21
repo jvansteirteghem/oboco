@@ -1,0 +1,2 @@
+mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=sevenzipjbinding.jar -DgroupId=net.sf.sevenzipjbinding -DartifactId=sevenzipjbinding -Dversion=16.02-2.01beta -Dpackaging=jar
+mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=sevenzipjbinding-AllPlatforms.jar -DgroupId=net.sf.sevenzipjbinding -DartifactId=sevenzipjbinding-all-platforms -Dversion=16.02-2.01beta -Dpackaging=jar

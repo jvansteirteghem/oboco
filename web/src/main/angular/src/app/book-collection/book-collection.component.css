@@ -1,0 +1,19 @@
+.example-button-row button,
+.example-button-row a {
+  margin-right: 8px;
+}
+
+.example-card {
+    max-width: 240px;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+  
+  .example-header-image {
+    background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
+    background-size: cover;
+  }

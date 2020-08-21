@@ -1,0 +1,33 @@
+<h2>USER CREATE</h2>
+
+<form [formGroup]="userForm" (ngSubmit)="userForm_onCreate()" class="example-form">
+    <p>
+    <mat-form-field class="example-full-width">
+        <input type="text" formControlName="name" matInput placeholder="name">
+    </mat-form-field>
+    <mat-error *ngIf="userForm_submitted && userForm.controls.name.errors">
+        <div *ngIf="userForm.controls.name.errors.required">name is required</div>
+    </mat-error>
+    </p>
+
+    <p>
+    <mat-form-field class="example-full-width">
+        <input type="password" formControlName="password" matInput placeholder="password">
+    </mat-form-field>
+    <mat-error *ngIf="userForm_submitted && userForm.controls.password.errors">
+        <div *ngIf="userForm.controls.password.errors.required">password is required</div>
+    </mat-error>
+    </p>
+
+    <p>
+    <mat-checkbox formControlName="roleAdministrator">ADMINISTRATOR</mat-checkbox>
+    <br>
+    <mat-checkbox formControlName="roleUser">USER</mat-checkbox>
+    </p>
+
+    <p>
+    <button [disabled]="userForm_loading" mat-raised-button color="primary">create</button>
+    <button mat-raised-button color="primary" (click)="userForm_onCancel()">cancel</button>
+    </p>
+    <mat-error *ngIf="userForm_error">{{userForm_error}}</mat-error>
+</form>

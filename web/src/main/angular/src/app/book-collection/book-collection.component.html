@@ -1,0 +1,71 @@
+<h2>BOOK COLLECTION</h2>
+
+<mat-error *ngIf="error">{{error}}</mat-error>
+
+<div *ngIf="bookCollection">
+  <button *ngIf="parentBookCollection" mat-raised-button (click)="bookCollection_onSelect(parentBookCollection)"><mat-icon>arrow_upward</mat-icon></button>
+  <br>
+
+  <div *ngIf="bookCollections && bookCollections.numberOfElements > 0">
+      <h3>BOOK COLLECTIONS</h3>
+      <div class="example-button-row">
+          <button mat-raised-button (click)="bookCollections_onFirstPage()"><mat-icon>first_page</mat-icon></button>
+          <button mat-raised-button (click)="bookCollections_onPreviousPage()"><mat-icon>chevron_left</mat-icon></button>
+          <button mat-raised-button (click)="bookCollections_onNextPage()"><mat-icon>chevron_right</mat-icon></button>
+          <button mat-raised-button (click)="bookCollections_onLastPage()"><mat-icon>last_page</mat-icon></button>
+      </div>
+
+      <mat-grid-list cols="5" rowHeight="700px">
+        <mat-grid-tile *ngFor="let bookCollection of bookCollections.elements">
+            <mat-card class="example-card">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-title>{{bookCollection.name}}</mat-card-title>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <p>
+                    id: {{bookCollection.id}}<br>
+                    name: {{bookCollection.name}}
+                  </p>
+                </mat-card-content>
+                <mat-card-actions>
+                    <a (click)="bookCollection_onSelect(bookCollection)" mat-button>GO</a>
+                </mat-card-actions>
+              </mat-card>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+
+    <div *ngIf="books && books.numberOfElements > 0">
+      <h3>BOOKS</h3>
+      <div class="example-button-row">
+          <button mat-raised-button (click)="books_onFirstPage()"><mat-icon>first_page</mat-icon></button>
+          <button mat-raised-button (click)="books_onPreviousPage()"><mat-icon>chevron_left</mat-icon></button>
+          <button mat-raised-button (click)="books_onNextPage()"><mat-icon>chevron_right</mat-icon></button>
+          <button mat-raised-button (click)="books_onLastPage()"><mat-icon>last_page</mat-icon></button>
+      </div>
+
+      <mat-grid-list cols="5" rowHeight="700px">
+        <mat-grid-tile *ngFor="let book of books.elements">
+            <mat-card class="example-card">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-title>{{book.name}}</mat-card-title>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <img mat-card-image [attr.src]="'/api/v1/books/' + this.book.id + '/pages/1.jpg?scaleType=DEFAULT&scaleWidth=240&scaleHeight=330' | download | async" (click)="book_onSelect(book)">
+                <mat-card-content>
+                  <p>
+                    id: {{book.id}}<br>
+                    name: {{book.name}}
+                  </p>
+                </mat-card-content>
+                <mat-card-actions>
+                  <a (click)="book_onDownload(book)" mat-button>DOWNLOAD</a>
+                </mat-card-actions>
+              </mat-card>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+</div>
