@@ -10,12 +10,19 @@ variables:
 cache:
   paths:
     - .m2/repository/
-    - target/
 
-build:
+compile:
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS compile
+
+package:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS package -DskipTests=true
+  artifacts:
+    paths:
+      - app\target\oboco-*.zip
 
 test:
   stage: test
