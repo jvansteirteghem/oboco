@@ -22,7 +22,7 @@ package:
     - mvn $MAVEN_CLI_OPTS package -DskipTests=true
   artifacts:
     paths:
-      - app\target\oboco-*.zip
+      - app/target/oboco-*.zip
 
 test:
   stage: test
