@@ -1,30 +1,44 @@
-image: maven:latest
+#https://blog.deniger.net/post/gitlab-maven-optimize-build/
 
+# latest: maven:latest
+image: maven:3.3.9-jdk-8
+
+# stages
 stages:
   - build
   - test
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode"
+  # cache repository
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
+# share dependencies
 cache:
   paths:
+    # cache repository
     - .m2/repository/
 
-compile:
+build_job:
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS compile
-
-package:
-  stage: build
-  script:
-    - mvn $MAVEN_CLI_OPTS package -DskipTests=true
+  # share artifacts
   artifacts:
-    paths:
-      - app/target/oboco-*.zip
+    expire_in: 1 hour
+    paths: 
+      - target/
+      # for modules
+      # use " and not / at the end...
+      - "*/target"
 
-test:
+test_job:
   stage: test
   script:
+    # every stage does a new 'git clone'
+    # the java files are more recent than the class files
+    # make the class files more recent with touch
+    # otherwise maven will recompile the java files
+    # https://freedumbytes.bitbucket.io/dpl/html/continuous.integration.pipeline.html#continuous.integration.pipeline.gitlab.touch.class
+    - find . -name "*.class" -exec touch {} \+
     - mvn $MAVEN_CLI_OPTS test
