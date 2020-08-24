@@ -23,9 +23,6 @@
 	  <fileSet>
 		<directory>target/data</directory>
 		<outputDirectory>data</outputDirectory>
-		<excludes>
-			<exclude>*/**</exclude>
-		</excludes>
 	  </fileSet>
 	  <fileSet>
 		<directory>target/libs</directory>
@@ -34,9 +31,6 @@
 	  <fileSet>
 		<directory>target/logs</directory>
 		<outputDirectory>logs</outputDirectory>
-		<excludes>
-			<exclude>*/**</exclude>
-		</excludes>
 	  </fileSet>
 	  <fileSet>
 		<directory>target/plugins</directory>

@@ -239,6 +239,7 @@
 									<directory>${project.basedir}/src/non-packaged-resources</directory>
 									<filtering>false</filtering>
 									<excludes>
+										<exclude>**/.gitignore</exclude>
 										<exclude>**/application.bat</exclude>
 								        <exclude>**/application.sh</exclude>
 								    </excludes>
