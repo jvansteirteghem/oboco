@@ -7,6 +7,7 @@ image: maven:3.3.9-jdk-8
 stages:
   - build
   - test
+  - package
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode"
@@ -19,7 +20,7 @@ cache:
     # cache repository
     - .m2/repository/
 
-build_job:
+compile:
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS compile
@@ -32,13 +33,23 @@ build_job:
       # use " and not / at the end...
       - "*/target"
 
-test_job:
+test:
   stage: test
   script:
     # every stage does a new 'git clone'
     # the java files are more recent than the class files
     # make the class files more recent with touch
     # otherwise maven will recompile the java files
-    # https://freedumbytes.bitbucket.io/dpl/html/continuous.integration.pipeline.html#continuous.integration.pipeline.gitlab.touch.class
     - find . -name "*.class" -exec touch {} \+
     - mvn $MAVEN_CLI_OPTS test
+
+package:
+  stage: package
+  script:
+    # see: test
+    - find . -name "*.class" -exec touch {} \+
+    - mvn $MAVEN_CLI_OPTS package -DskipTests=true
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - app/target/oboco-*.zip
