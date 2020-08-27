@@ -11,7 +11,7 @@ you can:
 - manage your users.
 
 the backend is a rest api with token-based authentication.
-the frontend is an single-page application (for now a basic proof-of-concept).
+the frontend is a single-page application (for now a basic proof-of-concept).
 
 you should use oboco with [oboco for android](https://gitlab.com/jeeto/oboco-android).
 [oboco for android](https://gitlab.com/jeeto/oboco-android) is a client for oboco.
@@ -74,6 +74,7 @@ remark: on windows you have to use \\\\ or / as path seperator.
 		
 ### application database
 
+- add the lib of the driver of the database to the libs directory.
 - configure application.properties
 	- database.name: the name of the database: "DB2", "DB2400", "DB2390", "PostgreSQL", "MySQL5", "MySQL5InnoDB", "MySQLMyISAM", "Oracle", "Oracle9i", "Oracle10g", "Oracle11g", "SybaseASE15", "SybaseAnywhere", "SQLServer", "SQLServer2005", "SQLServer2008", "SAPDB", "Informix", "HSQL", "H2", "Ingres", "Progress", "Mckoi", "Interbase", "Pointbase", "Frontbase" or "Firebird".
 	- database.driver: the driver of the database.
@@ -89,15 +90,15 @@ remark: on windows you have to use \\\\ or / as path seperator.
 
 - configure application.properties
 	- security.authentication.secret: the secret of the authentication.
-	- security.authentication.idToken.age: the age of the id token of the authentication (in milliseconds).
-	- security.authentication.refreshToken.age: the age of the refresh token of the authentication (in milliseconds).
+	- security.authentication.idToken.age: the age of the id token of the authentication (in seconds).
+	- security.authentication.refreshToken.age: the age of the refresh token of the authentication (in seconds).
 
 ### application plugins
 
 - configure application.properties
 	- plugin.archive.archiveReaderPool.size: the size of the archive reader pool.
-	- plugin.archive.archiveReaderPool.interval: the interval of the archive reader pool (in milliseconds).
-	- plugin.archive.archiveReaderPool.age: the age of the archive reader pool (in milliseconds).
+	- plugin.archive.archiveReaderPool.interval: the interval of the archive reader pool (in seconds).
+	- plugin.archive.archiveReaderPool.age: the age of the archive reader pool (in seconds).
 - configure plugins/enabled.txt
 	- JDKArchivePlugin: supports zip.
 	- JUnrarArchivePlugin: supports rar.
