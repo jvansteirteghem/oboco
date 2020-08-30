@@ -26,7 +26,7 @@ you should use oboco with [oboco for android](https://gitlab.com/jeeto/oboco-and
 
 ## configuration
 
-remark: on windows you have to use \\\\ or / as path seperator.
+remark: on windows you have to use \\\\ or / as path separator.
 
 ### user data (required)
 
@@ -110,9 +110,64 @@ remark: on windows you have to use \\\\ or / as path seperator.
 
 - start the server with application.bat or application.sh
 - open your browser to http://<server.address>:<server.port> or https://<server.address>:<server.ssl.port>
+- select "Web"
 - log in
 	- name: administrator
 	- password: administrator
+
+## faq
+
+### can I install oboco on a raspberry pi?
+
+yes, but you have to start oboco with additional parameters: "-Dos.arch=armv71"
+
+### can I configure oboco to use another database?
+
+yes, you can use: "DB2", "DB2400", "DB2390", "PostgreSQL", "MySQL5", "MySQL5InnoDB", "MySQLMyISAM", "Oracle", "Oracle9i", "Oracle10g", "Oracle11g", "SybaseASE15", "SybaseAnywhere", "SQLServer", "SQLServer2005", "SQLServer2008", "SAPDB", "Informix", "HSQL", "H2", "Ingres", "Progress", "Mckoi", "Interbase", "Pointbase", "Frontbase" or "Firebird".
+you have to add the lib of the driver of your database to the libs directory.
+
+- mysql
+	- add the lib to the libs directory: https://mvnrepository.com/artifact/mysql/mysql-connector-java
+	- configure application.properties:
+		- database.name: "MySQL5InnoDB"
+		- database.driver: "com.mysql.cj.jdbc.Driver"
+		- database.url: "jdbc:mysql://<address>:<port>/<database>"
+		- database.user.name: "<name>"
+		- database.user.password: "<password>"
+- postgresql
+	- add the lib to the libs directory: https://mvnrepository.com/artifact/org.postgresql/postgresql
+	- configure application.properties:
+		- database.name: "PostgreSQL"
+		- database.driver: "org.postgresql.Driver"
+		- database.url: "jdbc:postgresql://<address>:<port>/<database>"
+		- database.user.name: "<name>"
+		- database.user.password: "<password>"
+- ..
+
+### can I reset the password of the "administrator" user?
+
+yes. the password is hashed with a 12-round bcrypt and the password hash is stored in the user table of the database.
+
+- reset the password of the "administrator" user to "administrator"
+	- stop oboco
+	- create application.ddl: ""
+	- create application.sql: "update users set passwordhash = '$2a$12$msu32WtSMaQVCJsIDKCxkOTVOGRrncBjUe5x63GbY/RizCJ/zyFPC', updateDate = current_timestamp where name = 'administrator'"
+	- start oboco
+
+### can I debug oboco?
+
+yes, but you have to start oboco with additional parameters: "-Xdebug -Xrunjdwp:transport=dt_socket,address=8500,server=y,suspend=y"
+
+- eclipse
+	- select "oboco-app"
+	- select "debug as, debug configurations"
+	- select "remote java application"
+	- set "connection type=standard, host=localhost, port=8500"
+	- select "debug perspective"
+
+### can I create a frontend for oboco?
+
+yes, oboco deploys the first "*.war" file in the web directory.
 
 ## license
 
