@@ -109,7 +109,7 @@ you are required to configure "user data" and "application security".
 ## usage
 
 - start the server with application.bat or application.sh
-- open your browser to http://<server.address>:<server.port> or https://<server.address>:<server.ssl.port>
+- open your browser to http://server.address:server.port or https://server.address:server.ssl.port
 - select "Web"
 - log in
 	- name: administrator
@@ -131,17 +131,17 @@ you have to add the lib of the driver of your database to the libs directory.
 	- configure application.properties:
 		- database.name: "MySQL5InnoDB"
 		- database.driver: "com.mysql.cj.jdbc.Driver"
-		- database.url: "jdbc:mysql://<address>:<port>/<database>"
-		- database.user.name: "<name>"
-		- database.user.password: "<password>"
+		- database.url: "jdbc:mysql://address:port/database"
+		- database.user.name: "name"
+		- database.user.password: "password"
 - postgresql
 	- add the lib to the libs directory: https://mvnrepository.com/artifact/org.postgresql/postgresql
 	- configure application.properties:
 		- database.name: "PostgreSQL"
 		- database.driver: "org.postgresql.Driver"
-		- database.url: "jdbc:postgresql://<address>:<port>/<database>"
-		- database.user.name: "<name>"
-		- database.user.password: "<password>"
+		- database.url: "jdbc:postgresql://address:port/database"
+		- database.user.name: "name"
+		- database.user.password: "password"
 - ..
 
 ### can I reset the password of the "administrator" user?
