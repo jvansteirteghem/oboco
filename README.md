@@ -26,17 +26,17 @@ you should use oboco with [oboco for android](https://gitlab.com/jeeto/oboco-and
 
 ## configuration
 
-remark: on windows you have to use \\\\ or / as path separator.
+you are required to configure "user data" and "application security".
 
-### user data (required)
+### user data
 
 - configure user.properties
-	- data.path: the path of your book collection. you can add more than one path by using a ",".
+	- data.path: the path of your book collection. you can add more than one path by using a ",". [^1]
 
 ### application logger
 
 - configure application.properties
-	- logger.path: the path of the logs.
+	- logger.path: the path of the logs. [^1]
 	- logger.rootLevel: the root level of the logger: "FATAL", "ERROR", "WARN", "INFO", "DEBUG" or "TRACE".
 	- logger.level: the level of the logger: "FATAL", "ERROR", "WARN", "INFO", "DEBUG" or "TRACE".
 
@@ -59,13 +59,13 @@ remark: on windows you have to use \\\\ or / as path separator.
 					- select "import trusted certificates"
 - configure application.properties
 	- server.ssl.port: the ssl port of the server.
-	- server.ssl.keyStore.path: the path of the ssl key store.
+	- server.ssl.keyStore.path: the path of the ssl key store. [^1]
 	- server.ssl.keyStore.password: the password of the ssl key store.
 
-### application data
+### application data (cache)
 
 - configure application.properties
-	- data.path: the path of the data.
+	- data.path: the path of the data. [^1]
 - configure data.csv
 	- page: the page of the book or "" (all pages).
 	- scaleType: the scale type: "DEFAULT", "FIT", "FILL" or "" (do not scale).
@@ -86,7 +86,7 @@ remark: on windows you have to use \\\\ or / as path separator.
 - configure application.ddl
 - configure application.sql
 
-### application security (required)
+### application security
 
 - configure application.properties
 	- security.authentication.secret: the secret of the authentication.
@@ -172,3 +172,5 @@ yes, oboco deploys the first "*.war" file in the web directory.
 ## license
 
 mit license
+
+[^1]: on windows you have to use \\\\ or / as path separator.
