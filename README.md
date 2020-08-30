@@ -54,9 +54,9 @@ you are required to configure "user data" and "application security".
 - add the ssl certificate authority (server-ca.pem) to the trust store
 	- configure chrome
 		- select "settings"
-			- select "security"
-				- select "manage certificates"
-					- select "import trusted certificates"
+		- select "security"
+		- select "manage certificates"
+		- import server-ca.pem
 - configure application.properties
 	- server.ssl.port: the ssl port of the server.
 	- server.ssl.keyStore.path: the path of the ssl key store. [^1]
