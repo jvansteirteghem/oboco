@@ -1,4 +1,5 @@
-#https://blog.deniger.net/post/gitlab-maven-optimize-build/
+# https://blog.deniger.net/post/gitlab-maven-optimize-build/
+# https://forum.gitlab.com/t/getting-mvn-release-to-work-with-gitlab-ci/4904/2
 
 # latest: maven:latest
 image: maven:3.3.9-jdk-8
@@ -7,49 +8,50 @@ image: maven:3.3.9-jdk-8
 stages:
   - build
   - test
-  - package
+  - release
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode"
-  # cache repository
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
-# share dependencies
 cache:
   paths:
-    # cache repository
     - .m2/repository/
 
 compile:
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS compile
-  # share artifacts
-  artifacts:
-    expire_in: 1 hour
-    paths: 
-      - target/
-      # for modules
-      # use " and not / at the end...
-      - "*/target"
 
 test:
   stage: test
   script:
-    # every stage does a new 'git clone'
-    # the java files are more recent than the class files
-    # make the class files more recent with touch
-    # otherwise maven will recompile the java files
-    - find . -name "*.class" -exec touch {} \+
     - mvn $MAVEN_CLI_OPTS test
 
-package:
-  stage: package
+release:
+  stage: release
+  tags:
+    # runner tags
+    - docker
   script:
-    # see: test
-    - find . -name "*.class" -exec touch {} \+
-    - mvn $MAVEN_CLI_OPTS package -DskipTests=true
+    # install ssh agent if ssh agent is not installed
+    - '(which ssh-agent) || ( apt-get update -y && apt-get install openssh-client -y )'
+    # run ssh agent
+    - eval $(ssh-agent -s)
+    # add the ssh key stored in the SSH_PRIVATE_KEY variable to the ssh agent store
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    # disable host key check
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - git config user.name "jeeto jeeto"
+    - git config user.email "jeeto.jeeto@gmail.com"
+    # detached HEAD is checked out
+    # check out branch in the CI_BUILD_REF_NAME variable
+    - git checkout -B "$CI_BUILD_REF_NAME"
+    - mvn $MAVEN_CLI_OPTS release:prepare
   artifacts:
-    expire_in: 1 hour
     paths:
-      - app/target/oboco-*.zip
+      - app/target/oboco-*.jar
+  when: manual
+  only:
+     - master
