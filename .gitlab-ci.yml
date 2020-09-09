@@ -51,7 +51,7 @@ release:
     - mvn $MAVEN_CLI_OPTS release:prepare
   artifacts:
     paths:
-      - app/target/oboco-*.jar
+      - app/target/oboco-*.zip
   when: manual
   only:
      - master
