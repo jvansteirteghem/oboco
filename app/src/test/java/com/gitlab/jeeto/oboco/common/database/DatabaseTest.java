@@ -67,6 +67,7 @@ public class DatabaseTest extends TestCase {
 			bookCollection.setNumberOfBookCollections(0);
 			bookCollection.setBooks(null);
 			bookCollection.setNumberOfBooks(0);
+			bookCollection.setNumber(1);
 			
 			entityManager.persist(bookCollection);
 			
@@ -80,6 +81,7 @@ public class DatabaseTest extends TestCase {
 			book.setNormalizedName("0000000000");
 			book.setNumberOfPages(50);
 			book.setBookCollection(bookCollection);
+			book.setNumber(1);
 			
 			entityManager.persist(book);
 			

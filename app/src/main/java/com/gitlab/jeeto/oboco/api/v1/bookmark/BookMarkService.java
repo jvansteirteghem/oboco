@@ -177,6 +177,8 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
+			bookMark = entityManager.merge(bookMark);
+			
 			entityManager.remove(bookMark);
 			
 			entityTransaction.commit();

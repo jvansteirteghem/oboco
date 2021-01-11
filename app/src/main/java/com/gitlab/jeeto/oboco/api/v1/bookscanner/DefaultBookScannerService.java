@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 import com.gitlab.jeeto.oboco.plugin.FileType;
 import com.gitlab.jeeto.oboco.plugin.FileWrapper;
+import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.plugin.PluginManager;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderFactory;
@@ -160,7 +162,7 @@ public class DefaultBookScannerService implements BookScannerService {
 	    	
 	    	File directory = new File(directoryPath);
 	    	if(directory.isDirectory() == false) {
-	    		throw new ProblemException(new Problem(500, "PROBLEM_APPLICATION_DATA_PATH_INVALID", "The application.dataPath is invalid."));
+	    		throw new ProblemException(new Problem(500, "PROBLEM_APPLICATION_DATA_PATH_INVALID", "The application.data.path is invalid."));
 	    	}
 			
 			BookCollection bookCollection = bookCollectionService.getBookCollectionByDirectoryPath("");
@@ -170,6 +172,7 @@ public class DefaultBookScannerService implements BookScannerService {
 				
 				bookCollection = new BookCollection();
 				bookCollection.setDirectoryPath("");
+				bookCollection.setParentBookCollection(null);
 				bookCollection.setUpdateDate(updateDate);
 				
 				String name = NameHelper.getName("ROOT");
@@ -179,9 +182,9 @@ public class DefaultBookScannerService implements BookScannerService {
 				String normalizedName = NameHelper.getNormalizedName("ROOT");
 				
 				bookCollection.setNormalizedName(normalizedName);
-				bookCollection.setParentBookCollection(null);
 				bookCollection.setNumberOfBookCollections(0);
 				bookCollection.setNumberOfBooks(0);
+				bookCollection.setNumber(1);
 		        
 		        bookCollection = bookCollectionService.createBookCollection(bookCollection);
 			} else {
@@ -198,6 +201,7 @@ public class DefaultBookScannerService implements BookScannerService {
 				bookCollection.setNormalizedName(normalizedName);
 				bookCollection.setNumberOfBookCollections(0);
 				bookCollection.setNumberOfBooks(0);
+				bookCollection.setNumber(1);
 				
 				bookCollection = bookCollectionService.updateBookCollection(bookCollection);
 			}
@@ -210,7 +214,7 @@ public class DefaultBookScannerService implements BookScannerService {
 					path = file.getAbsolutePath();
 			        add(file, bookCollection);
 				} else {
-					throw new ProblemException(new Problem(500, "PROBLEM_USER_DATA_PATH_INVALID", "The user.dataPath is invalid."));
+					throw new ProblemException(new Problem(500, "PROBLEM_USER_DATA_PATH_INVALID", "The user.data.path is invalid."));
 				}
 			}
 			
@@ -250,11 +254,20 @@ public class DefaultBookScannerService implements BookScannerService {
 	}
     
     private void add(File parentFile, BookCollection parentBookCollection) throws Exception {
-    	Integer numberOfBookCollections = 0;
-		Integer numberOfBooks = 0;
+		Integer numberOfBookCollections = parentBookCollection.getNumberOfBookCollections();
+		Integer numberOfBooks = parentBookCollection.getNumberOfBooks();
 		
     	File[] files = parentFile.listFiles();
-		for(File file: files) {
+    	
+    	List<File> fileList = Arrays.asList(files);
+    	fileList.sort(new NaturalOrderComparator<File>() {
+    		@Override
+    		public String toString(File o) {
+				return o.getName();
+		   }
+    	});
+    	
+		for(File file: fileList) {
 			if(status.equals(BookScannerServiceStatus.STOPPING)) {
 	    		logger.info("stopping!");
 	    		break;
@@ -270,6 +283,7 @@ public class DefaultBookScannerService implements BookScannerService {
 					
 					bookCollection = new BookCollection();
 					bookCollection.setDirectoryPath(path);
+					bookCollection.setParentBookCollection(parentBookCollection);
 					bookCollection.setUpdateDate(updateDate);
 					
 					String name = NameHelper.getName(file.getName());
@@ -279,18 +293,19 @@ public class DefaultBookScannerService implements BookScannerService {
 					String normalizedName = NameHelper.getNormalizedName(file.getName());
 					
 					bookCollection.setNormalizedName(normalizedName);
-					bookCollection.setParentBookCollection(parentBookCollection);
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
+					
+					numberOfBookCollections = numberOfBookCollections + 1;
+					
+					bookCollection.setNumber(numberOfBookCollections);
 			        
 			        bookCollection = bookCollectionService.createBookCollection(bookCollection);
-			        
-			        numberOfBookCollections = numberOfBookCollections + 1;
 				} else {
 					logger.info("update bookCollection " + path);
 					
 					bookCollection.setUpdateDate(updateDate);
-
+					
 					String name = NameHelper.getName(file.getName());
 					
 					bookCollection.setName(name);
@@ -301,9 +316,11 @@ public class DefaultBookScannerService implements BookScannerService {
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
 					
-					bookCollection = bookCollectionService.updateBookCollection(bookCollection);
-					
 					numberOfBookCollections = numberOfBookCollections + 1;
+					
+					bookCollection.setNumber(numberOfBookCollections);
+					
+					bookCollection = bookCollectionService.updateBookCollection(bookCollection);
 				}
 				
 				add(file, bookCollection);
@@ -317,17 +334,36 @@ public class DefaultBookScannerService implements BookScannerService {
 					
 					Date fileUpdateDate = new Date(file.lastModified());
 					
-					if(book == null || book.getUpdateDate().compareTo(fileUpdateDate) < 0) {
+					if(book == null) {
 						logger.info("create book " + path);
 						
+						book = new Book();
+						
+				    	String fileId = createFileId(fileWrapper);
+				    	
+				    	book.setFileId(fileId);
+				    	book.setFilePath(file.getPath());
+				    	book.setBookCollection(parentBookCollection);
+				    	book.setUpdateDate(updateDate);
+				    	
+						String name = NameHelper.getName(file.getName());
+						
+						book.setName(name);
+						
+						String normalizedName = NameHelper.getNormalizedName(file.getName());
+						
+						book.setNormalizedName(normalizedName);
+						
 						try {
-							book = createBook(fileWrapper, parentBookCollection);
-							
-							numberOfBooks = numberOfBooks + 1;
+							book = createBookPages(fileWrapper, book);
 						} catch(Exception e) {
 							logger.error("error create book " + path, e);
 							continue;
 						}
+						
+						numberOfBooks = numberOfBooks + 1;
+						
+						book.setNumber(numberOfBooks);
 						
 						book = bookService.createBook(book);
 						
@@ -347,14 +383,30 @@ public class DefaultBookScannerService implements BookScannerService {
 					} else {
 						logger.info("update book " + path);
 						
+						book.setUpdateDate(updateDate);
+				    	
+						String name = NameHelper.getName(file.getName());
+						
+						book.setName(name);
+						
+						String normalizedName = NameHelper.getNormalizedName(file.getName());
+						
+						book.setNormalizedName(normalizedName);
+						
 						try {
-							book = updateBook(fileWrapper, book);
-							
-							numberOfBooks = numberOfBooks + 1;
+							if(book.getUpdateDate().compareTo(fileUpdateDate) < 0) {
+								book = createBookPages(fileWrapper, book);
+							} else {
+								book = updateBookPages(fileWrapper, book);
+							}
 						} catch(Exception e) {
 							logger.error("error update book " + path, e);
 							continue;
 						}
+						
+						numberOfBooks = numberOfBooks + 1;
+						
+						book.setNumber(numberOfBooks);
 						
 						book = bookService.updateBook(book);
 						
@@ -380,24 +432,7 @@ public class DefaultBookScannerService implements BookScannerService {
 		parentBookCollection = bookCollectionService.updateBookCollection(parentBookCollection);
     }
     
-    private Book createBook(FileWrapper<File> bookInputFileWrapper, BookCollection bookCollection) throws Exception {
-		Book book = new Book();
-		
-    	String fileId = createFileId(bookInputFileWrapper);
-    	
-    	book.setFileId(fileId);
-    	book.setFilePath(bookInputFileWrapper.getFile().getPath());
-    	book.setUpdateDate(updateDate);
-    	
-		String name = NameHelper.getName(bookInputFileWrapper.getFile().getName());
-		
-		book.setName(name);
-		
-		String normalizedName = NameHelper.getNormalizedName(bookInputFileWrapper.getFile().getName());
-		
-		book.setNormalizedName(normalizedName);
-    	book.setBookCollection(bookCollection);
-		
+    private Book createBookPages(FileWrapper<File> bookInputFileWrapper, Book book) throws Exception {
 		List<BookPage> bookPageList = new ArrayList<BookPage>();
     	for(BookPage defaultBookPage: defaultBookPageList) {
     		Integer defaultPage;
@@ -428,7 +463,7 @@ public class DefaultBookScannerService implements BookScannerService {
     		}
     	}
 		
-		PluginManager pluginManager = PluginManager.getInstance();
+    	PluginManager pluginManager = PluginManager.getInstance();
 		
 		ArchiveReaderFactory archiveReaderFactory = pluginManager.getFactory(ArchiveReaderFactory.class);
     	ArchiveReader archiveReader = null;
@@ -511,17 +546,7 @@ public class DefaultBookScannerService implements BookScannerService {
 		return book;
     }
     
-    private Book updateBook(FileWrapper<File> bookInputFileWrapper, Book book) throws Exception {
-    	book.setUpdateDate(updateDate);
-    	
-		String name = NameHelper.getName(bookInputFileWrapper.getFile().getName());
-		
-		book.setName(name);
-		
-		String normalizedName = NameHelper.getNormalizedName(bookInputFileWrapper.getFile().getName());
-		
-		book.setNormalizedName(normalizedName);
-    	
+    private Book updateBookPages(FileWrapper<File> bookInputFileWrapper, Book book) throws Exception {
     	List<BookPage> bookPageList = new ArrayList<BookPage>();
     	for(BookPage defaultBookPage: defaultBookPageList) {
     		Integer defaultPage;
@@ -567,7 +592,7 @@ public class DefaultBookScannerService implements BookScannerService {
     	if(bookPageList.size() > 0) {
     		PluginManager pluginManager = PluginManager.getInstance();
     		
-			ArchiveReaderFactory archiveReaderFactory = pluginManager.getFactory(ArchiveReaderFactory.class);
+    		ArchiveReaderFactory archiveReaderFactory = pluginManager.getFactory(ArchiveReaderFactory.class);
 	    	ArchiveReader archiveReader = null;
 			try {
 				archiveReader = archiveReaderFactory.getArchiveReader(bookInputFileWrapper.getFileType());
@@ -680,7 +705,7 @@ public class DefaultBookScannerService implements BookScannerService {
     }
     
     private FileWrapper<File> createBookPage(FileWrapper<File> bookPageInputFileWrapper, Integer page, ScaleType scaleType, Integer scaleWidth, Integer scaleHeight) throws Exception {
-		PluginManager pluginManager = PluginManager.getInstance();
+    	PluginManager pluginManager = PluginManager.getInstance();
 		
 		ImageManagerFactory imageManagerFactory = pluginManager.getFactory(ImageManagerFactory.class);
     	ImageManager imageManager = imageManagerFactory.getImageManager(bookPageInputFileWrapper.getFileType(), FileType.JPG);

@@ -12,13 +12,13 @@ import org.pf4j.Extension;
 import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 
-import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.FileWrapper;
-import com.gitlab.jeeto.oboco.plugin.FileWrapperSorter;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
+import com.gitlab.jeeto.oboco.plugin.FileType;
+import com.gitlab.jeeto.oboco.plugin.FileWrapper;
+import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
+import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
+import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 
 public class JUnrarArchivePlugin extends Plugin {
 	
@@ -57,7 +57,7 @@ public class JUnrarArchivePlugin extends Plugin {
 	            fileHeader = archive.nextFileHeader();
 	        }
 	        
-	        new FileWrapperSorter<FileHeader>() {
+	        listFileHeaderWrapper.sort(new NaturalOrderComparator<FileWrapper<FileHeader>>() {
 	        	private String getName(FileHeader fileHeader) {
 	        		if(fileHeader.isUnicode()) {
 	        			return fileHeader.getFileNameW();
@@ -66,12 +66,11 @@ public class JUnrarArchivePlugin extends Plugin {
 	        		}
 	            }
 	        	
-				@Override
-				public int compare(FileWrapper<FileHeader> fileWrapper1, FileWrapper<FileHeader> fileWrapper2) throws Exception {
-					return getName(fileWrapper1.getFile()).compareTo(getName(fileWrapper2.getFile()));
-				}
-	        	
-	        }.sort(listFileHeaderWrapper);
+	        	@Override
+	    		public String toString(FileWrapper<FileHeader> o) {
+					return getName(o.getFile());
+	        	}
+			});
 		}
 
 		@Override

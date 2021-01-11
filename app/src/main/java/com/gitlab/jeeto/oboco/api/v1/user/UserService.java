@@ -154,6 +154,8 @@ public class UserService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
+			user = entityManager.merge(user);
+			
 			entityManager.remove(user);
 			
 			entityTransaction.commit();

@@ -16,7 +16,7 @@ import org.pf4j.PluginWrapper;
 
 import com.gitlab.jeeto.oboco.plugin.FileType;
 import com.gitlab.jeeto.oboco.plugin.FileWrapper;
-import com.gitlab.jeeto.oboco.plugin.FileWrapperSorter;
+import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 
@@ -55,13 +55,12 @@ public class JdkArchivePlugin extends Plugin {
 	            }
 	        }
 	        
-	        new FileWrapperSorter<ZipEntry>() {
-				@Override
-				public int compare(FileWrapper<ZipEntry> fileWrapper1, FileWrapper<ZipEntry> fileWrapper2) throws Exception {
-					return fileWrapper1.getFile().getName().compareTo(fileWrapper2.getFile().getName());
-				}
-	        	
-	        }.sort(listZipEntryWrapper);
+	        listZipEntryWrapper.sort(new NaturalOrderComparator<FileWrapper<ZipEntry>>() {
+	        	@Override
+	    		public String toString(FileWrapper<ZipEntry> o) {
+					return o.getFile().getName();
+	        	}
+			});
 		}
 
 		@Override
