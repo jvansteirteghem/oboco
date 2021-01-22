@@ -31,7 +31,7 @@ you are required to configure "user data" and "application security".
 ### user data
 
 - configure user.properties
-	- data.path: the path of your book collection. you can add more than one path by using a ",". [^1]
+	- data.path: the path of the user data (books and book collections). you can add more than one path by using a ",". [^1]
 
 ### application logger
 
@@ -62,16 +62,16 @@ you are required to configure "user data" and "application security".
 	- server.ssl.keyStore.path: the path of the ssl key store. [^1]
 	- server.ssl.keyStore.password: the password of the ssl key store.
 
-### application data (cache)
+### application data
 
 - configure application.properties
-	- data.path: the path of the data. [^1]
+	- data.path: the path of the application data (book pages). [^1]
 - configure data.csv
 	- page: the page of the book or "" (all pages).
 	- scaleType: the scale type: "DEFAULT", "FIT", "FILL" or "" (do not scale).
 	- scaleWidth: the scale width (in pixels) or "" (do not scale).
 	- scaleHeight: the scale height (in pixels) or "" (do not scale).
-		
+
 ### application database
 
 - add the lib of the driver of the database to the libs directory.
@@ -168,6 +168,15 @@ yes, but you have to start oboco with additional parameters: "-Xdebug -Xrunjdwp:
 ### can I create a frontend for oboco?
 
 yes, oboco deploys the first "*.war" file in the web directory.
+
+### can I deploy oboco in the cloud?
+
+yes.
+
+- [oboco-backend](https://gitlab.com/jeeto/oboco-backend) is the backend of oboco (quarkus, quarkus-native).
+- [oboco-backend for heroku](https://gitlab.com/jeeto/oboco-backend-heroku) is the backend of oboco for heroku (quarkus-native).
+- [oboco-frontend](https://gitlab.com/jeeto/oboco-frontend) is the frontend of oboco (angular).
+- [oboco-frontend for heroku](https://gitlab.com/jeeto/oboco-frontend-heroku) is the frontend of oboco for heroku (angular).
 
 ## license
 
