@@ -11,7 +11,7 @@ you can:
 - manage your users.
 
 the backend is a rest api with token-based authentication.
-the frontend is a single-page application (for now a basic proof-of-concept).
+the frontend is a single-page application (work in progress).
 
 you should use oboco with [oboco for android](https://gitlab.com/jeeto/oboco-android).
 [oboco for android](https://gitlab.com/jeeto/oboco-android) is a client for oboco.
