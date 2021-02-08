@@ -22,7 +22,7 @@ you should use oboco with [oboco for android](https://gitlab.com/jeeto/oboco-and
 
 ## installation
 
-- install [the latest release](https://gitlab.com/jeeto/oboco/-/jobs/artifacts/ef987399/download?job=release).
+- install [the latest release](https://gitlab.com/jeeto/oboco/-/jobs/artifacts/9d416030/download?job=release).
 
 ## configuration
 
