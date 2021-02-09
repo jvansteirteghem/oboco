@@ -173,6 +173,7 @@ yes, oboco deploys the first "*.war" file in the web directory.
 
 yes.
 
+- [oboco-backend-frontend](https://gitlab.com/jeeto/oboco-backend-frontend) is the backend and the frontend of oboco (quarkus-native, angular).
 - [oboco-backend](https://gitlab.com/jeeto/oboco-backend) is the backend of oboco (quarkus, quarkus-native).
 - [oboco-backend for heroku](https://gitlab.com/jeeto/oboco-backend-heroku) is the backend of oboco for heroku (quarkus-native).
 - [oboco-frontend](https://gitlab.com/jeeto/oboco-frontend) is the frontend of oboco (angular).
