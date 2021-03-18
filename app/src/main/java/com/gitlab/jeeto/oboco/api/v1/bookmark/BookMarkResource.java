@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
+import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.GraphDto;
 import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
@@ -22,6 +23,7 @@ import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 import com.gitlab.jeeto.oboco.common.security.authentication.Authentication;
+import com.gitlab.jeeto.oboco.common.security.authentication.UserPrincipal;
 import com.gitlab.jeeto.oboco.common.security.authorization.Authorization;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,9 +56,9 @@ public class BookMarkResource {
     )
 	@DELETE
 	public Response deleteBookMarks() throws ProblemException {
-		String userName = securityContext.getUserPrincipal().getName();
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
-		bookMarkService.deleteBookMarkByUserName(userName);
+		bookMarkService.deleteBookMarkByUserId(user.getId());
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		
@@ -70,6 +72,7 @@ public class BookMarkResource {
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
@@ -85,9 +88,15 @@ public class BookMarkResource {
 		
 		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
 		
-		String userName = securityContext.getUserPrincipal().getName();
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
-		PageableList<BookMarkReference> bookMarkPageableList = bookMarkService.getBookMarkReferencesByUserName(userName, page, pageSize);
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		PageableList<BookMarkReference> bookMarkPageableList = bookMarkService.getBookMarkReferencesByUserId(rootBookCollectionId, user.getId(), page, pageSize);
 		PageableListDto<BookMarkDto> bookMarkPageableListDto = bookMarkDtoMapper.getBookMarksDto(bookMarkPageableList, graphDto);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
@@ -103,7 +112,7 @@ public class BookMarkResource {
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_BOOK_MARK_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND, PROBLEM_BOOK_MARK_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
@@ -116,9 +125,15 @@ public class BookMarkResource {
 		
 		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
 		
-		String userName = securityContext.getUserPrincipal().getName();
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
-		BookMarkReference bookMarkReference = bookMarkService.getLastBookMarkReferenceByUserName(userName);
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		BookMarkReference bookMarkReference = bookMarkService.getLastBookMarkReferenceByUserId(rootBookCollectionId, user.getId());
 		
 		if(bookMarkReference == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_MARK_NOT_FOUND", "The bookMark is not found."));

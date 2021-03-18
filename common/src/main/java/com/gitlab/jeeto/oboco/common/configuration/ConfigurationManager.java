@@ -38,13 +38,6 @@ public class ConfigurationManager {
 				for(Entry<Object, Object> entry: applicationProperties.entrySet()) {
 					configuration.set("application." + entry.getKey().toString(), entry.getValue().toString());
 				}
-				
-				Properties userProperties = new Properties();
-				userProperties.load(new FileInputStream("./user.properties"));
-				
-				for(Entry<Object, Object> entry: userProperties.entrySet()) {
-					configuration.set("user." + entry.getKey().toString(), entry.getValue().toString());
-				}
 			} catch(Exception e) {
 				logger.error("Error.", e);
 			}

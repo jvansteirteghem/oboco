@@ -54,12 +54,13 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public BookMarkReference getLastBookMarkReferenceByUserName(String userName) throws ProblemException {
+	public BookMarkReference getLastBookMarkReferenceByUserId(Long rootBookCollectionId, Long userId) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
-			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.userName = :userName order by bmr.bookMark.updateDate desc", BookMarkReference.class)
-				.setParameter("userName", userName)
+			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId order by bmr.bookMark.updateDate desc", BookMarkReference.class)
+				.setParameter("rootBookCollectionId", rootBookCollectionId)
+				.setParameter("userId", userId)
 				.setMaxResults(1)
 				.getSingleResult();
 		} catch(NoResultException e) {
@@ -69,12 +70,13 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public BookMarkReference getBookMarkReferenceByUserNameAndId(String userName, Long id) throws ProblemException {
+	public BookMarkReference getBookMarkReferenceByUserIdAndId(Long rootBookCollectionId, Long userId, Long id) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
-			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.userName = :userName and bmr.id = :id", BookMarkReference.class)
-				.setParameter("userName", userName)
+			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId and bmr.id = :id", BookMarkReference.class)
+				.setParameter("rootBookCollectionId", rootBookCollectionId)
+				.setParameter("userId", userId)
 				.setParameter("id", id)
 				.getSingleResult();
 		} catch(NoResultException e) {
@@ -84,12 +86,13 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public BookMarkReference getBookMarkReferenceByUserNameAndBookId(String userName, Long bookId) throws ProblemException {
+	public BookMarkReference getBookMarkReferenceByUserIdAndBookId(Long rootBookCollectionId, Long userId, Long bookId) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
-			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.userName = :userName and bmr.book.id = :bookId", BookMarkReference.class)
-				.setParameter("userName", userName)
+			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId and bmr.book.id = :bookId", BookMarkReference.class)
+				.setParameter("rootBookCollectionId", rootBookCollectionId)
+				.setParameter("userId", userId)
 				.setParameter("bookId", bookId)
 				.getSingleResult();
 		} catch(NoResultException e) {
@@ -99,13 +102,15 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public PageableList<BookMarkReference> getBookMarkReferencesByUserName(String userName, Integer page, Integer pageSize) throws ProblemException {
-		Long bookMarkListSize = (Long) entityManager.createQuery("select count(bmr.id) from BookMarkReference bmr where bmr.userName = :userName")
-				.setParameter("userName", userName)
+	public PageableList<BookMarkReference> getBookMarkReferencesByUserId(Long rootBookCollectionId, Long userId, Integer page, Integer pageSize) throws ProblemException {
+		Long bookMarkListSize = (Long) entityManager.createQuery("select count(bmr.id) from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId")
+				.setParameter("rootBookCollectionId", rootBookCollectionId)
+				.setParameter("userId", userId)
 				.getSingleResult();
 		
-		List<BookMarkReference> bookMarkList = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.userName = :userName order by bmr.bookMark.updateDate desc", BookMarkReference.class)
-				.setParameter("userName", userName)
+		List<BookMarkReference> bookMarkList = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId order by bmr.bookMark.updateDate desc", BookMarkReference.class)
+				.setParameter("rootBookCollectionId", rootBookCollectionId)
+				.setParameter("userId", userId)
 				.setFirstResult((page - 1) * pageSize)
 				.setMaxResults(pageSize)
 				.getResultList();
@@ -189,16 +194,16 @@ public class BookMarkService {
 		}
 	}
 	
-	public void deleteBookMarkByUserName(String userName) throws ProblemException {
+	public void deleteBookMarkByUserId(Long userId) throws ProblemException {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			entityManager.createQuery("delete from BookMarkReference bmr where bmr.userName = :userName")
-				.setParameter("userName", userName)
+			entityManager.createQuery("delete from BookMarkReference bmr where bmr.user.id = :userId")
+				.setParameter("userId", userId)
 				.executeUpdate();
 			
-			entityManager.createQuery("delete from BookMark bm where bm.userName = :userName")
-			.setParameter("userName", userName)
+			entityManager.createQuery("delete from BookMark bm where bm.user.id = :userId")
+			.setParameter("userId", userId)
 			.executeUpdate();
 			
 			entityTransaction.commit();

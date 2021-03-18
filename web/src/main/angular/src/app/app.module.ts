@@ -17,6 +17,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list'; 
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 
 import { BookComponent } from './book';
 import { BookCollectionComponent } from './book-collection';
@@ -50,7 +51,7 @@ import { UserComponent, UserCreateComponent, UserUpdateComponent, UserUpdatePass
   imports: [
     HttpClientModule,
     BrowserModule,
-	ReactiveFormsModule,
+	  ReactiveFormsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatCardModule,
@@ -60,7 +61,8 @@ import { UserComponent, UserCreateComponent, UserUpdateComponent, UserUpdatePass
     MatToolbarModule,
     MatInputModule,
     MatListModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSelectModule
   ],
   providers: [
   		{ provide: LocationStrategy, useClass: HashLocationStrategy },

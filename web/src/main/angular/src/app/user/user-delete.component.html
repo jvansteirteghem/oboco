@@ -21,6 +21,17 @@
         </p>
 
         <p>
+        <mat-form-field class="example-full-width">
+            <mat-select formControlName="rootBookCollection" placeholder="rootBookCollection">
+                <mat-option [value]="" selected></mat-option>
+                <mat-option *ngFor="let rootBookCollection of rootBookCollections" [value]="rootBookCollection.id">
+                    {{rootBookCollection.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        </p>
+
+        <p>
         <button [disabled]="userForm_loading" mat-raised-button color="primary">delete</button>
         <button mat-raised-button color="primary" (click)="userForm_onCancel()">cancel</button>
         </p>

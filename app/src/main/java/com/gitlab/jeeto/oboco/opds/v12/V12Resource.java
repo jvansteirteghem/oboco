@@ -12,6 +12,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import com.gitlab.jeeto.oboco.api.v1.book.Book;
@@ -20,11 +21,13 @@ import com.gitlab.jeeto.oboco.api.v1.book.GetBookAsStreamingOutput;
 import com.gitlab.jeeto.oboco.api.v1.book.GetBookPageAsStreamingOutput;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
+import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDtoHelper;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 import com.gitlab.jeeto.oboco.common.security.authentication.Authentication;
+import com.gitlab.jeeto.oboco.common.security.authentication.UserPrincipal;
 import com.gitlab.jeeto.oboco.common.security.authorization.Authorization;
 import com.gitlab.jeeto.oboco.opds.opds.Author;
 import com.gitlab.jeeto.oboco.opds.opds.ContentType;
@@ -42,6 +45,8 @@ import io.swagger.v3.oas.annotations.Hidden;
 @Path("v1.2")
 @Produces(MediaType.APPLICATION_XML)
 public class V12Resource {
+	@Context
+    private SecurityContext securityContext;
 	@Context
 	private UriInfo uriInfo;
 	@Inject
@@ -87,14 +92,22 @@ public class V12Resource {
 	public Response getBookCollections(@QueryParam("parentBookCollectionId") Long parentBookCollectionId, @DefaultValue("1") @QueryParam("page") Integer page, @DefaultValue("25") @QueryParam("pageSize") Integer pageSize) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
 		PageableList<BookCollection> bookCollectionPageableList = null;
 		
 		boolean hasParentBookCollectionId = uriInfo.getQueryParameters().containsKey("parentBookCollectionId");
 		
 		if(hasParentBookCollectionId) {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByParentBookCollectionId(parentBookCollectionId, page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByParentBookCollectionId(rootBookCollectionId, parentBookCollectionId, page, pageSize);
 		} else {
-			bookCollectionPageableList = bookCollectionService.getBookCollections(page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollections(rootBookCollectionId, page, pageSize);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -159,14 +172,22 @@ public class V12Resource {
 	public Response getBooks(@QueryParam("bookCollectionId") Long bookCollectionId, @DefaultValue("1") @QueryParam("page") Integer page, @DefaultValue("25") @QueryParam("pageSize") Integer pageSize) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
 		PageableList<Book> bookPageableList = null;
 		
 		boolean hasBookCollectionId = uriInfo.getQueryParameters().containsKey("bookCollectionId");
 		
 		if(hasBookCollectionId) {
-			bookPageableList = bookService.getBooksByBookCollectionId(bookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, page, pageSize);
 		} else {
-			bookPageableList = bookService.getBooks(page, pageSize);
+			bookPageableList = bookService.getBooks(rootBookCollectionId, page, pageSize);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -217,7 +238,15 @@ public class V12Resource {
 	@Path("books/{bookId}.cbz")
 	@GET
 	public Response getBookAs(@PathParam("bookId") Long bookId) throws ProblemException {
-		Book book = bookService.getBookById(bookId);
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		Book book = bookService.getBookById(rootBookCollectionId, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -235,7 +264,15 @@ public class V12Resource {
 	@Path("books/{bookId}/pages/{page}.jpg")
 	@GET
 	public Response getBookPageAs(@PathParam("bookId") Long bookId, @PathParam("page") Integer page, @QueryParam("scaleType") ScaleType scaleType, @QueryParam("scaleWidth") Integer scaleWidth, @QueryParam("scaleHeight") Integer scaleHeight) throws ProblemException {
-		Book book = bookService.getBookById(bookId);
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		Book book = bookService.getBookById(rootBookCollectionId, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));

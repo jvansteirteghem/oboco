@@ -20,6 +20,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkStatus;
+import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.GraphDto;
 import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
@@ -29,6 +30,7 @@ import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 import com.gitlab.jeeto.oboco.common.security.authentication.Authentication;
+import com.gitlab.jeeto.oboco.common.security.authentication.UserPrincipal;
 import com.gitlab.jeeto.oboco.common.security.authorization.Authorization;
 import com.gitlab.jeeto.oboco.plugin.image.ScaleType;
 
@@ -68,6 +70,7 @@ public class BookByBookCollectionResource {
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
@@ -84,14 +87,22 @@ public class BookByBookCollectionResource {
 		
 		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
 		
-		String userName = securityContext.getUserPrincipal().getName();
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		String userName = user.getName();
 		
 		PageableList<Book> bookPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("bookMarkStatus")) {
-			bookPageableList = bookService.getBooksByBookCollectionId(bookCollectionId, userName, bookMarkStatus, page, pageSize);
+			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, userName, bookMarkStatus, page, pageSize);
 		} else {
-			bookPageableList = bookService.getBooksByBookCollectionId(bookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, page, pageSize);
 		}
 		
 		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);;
@@ -109,6 +120,7 @@ public class BookByBookCollectionResource {
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
@@ -122,7 +134,15 @@ public class BookByBookCollectionResource {
 		
 		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
 		
-		PageableList<Book> bookPageableList = bookService.getBooksByBookCollectionIdAndId(bookCollectionId, bookId);
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		PageableList<Book> bookPageableList = bookService.getBooksByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId, bookId);
 		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
@@ -138,7 +158,7 @@ public class BookByBookCollectionResource {
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_BOOK_COLLECTION_ID_INVALID, PROBLEM_BOOK_ID_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_PAGE_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND, PROBLEM_PAGE_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
@@ -149,9 +169,17 @@ public class BookByBookCollectionResource {
 			@Parameter(name = "scaleWidth", description = "The scaleWidth.", required = false) @QueryParam("scaleWidth") Integer scaleWidth, 
 			@Parameter(name = "scaleHeight", description = "The scaleHeight.", required = false) @QueryParam("scaleHeight") Integer scaleHeight, 
 			@Context Request request) throws ProblemException {
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
 		Book book = null;
 		
-		PageableList<Book> bookPageableList = bookService.getBooksByBookCollectionId(bookCollectionId, 1, 1);
+		PageableList<Book> bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, 1, 1);
 		
 		if(bookPageableList.getElements() != null && bookPageableList.getElements().size() == 1) {
 			book = bookPageableList.getElements().get(0);

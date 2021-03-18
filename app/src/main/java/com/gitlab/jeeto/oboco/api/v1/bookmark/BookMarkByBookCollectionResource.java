@@ -19,10 +19,12 @@ import com.gitlab.jeeto.oboco.api.v1.book.Book;
 import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
+import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 import com.gitlab.jeeto.oboco.common.security.authentication.Authentication;
+import com.gitlab.jeeto.oboco.common.security.authentication.UserPrincipal;
 import com.gitlab.jeeto.oboco.common.security.authorization.Authorization;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,16 +62,22 @@ public class BookMarkByBookCollectionResource {
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_BOOK_COLLECTION_ID_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_BOOK_MARK_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND, PROBLEM_BOOK_MARK_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createOrUpdateBookMarksByBookCollection() throws ProblemException {
-		String userName = securityContext.getUserPrincipal().getName();
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
-		BookCollection bookCollection = bookCollectionService.getBookCollectionById(bookCollectionId);
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		BookCollection bookCollection = bookCollectionService.getBookCollectionById(rootBookCollectionId, bookCollectionId);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_COLLECTION_ID_INVALID", "The bookCollection.id is invalid."));
@@ -80,11 +88,11 @@ public class BookMarkByBookCollectionResource {
 		List<Book> bookList = bookCollection.getBooks();
 		
 		for(Book book: bookList) {
-			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserNameAndBookId(userName, book.getId());
+			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
 			
 			if(bookMarkReference == null) {
 				BookMark bookMark = new BookMark();
-				bookMark.setUserName(userName);
+				bookMark.setUser(user);
 				bookMark.setFileId(book.getFileId());
 				bookMark.setUpdateDate(updateDate);
 				bookMark.setPage(book.getNumberOfPages());
@@ -95,11 +103,12 @@ public class BookMarkByBookCollectionResource {
 				
 				for(Book referencedBook: referencedBookList) {
 					bookMarkReference = new BookMarkReference();
-					bookMarkReference.setUserName(userName);
+					bookMarkReference.setUser(user);
 					bookMarkReference.setFileId(referencedBook.getFileId());
 					bookMarkReference.setUpdateDate(updateDate);
 					bookMarkReference.setBook(referencedBook);
 					bookMarkReference.setBookMark(bookMark);
+					bookMarkReference.setRootBookCollection(referencedBook.getRootBookCollection());
 					
 					bookMarkReferenceList.add(bookMarkReference);
 				}
@@ -128,15 +137,21 @@ public class BookMarkByBookCollectionResource {
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_BOOK_COLLECTION_ID_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_BOOK_MARK_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND, PROBLEM_BOOK_MARK_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
 	@DELETE
 	public Response deleteBookMarksByBookCollection() throws ProblemException {
-		String userName = securityContext.getUserPrincipal().getName();
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
-		BookCollection bookCollection = bookCollectionService.getBookCollectionById(bookCollectionId);
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		Long rootBookCollectionId = user.getRootBookCollection().getId();
+		
+		BookCollection bookCollection = bookCollectionService.getBookCollectionById(rootBookCollectionId, bookCollectionId);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_COLLECTION_ID_INVALID", "The bookCollection.id is invalid."));
@@ -145,7 +160,7 @@ public class BookMarkByBookCollectionResource {
 		List<Book> bookList = bookCollection.getBooks();
 		
 		for(Book book: bookList) {
-			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserNameAndBookId(userName, book.getId());
+			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
 			
 			if(bookMarkReference != null) {
 				BookMark bookMark = bookMarkReference.getBookMark();

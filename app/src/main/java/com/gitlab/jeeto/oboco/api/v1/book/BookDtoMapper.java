@@ -15,10 +15,13 @@ import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkReference;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkDto;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkService;
+import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.GraphDto;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
+import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
+import com.gitlab.jeeto.oboco.common.security.authentication.UserPrincipal;
 
 public class BookDtoMapper {
 	@Context
@@ -74,7 +77,15 @@ public class BookDtoMapper {
 				if(graphDto.containsKey("bookMark")) {
 					GraphDto nestedGraphDto = graphDto.get("bookMark");
 					
-					BookMarkReference bookMarkReference = getBookMarkService().getBookMarkReferenceByUserNameAndBookId(securityContext.getUserPrincipal().getName(), book.getId());
+					User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+					
+					if(user.getRootBookCollection() == null) {
+						throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+					}
+					
+					Long rootBookCollectionId = user.getRootBookCollection().getId();
+					
+					BookMarkReference bookMarkReference = getBookMarkService().getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
 					BookMarkDto bookMarkDto = getBookMarkDtoMapper().getBookMarkDto(bookMarkReference, nestedGraphDto);
 					
 					bookDto.setBookMark(bookMarkDto);

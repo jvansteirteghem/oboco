@@ -5,6 +5,7 @@ import { UserService } from './user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { BookCollection } from '../book-collection/book-collection';
 
 @Component({
   selector: 'app-user-create',
@@ -17,6 +18,7 @@ export class UserCreateComponent implements OnInit {
   userForm_submitted = false;
   userForm_loading = false;
   user: User;
+  rootBookCollections: BookCollection[];
 
   constructor(private formBuilder: FormBuilder, private userService: UserService, private router: Router) { }
 
@@ -25,13 +27,19 @@ export class UserCreateComponent implements OnInit {
   }
 
   load(): void {
-    this.user = new User();
-
     this.userForm = this.formBuilder.group({
       name: ['', Validators.required],
       password: ['', Validators.required],
       roleAdministrator: '',
-      roleUser: ''
+      roleUser: '',
+      rootBookCollection: ''
+    });
+
+    this.userService.getRootBookCollectionList()
+    .subscribe(rootBookCollectionList => {
+      this.rootBookCollections = rootBookCollectionList;
+
+      this.user = new User();
     });
   }
 
@@ -60,6 +68,11 @@ export class UserCreateComponent implements OnInit {
 
     if(this.userForm.controls.roleUser.value == true) {
       this.user.roles.push("USER");
+    }
+
+    if(this.userForm.controls.rootBookCollection.value != "") {
+      this.user.rootBookCollection = new BookCollection();
+      this.user.rootBookCollection.id = this.userForm.controls.rootBookCollection.value;
     }
 
     this.userService.createUser(this.user)

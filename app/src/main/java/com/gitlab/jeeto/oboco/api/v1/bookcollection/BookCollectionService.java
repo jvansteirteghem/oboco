@@ -1,5 +1,6 @@
 package com.gitlab.jeeto.oboco.api.v1.bookcollection;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,8 +11,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.NameHelper;
+import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 
@@ -55,24 +56,33 @@ public class BookCollectionService {
         return bookCollection;
 	}
 	
-	public BookCollection getRootBookCollection() throws ProblemException {
-		BookCollection bookCollection = null;
+	public BookCollection getRootBookCollection(Long rootBookCollectionId) throws ProblemException {
+		BookCollection rootBookCollection = null;
 		
 		try {
-			bookCollection = entityManager.createQuery("select bc from BookCollection bc where bc.parentBookCollection.id is null", BookCollection.class)
+			rootBookCollection = entityManager.createQuery("select bc from BookCollection bc where bc.parentBookCollection.id is null and bc.id = :id", BookCollection.class)
+					.setParameter("id", rootBookCollectionId)
 					.getSingleResult();
 		} catch(NoResultException e) {
 			
 		}
 		
-        return bookCollection;
+        return rootBookCollection;
 	}
 	
-	public BookCollection getBookCollectionById(Long id) throws ProblemException {
+	public List<BookCollection> getRootBookCollections() throws ProblemException {
+		List<BookCollection> rootBookCollectionList = entityManager.createQuery("select bc from BookCollection bc where bc.parentBookCollection.id is null", BookCollection.class)
+				.getResultList();
+		
+        return rootBookCollectionList;
+	}
+	
+	public BookCollection getBookCollectionById(Long rootBookCollectionId, Long id) throws ProblemException {
 		BookCollection bookCollection = null;
 		
 		try {
-			bookCollection = entityManager.createQuery("select bc from BookCollection bc where bc.id = :id", BookCollection.class)
+			bookCollection = entityManager.createQuery("select bc from BookCollection bc where (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId) and bc.id = :id", BookCollection.class)
+					.setParameter("rootBookCollectionId", rootBookCollectionId)
 					.setParameter("id", id)
 					.getSingleResult();
 		} catch(NoResultException e) {
@@ -82,11 +92,26 @@ public class BookCollectionService {
         return bookCollection;
 	}
 	
-	public BookCollection getBookCollectionByDirectoryPath(String directoryPath) throws ProblemException {
+	public BookCollection getRootBookCollectionByName(String name) throws ProblemException {
 		BookCollection bookCollection = null;
 		
 		try {
-			bookCollection = entityManager.createQuery("select bc from BookCollection bc where bc.directoryPath = :directoryPath", BookCollection.class)
+			bookCollection = entityManager.createQuery("select bc from BookCollection bc where bc.parentBookCollection.id is null and bc.name = :name", BookCollection.class)
+					.setParameter("name", name)
+					.getSingleResult();
+		} catch(NoResultException e) {
+			
+		}
+		
+        return bookCollection;
+	}
+	
+	public BookCollection getBookCollectionByDirectoryPath(Long rootBookCollectionId, String directoryPath) throws ProblemException {
+		BookCollection bookCollection = null;
+		
+		try {
+			bookCollection = entityManager.createQuery("select bc from BookCollection bc where (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId) and bc.directoryPath = :directoryPath", BookCollection.class)
+					.setParameter("rootBookCollectionId", rootBookCollectionId)
 					.setParameter("directoryPath", directoryPath)
 					.getSingleResult();
 		} catch(NoResultException e) {
@@ -96,11 +121,13 @@ public class BookCollectionService {
         return bookCollection;
 	}
 	
-	public PageableList<BookCollection> getBookCollections(Integer page, Integer pageSize) throws ProblemException {
-		Long bookCollectionListSize = (Long) entityManager.createQuery("select count(bc.id) from BookCollection bc")
+	public PageableList<BookCollection> getBookCollections(Long rootBookCollectionId, Integer page, Integer pageSize) throws ProblemException {
+		Long bookCollectionListSize = (Long) entityManager.createQuery("select count(bc.id) from BookCollection bc where (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)")
+				.setParameter("rootBookCollectionId", rootBookCollectionId)
 				.getSingleResult();
 	
-		List<BookCollection> bookCollectionList = entityManager.createQuery("select bc from BookCollection bc", BookCollection.class)
+		List<BookCollection> bookCollectionList = entityManager.createQuery("select bc from BookCollection bc where (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)", BookCollection.class)
+				.setParameter("rootBookCollectionId", rootBookCollectionId)
 				.setFirstResult((page - 1) * pageSize)
 				.setMaxResults(pageSize)
 				.getResultList();
@@ -110,16 +137,19 @@ public class BookCollectionService {
         return bookCollectionPageableList;
 	}
 	
-	public PageableList<BookCollection> getBookCollections(String name, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookCollection> getBookCollections(Long rootBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
 		String normalizedName = NameHelper.getNormalizedName(name);
 		
 		String bookCollectionListQueryString = " where 1 = 1";
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)";
 		
 		if("".equals(normalizedName) == false) {
 			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.normalizedName like :normalizedName";
 		}
 		
 		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc" + bookCollectionListQueryString);
+		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
 		if("".equals(normalizedName) == false) {
 			bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
@@ -128,6 +158,7 @@ public class BookCollectionService {
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
 		
 		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select bc from BookCollection bc" + bookCollectionListQueryString, BookCollection.class);
+		bookCollectionListQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
 		if("".equals(normalizedName) == false) {
 			bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
@@ -143,8 +174,10 @@ public class BookCollectionService {
         return bookCollectionPageableList;
 	}
 	
-	public PageableList<BookCollection> getBookCollectionsByParentBookCollectionId(Long parentBookCollectionId, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookCollection> getBookCollectionsByParentBookCollectionId(Long rootBookCollectionId, Long parentBookCollectionId, Integer page, Integer pageSize) throws ProblemException {
 		String bookCollectionListQueryString = " where 1 = 1 ";
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)";
 		
 		if(parentBookCollectionId == null) {
 			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.parentBookCollection.id is null";
@@ -153,6 +186,7 @@ public class BookCollectionService {
 		}
 		
 		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc" + bookCollectionListQueryString);
+		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
 		if(parentBookCollectionId != null) {
 			bookCollectionListSizeQuery.setParameter("parentBookCollectionId", parentBookCollectionId);
@@ -161,6 +195,7 @@ public class BookCollectionService {
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
 		
 		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select bc from BookCollection bc" + bookCollectionListQueryString, BookCollection.class);
+		bookCollectionListQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
 		if(parentBookCollectionId != null) {
 			bookCollectionListQuery.setParameter("parentBookCollectionId", parentBookCollectionId);
@@ -176,17 +211,16 @@ public class BookCollectionService {
         return bookCollectionPageableList;
 	}
 	
-	public PageableList<BookCollection> getBookCollectionsByParentBookCollectionId(Long parentBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
-		String directoryPath = "";
+	public PageableList<BookCollection> getBookCollectionsByParentBookCollectionId(Long rootBookCollectionId, Long parentBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
+		List<Long> childBookCollectionIds = new ArrayList<Long>();
 		
 		if(parentBookCollectionId != null) {
-			BookCollection parentBookCollection = getBookCollectionById(parentBookCollectionId);
+			BookCollection parentBookCollection = getBookCollectionById(rootBookCollectionId, parentBookCollectionId);
 			
 			if(parentBookCollection != null) {
-				directoryPath = parentBookCollection.getDirectoryPath();
-				directoryPath = directoryPath.replaceAll("[\\\\]", "\\\\\\\\");
-				directoryPath = directoryPath.replaceAll("[\\%]", "\\\\%");
-				directoryPath = directoryPath.replaceAll("[\\_]", "\\\\_");
+				for(BookCollection childBookCollection: parentBookCollection.getChildBookCollections()) {
+					childBookCollectionIds.add(childBookCollection.getId());
+				}
 			}
 		}
 		
@@ -194,8 +228,10 @@ public class BookCollectionService {
 		
 		String bookCollectionListQueryString = " where 1 = 1";
 		
-		if("".equals(directoryPath) == false) {
-			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.directoryPath like :directoryPath";
+		bookCollectionListQueryString = bookCollectionListQueryString + " and (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)";
+		
+		if(parentBookCollectionId != null) {
+			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.id in :childBookCollectionIds";
 		}
 		
 		if("".equals(normalizedName) == false) {
@@ -203,9 +239,10 @@ public class BookCollectionService {
 		}
 		
 		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc" + bookCollectionListQueryString);
+		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
-		if("".equals(directoryPath) == false) {
-			bookCollectionListSizeQuery.setParameter("directoryPath", directoryPath + "%");
+		if(parentBookCollectionId != null) {
+			bookCollectionListSizeQuery.setParameter("childBookCollectionIds", childBookCollectionIds);
 		}
 		
 		if("".equals(normalizedName) == false) {
@@ -215,9 +252,10 @@ public class BookCollectionService {
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
 		
 		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select bc from BookCollection bc" + bookCollectionListQueryString, BookCollection.class);
+		bookCollectionListQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
-		if("".equals(directoryPath) == false) {
-			bookCollectionListQuery.setParameter("directoryPath", directoryPath + "%");
+		if(parentBookCollectionId != null) {
+			bookCollectionListQuery.setParameter("childBookCollectionIds", childBookCollectionIds);
 		}
 		
 		if("".equals(normalizedName) == false) {
