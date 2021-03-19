@@ -1,6 +1,5 @@
 package com.gitlab.jeeto.oboco.api.v1.bookcollection;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
