@@ -212,18 +212,6 @@ public class BookCollectionService {
 	}
 	
 	public PageableList<BookCollection> getBookCollectionsByParentBookCollectionId(Long rootBookCollectionId, Long parentBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
-		List<Long> childBookCollectionIds = new ArrayList<Long>();
-		
-		if(parentBookCollectionId != null) {
-			BookCollection parentBookCollection = getBookCollectionById(rootBookCollectionId, parentBookCollectionId);
-			
-			if(parentBookCollection != null) {
-				for(BookCollection childBookCollection: parentBookCollection.getChildBookCollections()) {
-					childBookCollectionIds.add(childBookCollection.getId());
-				}
-			}
-		}
-		
 		String normalizedName = NameHelper.getNormalizedName(name);
 		
 		String bookCollectionListQueryString = " where 1 = 1";
@@ -231,7 +219,7 @@ public class BookCollectionService {
 		bookCollectionListQueryString = bookCollectionListQueryString + " and (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)";
 		
 		if(parentBookCollectionId != null) {
-			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.id in :childBookCollectionIds";
+			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.id in (select cbc.id from BookCollection pbc join pbc.childBookCollections cbc where pbc.id = :parentBookCollectionId)";
 		}
 		
 		if("".equals(normalizedName) == false) {
@@ -242,7 +230,7 @@ public class BookCollectionService {
 		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
 		if(parentBookCollectionId != null) {
-			bookCollectionListSizeQuery.setParameter("childBookCollectionIds", childBookCollectionIds);
+			bookCollectionListSizeQuery.setParameter("parentBookCollectionId", parentBookCollectionId);
 		}
 		
 		if("".equals(normalizedName) == false) {
@@ -255,7 +243,7 @@ public class BookCollectionService {
 		bookCollectionListQuery.setParameter("rootBookCollectionId", rootBookCollectionId);
 		
 		if(parentBookCollectionId != null) {
-			bookCollectionListQuery.setParameter("childBookCollectionIds", childBookCollectionIds);
+			bookCollectionListQuery.setParameter("parentBookCollectionId", parentBookCollectionId);
 		}
 		
 		if("".equals(normalizedName) == false) {
