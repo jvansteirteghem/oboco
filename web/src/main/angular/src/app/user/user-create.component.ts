@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { User } from './user';
 import { UserService } from './user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -35,8 +35,10 @@ export class UserCreateComponent implements OnInit {
       rootBookCollection: ''
     });
 
-    this.userService.getRootBookCollectionList()
-    .subscribe(rootBookCollectionList => {
+    forkJoin(
+      this.userService.getRootBookCollectionList()
+    )
+    .subscribe(([rootBookCollectionList]) => {
       this.rootBookCollections = rootBookCollectionList;
 
       this.user = new User();

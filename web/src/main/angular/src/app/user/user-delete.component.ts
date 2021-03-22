@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { User } from './user';
 import { UserService } from './user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -37,13 +37,13 @@ export class UserDeleteComponent implements OnInit {
 
     let id = +this.route.snapshot.queryParamMap.get('id');
 
-    this.userService.getRootBookCollectionList()
-    .subscribe(rootBookCollectionList => {
-      this.rootBookCollections = rootBookCollectionList;
-
+    forkJoin(
+      this.userService.getRootBookCollectionList(),
       this.userService.getUser(id)
-      .subscribe(user => {
-        this.user = user;
+    )
+    .subscribe(([rootBookCollectionList, user]) => {
+      this.rootBookCollections = rootBookCollectionList;
+      this.user = user;
 
         this.userForm.controls.name.setValue(this.user.name);
 
@@ -58,7 +58,6 @@ export class UserDeleteComponent implements OnInit {
         if(this.user.rootBookCollection) {
           this.userForm.controls.rootBookCollection.setValue(this.user.rootBookCollection.id);
         }
-      });
     });
   }
 
