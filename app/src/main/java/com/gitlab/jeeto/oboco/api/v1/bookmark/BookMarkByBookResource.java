@@ -87,7 +87,7 @@ public class BookMarkByBookResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		Book book = bookService.getBookById(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_ID_INVALID", "The book.id is invalid."));
@@ -103,7 +103,7 @@ public class BookMarkByBookResource {
 		
 		Date updateDate = new Date();
 		
-		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), bookId);
+		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(rootBookCollectionId, user.getId(), bookId);
 		
 		if(bookMarkReference == null) {
 			BookMark bookMark = new BookMark();
@@ -138,7 +138,7 @@ public class BookMarkByBookResource {
 			
 			bookMark = bookMarkService.updateBookMark(bookMark);
 			
-			bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), bookId);
+			bookMarkReference = bookMarkService.getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(rootBookCollectionId, user.getId(), bookId);
 			
 			bookMarkDto = bookMarkDtoMapper.getBookMarkDto(bookMarkReference, graphDto);
 		}
@@ -170,13 +170,13 @@ public class BookMarkByBookResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		Book book = bookService.getBookById(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_ID_INVALID", "The book.id is invalid."));
 		}
 		
-		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), bookId);
+		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(rootBookCollectionId, user.getId(), bookId);
 		
 		if(bookMarkReference == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_MARK_NOT_FOUND", "The bookMark is not found."));
@@ -218,13 +218,13 @@ public class BookMarkByBookResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		Book book = bookService.getBookById(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_ID_INVALID", "The book.id is invalid."));
 		}
 		
-		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndId(rootBookCollectionId, user.getId(), bookId);
+		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByBookCollectionIdAndUserIdAndId(rootBookCollectionId, user.getId(), bookId);
 		
 		if(bookMarkReference == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_MARK_NOT_FOUND", "The bookMark is not found."));

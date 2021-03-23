@@ -77,7 +77,7 @@ public class BookMarkByBookCollectionResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		BookCollection bookCollection = bookCollectionService.getBookCollectionById(rootBookCollectionId, bookCollectionId);
+		BookCollection bookCollection = bookCollectionService.getBookCollectionByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_COLLECTION_ID_INVALID", "The bookCollection.id is invalid."));
@@ -88,7 +88,7 @@ public class BookMarkByBookCollectionResource {
 		List<Book> bookList = bookCollection.getBooks();
 		
 		for(Book book: bookList) {
-			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
+			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
 			
 			if(bookMarkReference == null) {
 				BookMark bookMark = new BookMark();
@@ -151,7 +151,7 @@ public class BookMarkByBookCollectionResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		BookCollection bookCollection = bookCollectionService.getBookCollectionById(rootBookCollectionId, bookCollectionId);
+		BookCollection bookCollection = bookCollectionService.getBookCollectionByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_COLLECTION_ID_INVALID", "The bookCollection.id is invalid."));
@@ -160,7 +160,7 @@ public class BookMarkByBookCollectionResource {
 		List<Book> bookList = bookCollection.getBooks();
 		
 		for(Book book: bookList) {
-			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
+			BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
 			
 			if(bookMarkReference != null) {
 				BookMark bookMark = bookMarkReference.getBookMark();

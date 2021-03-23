@@ -55,12 +55,12 @@ public class BookCollectionService {
         return bookCollection;
 	}
 	
-	public BookCollection getRootBookCollection(Long rootBookCollectionId) throws ProblemException {
+	public BookCollection getRootBookCollectionById(Long id) throws ProblemException {
 		BookCollection rootBookCollection = null;
 		
 		try {
 			rootBookCollection = entityManager.createQuery("select bc from BookCollection bc where bc.parentBookCollection.id is null and bc.id = :id", BookCollection.class)
-					.setParameter("id", rootBookCollectionId)
+					.setParameter("id", id)
 					.getSingleResult();
 		} catch(NoResultException e) {
 			
@@ -76,7 +76,7 @@ public class BookCollectionService {
         return rootBookCollectionList;
 	}
 	
-	public BookCollection getBookCollectionById(Long rootBookCollectionId, Long id) throws ProblemException {
+	public BookCollection getBookCollectionByBookCollectionIdAndId(Long rootBookCollectionId, Long id) throws ProblemException {
 		BookCollection bookCollection = null;
 		
 		try {
@@ -105,7 +105,7 @@ public class BookCollectionService {
         return bookCollection;
 	}
 	
-	public BookCollection getBookCollectionByDirectoryPath(Long rootBookCollectionId, String directoryPath) throws ProblemException {
+	public BookCollection getBookCollectionByBookCollectionIdAndDirectoryPath(Long rootBookCollectionId, String directoryPath) throws ProblemException {
 		BookCollection bookCollection = null;
 		
 		try {
@@ -120,7 +120,7 @@ public class BookCollectionService {
         return bookCollection;
 	}
 	
-	public PageableList<BookCollection> getBookCollections(Long rootBookCollectionId, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookCollection> getBookCollectionsByBookCollectionId(Long rootBookCollectionId, Integer page, Integer pageSize) throws ProblemException {
 		Long bookCollectionListSize = (Long) entityManager.createQuery("select count(bc.id) from BookCollection bc where (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)")
 				.setParameter("rootBookCollectionId", rootBookCollectionId)
 				.getSingleResult();
@@ -136,7 +136,7 @@ public class BookCollectionService {
         return bookCollectionPageableList;
 	}
 	
-	public PageableList<BookCollection> getBookCollections(Long rootBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookCollection> getBookCollectionsByBookCollectionIdAndName(Long rootBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
 		String normalizedName = NameHelper.getNormalizedName(name);
 		
 		String bookCollectionListQueryString = " where 1 = 1";
@@ -173,7 +173,7 @@ public class BookCollectionService {
         return bookCollectionPageableList;
 	}
 	
-	public PageableList<BookCollection> getBookCollectionsByParentBookCollectionId(Long rootBookCollectionId, Long parentBookCollectionId, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookCollection> getBookCollectionsByBookCollectionId(Long rootBookCollectionId, Long parentBookCollectionId, Integer page, Integer pageSize) throws ProblemException {
 		String bookCollectionListQueryString = " where 1 = 1 ";
 		
 		bookCollectionListQueryString = bookCollectionListQueryString + " and (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)";
@@ -210,7 +210,7 @@ public class BookCollectionService {
         return bookCollectionPageableList;
 	}
 	
-	public PageableList<BookCollection> getBookCollectionsByParentBookCollectionId(Long rootBookCollectionId, Long parentBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookCollection> getBookCollectionsByBookCollectionIdAndName(Long rootBookCollectionId, Long parentBookCollectionId, String name, Integer page, Integer pageSize) throws ProblemException {
 		String normalizedName = NameHelper.getNormalizedName(name);
 		
 		String bookCollectionListQueryString = " where 1 = 1";

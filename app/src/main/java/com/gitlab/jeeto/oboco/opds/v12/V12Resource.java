@@ -105,9 +105,9 @@ public class V12Resource {
 		boolean hasParentBookCollectionId = uriInfo.getQueryParameters().containsKey("parentBookCollectionId");
 		
 		if(hasParentBookCollectionId) {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByParentBookCollectionId(rootBookCollectionId, parentBookCollectionId, page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, parentBookCollectionId, page, pageSize);
 		} else {
-			bookCollectionPageableList = bookCollectionService.getBookCollections(rootBookCollectionId, page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, page, pageSize);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -187,7 +187,7 @@ public class V12Resource {
 		if(hasBookCollectionId) {
 			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, page, pageSize);
 		} else {
-			bookPageableList = bookService.getBooks(rootBookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, page, pageSize);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -246,7 +246,7 @@ public class V12Resource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		Book book = bookService.getBookById(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -272,7 +272,7 @@ public class V12Resource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		Book book = bookService.getBookById(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));

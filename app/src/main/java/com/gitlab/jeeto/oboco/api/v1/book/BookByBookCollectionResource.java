@@ -95,12 +95,10 @@ public class BookByBookCollectionResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		String userName = user.getName();
-		
 		PageableList<Book> bookPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("bookMarkStatus")) {
-			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, userName, bookMarkStatus, page, pageSize);
+			bookPageableList = bookService.getBooksByBookCollectionIdAndUserIdAndBookMarkStatus(rootBookCollectionId, bookCollectionId, user.getId(), bookMarkStatus, page, pageSize);
 		} else {
 			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, page, pageSize);
 		}

@@ -96,7 +96,7 @@ public class BookMarkResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		PageableList<BookMarkReference> bookMarkPageableList = bookMarkService.getBookMarkReferencesByUserId(rootBookCollectionId, user.getId(), page, pageSize);
+		PageableList<BookMarkReference> bookMarkPageableList = bookMarkService.getBookMarkReferencesByBookCollectionIdAndUserId(rootBookCollectionId, user.getId(), page, pageSize);
 		PageableListDto<BookMarkDto> bookMarkPageableListDto = bookMarkDtoMapper.getBookMarksDto(bookMarkPageableList, graphDto);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
@@ -133,7 +133,7 @@ public class BookMarkResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		BookMarkReference bookMarkReference = bookMarkService.getLastBookMarkReferenceByUserId(rootBookCollectionId, user.getId());
+		BookMarkReference bookMarkReference = bookMarkService.getLastBookMarkReferenceByBookCollectionIdAndUserId(rootBookCollectionId, user.getId());
 		
 		if(bookMarkReference == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_MARK_NOT_FOUND", "The bookMark is not found."));

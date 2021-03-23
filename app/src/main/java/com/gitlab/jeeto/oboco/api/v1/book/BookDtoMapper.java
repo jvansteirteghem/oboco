@@ -85,7 +85,7 @@ public class BookDtoMapper {
 					
 					Long rootBookCollectionId = user.getRootBookCollection().getId();
 					
-					BookMarkReference bookMarkReference = getBookMarkService().getBookMarkReferenceByUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
+					BookMarkReference bookMarkReference = getBookMarkService().getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
 					BookMarkDto bookMarkDto = getBookMarkDtoMapper().getBookMarkDto(bookMarkReference, nestedGraphDto);
 					
 					bookDto.setBookMark(bookMarkDto);

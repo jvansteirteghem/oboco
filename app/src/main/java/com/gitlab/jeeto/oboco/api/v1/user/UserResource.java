@@ -202,7 +202,7 @@ public class UserResource {
 		user.setUpdateDate(new Date());
 		
 		if(userDto.getRootBookCollection() != null) {
-			BookCollection rootBookCollection = bookCollectionService.getRootBookCollection(userDto.getRootBookCollection().getId());
+			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId());
 			
 			user.setRootBookCollection(rootBookCollection);
 		}
@@ -256,7 +256,7 @@ public class UserResource {
 		user.setUpdateDate(new Date());
 		
 		if(userDto.getRootBookCollection() != null) {
-			BookCollection rootBookCollection = bookCollectionService.getRootBookCollection(userDto.getRootBookCollection().getId());
+			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId());
 			
 			user.setRootBookCollection(rootBookCollection);
 		}

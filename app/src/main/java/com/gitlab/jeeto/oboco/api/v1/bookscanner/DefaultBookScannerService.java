@@ -299,7 +299,7 @@ public class DefaultBookScannerService implements BookScannerService {
 			String path = file.getPath();
 			
 			if(file.isDirectory()) {
-				BookCollection bookCollection = bookCollectionService.getBookCollectionByDirectoryPath(rootBookCollection.getId(), path);
+				BookCollection bookCollection = bookCollectionService.getBookCollectionByBookCollectionIdAndDirectoryPath(rootBookCollection.getId(), path);
 				
 				if(bookCollection == null) {
 					logger.info("create bookCollection " + path);
@@ -360,7 +360,7 @@ public class DefaultBookScannerService implements BookScannerService {
 				FileWrapper<File> fileWrapper = new FileWrapper<File>(file, fileType);
 				
 				if(FileType.ZIP.equals(fileType) || FileType.RAR.equals(fileType) || FileType.RAR5.equals(fileType)) {
-					Book book = bookService.getBookByFilePath(rootBookCollection.getId(), path);
+					Book book = bookService.getBookByBookCollectionIdAndFilePath(rootBookCollection.getId(), path);
 					
 					Date fileUpdateDate = new Date(file.lastModified());
 					

@@ -90,15 +90,15 @@ public class BookCollectionResource {
 		
 		if(uriInfo.getQueryParameters().containsKey("parentBookCollectionId")) {
 			if(uriInfo.getQueryParameters().containsKey("name")) {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByParentBookCollectionId(rootBookCollectionId, parentBookCollectionId, name, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionIdAndName(rootBookCollectionId, parentBookCollectionId, name, page, pageSize);
 			} else {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByParentBookCollectionId(rootBookCollectionId, parentBookCollectionId, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, parentBookCollectionId, page, pageSize);
 			}
 		} else {
 			if(uriInfo.getQueryParameters().containsKey("name")) {
-				bookCollectionPageableList = bookCollectionService.getBookCollections(rootBookCollectionId, name, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionIdAndName(rootBookCollectionId, name, page, pageSize);
 			} else {
-				bookCollectionPageableList = bookCollectionService.getBookCollections(rootBookCollectionId, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, page, pageSize);
 			}
 		}
 		
@@ -138,7 +138,7 @@ public class BookCollectionResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		BookCollection bookCollection = bookCollectionService.getRootBookCollection(rootBookCollectionId);
+		BookCollection bookCollection = bookCollectionService.getRootBookCollectionById(rootBookCollectionId);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_COLLECTION_NOT_FOUND", "The bookCollection is not found."));
@@ -181,7 +181,7 @@ public class BookCollectionResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		BookCollection bookCollection = bookCollectionService.getBookCollectionById(rootBookCollectionId, bookCollectionId);
+		BookCollection bookCollection = bookCollectionService.getBookCollectionByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_COLLECTION_NOT_FOUND", "The bookCollection is not found."));

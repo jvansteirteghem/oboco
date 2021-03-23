@@ -54,7 +54,7 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public BookMarkReference getLastBookMarkReferenceByUserId(Long rootBookCollectionId, Long userId) throws ProblemException {
+	public BookMarkReference getLastBookMarkReferenceByBookCollectionIdAndUserId(Long rootBookCollectionId, Long userId) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
@@ -70,7 +70,7 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public BookMarkReference getBookMarkReferenceByUserIdAndId(Long rootBookCollectionId, Long userId, Long id) throws ProblemException {
+	public BookMarkReference getBookMarkReferenceByBookCollectionIdAndUserIdAndId(Long rootBookCollectionId, Long userId, Long id) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
@@ -86,7 +86,7 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public BookMarkReference getBookMarkReferenceByUserIdAndBookId(Long rootBookCollectionId, Long userId, Long bookId) throws ProblemException {
+	public BookMarkReference getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(Long rootBookCollectionId, Long userId, Long bookId) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
@@ -102,7 +102,7 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public PageableList<BookMarkReference> getBookMarkReferencesByUserId(Long rootBookCollectionId, Long userId, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookMarkReference> getBookMarkReferencesByBookCollectionIdAndUserId(Long rootBookCollectionId, Long userId, Integer page, Integer pageSize) throws ProblemException {
 		Long bookMarkListSize = (Long) entityManager.createQuery("select count(bmr.id) from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId")
 				.setParameter("rootBookCollectionId", rootBookCollectionId)
 				.setParameter("userId", userId)
