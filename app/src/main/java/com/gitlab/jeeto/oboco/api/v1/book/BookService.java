@@ -72,6 +72,21 @@ public class BookService {
         return book;
 	}
 	
+	public Book getBookByUpdateDateAndFilePath(Date updateDate, String filePath) throws ProblemException {
+		Book book = null;
+		
+		try {
+			book = entityManager.createQuery("select b from Book b where b.updateDate = :updateDate and b.filePath = :filePath", Book.class)
+					.setParameter("updateDate", updateDate)
+					.setParameter("filePath", filePath)
+					.getSingleResult();
+		} catch(NoResultException e) {
+			
+		}
+		
+        return book;
+	}
+	
 	public Book getBookByBookCollectionIdAndFilePath(Long rootBookCollectionId, String filePath) throws ProblemException {
 		Book book = null;
 		
