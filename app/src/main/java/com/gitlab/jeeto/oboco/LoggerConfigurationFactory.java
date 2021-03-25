@@ -35,7 +35,7 @@ public class LoggerConfigurationFactory extends ConfigurationFactory {
 		
 		// rollingFileAppender
 		
-		String rollingFilePath = getConfiguration().getAsString("application.logger.path", "./logs");
+		String rollingFilePath = getConfiguration().getAsString("logger.path", "./logs");
 		
 		AppenderComponentBuilder rollingFileAppenderComponentBuilder = builder.newAppender("rollingFile", "RollingFile")
 				.addAttribute("fileName", new File(rollingFilePath, "application.log").getPath())
@@ -69,7 +69,7 @@ public class LoggerConfigurationFactory extends ConfigurationFactory {
     	levelMap.put("DEBUG", Level.DEBUG);
     	levelMap.put("TRACE", Level.TRACE);
         
-    	String rootLoggerLevelName = getConfiguration().getAsString("application.logger.rootLevel", "ERROR");
+    	String rootLoggerLevelName = getConfiguration().getAsString("logger.rootLevel", "ERROR");
     	
     	Level rootLoggerLevel = levelMap.get(rootLoggerLevelName);
         
@@ -81,7 +81,7 @@ public class LoggerConfigurationFactory extends ConfigurationFactory {
         
         // logger
         
-        String loggerLevelName = getConfiguration().getAsString("application.logger.level", "INFO");
+        String loggerLevelName = getConfiguration().getAsString("logger.level", "INFO");
     	
     	Level loggerLevel = levelMap.get(loggerLevelName);
         

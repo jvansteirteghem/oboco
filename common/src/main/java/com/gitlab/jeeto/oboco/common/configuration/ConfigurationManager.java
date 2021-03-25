@@ -36,7 +36,7 @@ public class ConfigurationManager {
 				applicationProperties.load(new FileInputStream("./application.properties"));
 				
 				for(Entry<Object, Object> entry: applicationProperties.entrySet()) {
-					configuration.set("application." + entry.getKey().toString(), entry.getValue().toString());
+					configuration.set(entry.getKey().toString(), entry.getValue().toString());
 				}
 			} catch(Exception e) {
 				logger.error("Error.", e);

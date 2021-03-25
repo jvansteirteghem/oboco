@@ -25,7 +25,7 @@ public class EntityManagerFactoryFactory implements Factory<javax.persistence.En
 	public javax.persistence.EntityManagerFactory provide() {
 		Map<String, String> propertyMap = new HashMap<String, String>();
 		
-		String dialectName = getConfiguration().getAsString("application.database.name", "H2");
+		String dialectName = getConfiguration().getAsString("database.name", "H2");
 		
 		Map<String, String> dialectMap = new HashMap<String, String>();
 		dialectMap.put("DB2", "org.hibernate.dialect.DB2Dialect");
@@ -60,18 +60,18 @@ public class EntityManagerFactoryFactory implements Factory<javax.persistence.En
 		
 		propertyMap.put("hibernate.dialect", dialect);
 		
-		String driver = getConfiguration().getAsString("application.database.driver", "org.h2.Driver");
-		String url = getConfiguration().getAsString("application.database.url", "jdbc:h2:file:./application");
-		String userName = getConfiguration().getAsString("application.database.user.name", "");
-		String userPassword = getConfiguration().getAsString("application.database.user.password", "");
+		String driver = getConfiguration().getAsString("database.driver", "org.h2.Driver");
+		String url = getConfiguration().getAsString("database.url", "jdbc:h2:file:./application");
+		String userName = getConfiguration().getAsString("database.user.name", "");
+		String userPassword = getConfiguration().getAsString("database.user.password", "");
 		
 		propertyMap.put("javax.persistence.jdbc.driver", driver);
 		propertyMap.put("javax.persistence.jdbc.url", url);
 		propertyMap.put("javax.persistence.jdbc.user", userName);
 		propertyMap.put("javax.persistence.jdbc.password", userPassword);
         
-        String size = getConfiguration().getAsString("application.database.connectionPool.size", "50");
-		String age = getConfiguration().getAsString("application.database.connectionPool.age", "1800");
+        String size = getConfiguration().getAsString("database.connectionPool.size", "50");
+		String age = getConfiguration().getAsString("database.connectionPool.age", "1800");
 		
         propertyMap.put("hibernate.c3p0.min_size", "5");
         propertyMap.put("hibernate.c3p0.max_size", size);

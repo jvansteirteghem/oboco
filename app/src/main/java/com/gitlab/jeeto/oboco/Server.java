@@ -80,13 +80,13 @@ public class Server {
 			
 			server = new org.eclipse.jetty.server.Server();
 			
-			Integer port = getConfiguration().getAsInteger("application.server.port", "8080");
+			Integer port = getConfiguration().getAsInteger("server.port", "8080");
 			
 			logger.info("start server: http://127.0.0.1:" + port);
 			
-	    	Integer sslPort = getConfiguration().getAsInteger("application.server.ssl.port", null);
-	    	String sslKeyStorePath = getConfiguration().getAsString("application.server.ssl.keyStore.path", null);
-	    	String sslKeyStorePassword = getConfiguration().getAsString("application.server.ssl.keyStore.password", null);
+	    	Integer sslPort = getConfiguration().getAsInteger("server.ssl.port", null);
+	    	String sslKeyStorePath = getConfiguration().getAsString("server.ssl.keyStore.path", null);
+	    	String sslKeyStorePassword = getConfiguration().getAsString("server.ssl.keyStore.password", null);
 			
 			HttpConfiguration httpConfiguration = new HttpConfiguration();
 			if(sslPort != null) {

@@ -160,7 +160,7 @@ public class DefaultBookScannerService implements BookScannerService {
 		try {
 			defaultBookPageList = createBookPageList();
 			
-			String directoryPath = getConfiguration().getAsString("application.data.path", "./data");
+			String directoryPath = getConfiguration().getAsString("data.path", "./data");
 	    	
 	    	File directory = new File(directoryPath);
 	    	if(directory.isDirectory() == false) {
@@ -737,7 +737,7 @@ public class DefaultBookScannerService implements BookScannerService {
     }
     
     private FileWrapper<File> createBookPageFileWrapper(Book book, Integer page, ScaleType scaleType, Integer scaleWidth, Integer scaleHeight) throws Exception {
-    	String dataDirectoryPath = getConfiguration().getAsString("application.data.path", "./data");
+    	String dataDirectoryPath = getConfiguration().getAsString("data.path", "./data");
     	
     	String bookPageFilePath = book.getFileId().substring(0, 2) + "/" + book.getFileId().substring(2) + "/" + page;
         if(scaleType != null) {
@@ -828,7 +828,7 @@ public class DefaultBookScannerService implements BookScannerService {
     }
     
     private void deleteBookPageByUpdateDate() throws Exception {
-    	String directoryPath = getConfiguration().getAsString("application.data.path", "./data");
+    	String directoryPath = getConfiguration().getAsString("data.path", "./data");
     	
     	File directory = new File(directoryPath);
     	if(directory.isDirectory()) {
