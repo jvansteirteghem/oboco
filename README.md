@@ -26,26 +26,21 @@ you should use oboco with [oboco for android](https://gitlab.com/jeeto/oboco-and
 
 ## configuration
 
-you are required to configure "user data" and "application security".
+you are required to configure "application.properties/security.authentication.secret" and "data.properties".
 
-### user data
-
-- configure user.properties
-	- data.path: the path of the user data (books and book collections). you can add more than one path by using a ",". [^1]
-
-### application logger
+### logger
 
 - configure application.properties
 	- logger.path: the path of the logs. [^1]
 	- logger.rootLevel: the root level of the logger: "FATAL", "ERROR", "WARN", "INFO", "DEBUG" or "TRACE".
 	- logger.level: the level of the logger: "FATAL", "ERROR", "WARN", "INFO", "DEBUG" or "TRACE".
 
-### application server
+### server
 
 - configure application.properties
 	- server.port: the port of the server.
 
-### application ssl server
+### ssl server
 
 - create the ssl key store (server.jks) with tools/ssl.bat or tools/ssl.sh
 	- dns: the dns of the ssl certificate.
@@ -62,17 +57,19 @@ you are required to configure "user data" and "application security".
 	- server.ssl.keyStore.path: the path of the ssl key store. [^1]
 	- server.ssl.keyStore.password: the password of the ssl key store.
 
-### application data
+### data
 
 - configure application.properties
-	- data.path: the path of the application data (book pages). [^1]
+	- data.path: the path of the data (book pages). [^1]
 - configure data.csv
-	- page: the page of the book or "" (all pages).
+	- page: the page of the book or "" (all book pages).
 	- scaleType: the scale type: "DEFAULT", "FIT", "FILL" or "" (do not scale).
 	- scaleWidth: the scale width (in pixels) or "" (do not scale).
 	- scaleHeight: the scale height (in pixels) or "" (do not scale).
+- configure data.properties
+	- %ROOT_BOOK_COLLECTION%=%DATA_PATH%: the path of the data (books and book collections). you can add more than one path by using a ",". [^1]
 
-### application database
+### database
 
 - add the lib of the driver of the database to the libs directory.
 - configure application.properties
@@ -86,14 +83,14 @@ you are required to configure "user data" and "application security".
 - configure application.ddl
 - configure application.sql
 
-### application security
+### security
 
 - configure application.properties
 	- security.authentication.secret: the secret of the authentication.
 	- security.authentication.idToken.age: the age of the id token of the authentication (in seconds).
 	- security.authentication.refreshToken.age: the age of the refresh token of the authentication (in seconds).
 
-### application plugins
+### plugins
 
 - configure application.properties
 	- plugin.archive.archiveReaderPool.size: the size of the archive reader pool.
@@ -109,7 +106,7 @@ you are required to configure "user data" and "application security".
 ## usage
 
 - start the server with application.bat or application.sh
-- open your browser to http://server.address:server.port or https://server.address:server.ssl.port
+- open your browser to http://%SERVER_ADDRESS%:%SERVER_PORT% or https://%SERVER_ADDRESS%:%SERVER_SSL_PORT%
 - select "Web"
 - log in
 	- name: administrator
