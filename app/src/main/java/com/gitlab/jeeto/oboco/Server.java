@@ -28,19 +28,32 @@ import com.gitlab.jeeto.oboco.plugin.PluginManager;
 
 public class Server {
 	private static Logger logger;
-	private PluginManager pluginManager;
-	private org.eclipse.jetty.server.Server server;
-	private Configuration configuration;
+	private static Configuration configuration;
 	
-	private Configuration getConfiguration() {
+	public static Configuration getConfiguration() {
 		if(configuration == null) {
 			ConfigurationManager configurationManager = ConfigurationManager.getInstance();
+			
 			configuration = configurationManager.getConfiguration();
 		}
+		
 		return configuration;
 	}
 	
+	private PluginManager pluginManager;
+	private org.eclipse.jetty.server.Server server;
+	
 	public static void main(String[] args) throws Exception {
+		for(String arg: args) {
+    		int index = arg.indexOf('=');
+			if (index != -1) {
+			    String key = arg.substring(0, index);
+			    String value = arg.substring(index + 1);
+			    
+			    getConfiguration().set(key, value);
+			}
+    	}
+		
 		LoggerConfigurationFactory loggerConfigurationFactory = new LoggerConfigurationFactory();
 		
 	    ConfigurationFactory.setConfigurationFactory(loggerConfigurationFactory);
