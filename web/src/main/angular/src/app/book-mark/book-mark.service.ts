@@ -4,14 +4,17 @@ import { PageableList } from '../common';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookMarkService {
-  private url = '/api/v1/';  // URL to web api
+  private url;  // URL to web api
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    this.url = environment.baseUrl + '/api/v1/';
+  }
 
   getBookMarkList(page: number, pageSize: number): Observable<PageableList<BookMark>> {
     return this.http.get<PageableList<BookMark>>(this.url + "bookMarks?page=" + page + "&pageSize=" + pageSize + "&graph=(book(bookCollection))");

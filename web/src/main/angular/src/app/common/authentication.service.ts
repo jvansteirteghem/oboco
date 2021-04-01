@@ -5,13 +5,16 @@ import { map, tap, catchError, finalize } from 'rxjs/operators';
 import { UserId } from './user-id';
 import { UserNamePassword } from './user-name-password';
 import { UserToken } from './user-token';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
+    private url;  // URL to web api
     private userIdSubject: BehaviorSubject<UserId>;
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient) { 
+        this.url = environment.baseUrl + '/api/v1/';
         this.userIdSubject = new BehaviorSubject<UserId>(JSON.parse(localStorage.getItem("userId")));
     }
 
@@ -28,7 +31,7 @@ export class AuthenticationService {
         userNamePassword.name = name;
         userNamePassword.password = password;
 
-        return this.http.post<any>("/api/v1/authentication", userNamePassword)
+        return this.http.post<any>(this.url + "authentication", userNamePassword)
             .pipe(map(userId => {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem("userId", JSON.stringify(userId));
@@ -46,7 +49,7 @@ export class AuthenticationService {
             userToken.token = userId.refreshToken;
         }
 
-        return this.http.post<any>("/api/v1/authentication/refresh", userToken)
+        return this.http.post<any>(this.url + "authentication/refresh", userToken)
         .pipe(tap(
                 userId => {
                     // store user details and jwt token in local storage to keep user logged in between page refreshes

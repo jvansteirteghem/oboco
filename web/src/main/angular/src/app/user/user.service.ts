@@ -6,14 +6,17 @@ import { PageableList } from '../common';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private url = '/api/v1/';  // URL to web api
+  private url;  // URL to web api
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    this.url = environment.baseUrl + '/api/v1/';
+  }
 
   getAuthenticatedUser(): Observable<User> {
     return this.http.get<User>(this.url + "users/ME?graph=(rootBookCollection)");

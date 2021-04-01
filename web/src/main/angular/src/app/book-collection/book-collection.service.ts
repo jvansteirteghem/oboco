@@ -4,14 +4,17 @@ import { PageableList } from '../common';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookCollectionService {
-  private url = '/api/v1/';  // URL to web api
+  private url;  // URL to web api
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    this.url = environment.baseUrl + '/api/v1/';
+  }
 
   getBookCollectionList(parentBookCollectionId: number, page: number, pageSize: number): Observable<PageableList<BookCollection>> {
     return this.http.get<PageableList<BookCollection>>(this.url + "bookCollections?parentBookCollectionId=" + parentBookCollectionId + "&page=" + page + "&pageSize=" + pageSize + "&graph=()");

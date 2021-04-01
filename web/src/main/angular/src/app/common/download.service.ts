@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subscriber } from 'rxjs';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,7 @@ export class DownloadService {
     }
 
     downloadAsSafeUrl(url: string): Observable<SafeUrl> {
+        url = environment.baseUrl + url;
         return new Observable((observer: Subscriber<SafeUrl>) => {
             let objectUrl: string = null;
 
@@ -35,6 +37,7 @@ export class DownloadService {
     }
 
     download(url: string, name: string) {
+        url = environment.baseUrl + url;
         this.http
             .get(url, {
                 responseType: 'blob'

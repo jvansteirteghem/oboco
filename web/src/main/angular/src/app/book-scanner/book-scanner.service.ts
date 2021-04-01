@@ -4,14 +4,17 @@ import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
 import { BookScanner } from './book-scanner';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookScannerService {
-  private url = '/api/v1/';  // URL to web api
+  private url;  // URL to web api
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    this.url = environment.baseUrl + '/api/v1/';
+  }
 
   startBookScanner(id: string): Observable<any> {
     return this.http.post(this.url + "bookScanners/" + id + "/start", {});
