@@ -117,10 +117,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
     	String header = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         if(header != null) {
         	if(header.startsWith("Bearer")) {
-		    	String idTokenValue = header.substring("Bearer".length()).trim();
-		    	UserToken idToken;
+		    	String accessTokenValue = header.substring("Bearer".length()).trim();
+		    	UserToken accessToken;
 		    	try {
-		    		idToken = tokenService.getIdToken(idTokenValue);
+		    		accessToken = tokenService.getAccessToken(accessTokenValue);
 				} catch (Exception e) {
 					ResponseBuilder responseBuilder = Response.status(401);
 					responseBuilder.header("WWW-Authenticate", "Bearer realm=\"oboco\"");
@@ -131,7 +131,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					return;
 				}
 		    	
-		    	User user = userService.getUserByName(idToken.getName());
+		    	User user = userService.getUserByName(accessToken.getName());
 				
 				if(user == null) {
 					ResponseBuilder responseBuilder = Response.status(401);
@@ -143,7 +143,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		    		return;
 				}
 				
-				if(user.getUpdateDate() == null || user.getUpdateDate().compareTo(idToken.getStartDate()) >= 0) {
+				if(user.getUpdateDate() == null || user.getUpdateDate().compareTo(accessToken.getStartDate()) >= 0) {
 					ResponseBuilder responseBuilder = Response.status(401);
 					responseBuilder.header("WWW-Authenticate", "Bearer realm=\"oboco\"");
 					responseBuilder.entity(new ProblemDto(401, "PROBLEM_USER_NOT_AUTHENTICATED", "The user is not authenticated."));

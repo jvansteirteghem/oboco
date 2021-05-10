@@ -32,7 +32,7 @@ export class UserTokenInterceptor implements HttpInterceptor {
   private addToken(request: HttpRequest<any>, userId: UserId) {
     return request.clone({
       setHeaders: {
-        'Authorization': `Bearer ${userId.idToken}`
+        'Authorization': `Bearer ${userId.accessToken}`
       }
     });
   }

@@ -1,6 +1,6 @@
 ﻿export class UserId {
     name: string;
     roles: Array<string>;
-    idToken: string;
+    accessToken: string;
     refreshToken: string;
 }
