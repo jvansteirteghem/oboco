@@ -1,6 +1,5 @@
 package com.gitlab.jeeto.oboco.api.v1.book;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,13 +40,14 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 	
 	@Override
 	public void write(OutputStream outputStream) throws IOException, WebApplicationException {
+		ZipOutputStream zipOutputStream = null;
 		try {
+			zipOutputStream = new ZipOutputStream(outputStream);
+			
 			File bookInputFile = new File(book.getFilePath());
 			FileType bookInputFileType = FileType.getFileType(bookInputFile);
 			
 			FileWrapper<File> bookInputFileWrapper = new FileWrapper<File>(bookInputFile, bookInputFileType);
-			
-			ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(outputStream));
 			
 			PluginManager pluginManager = PluginManager.getInstance();
 			
@@ -63,7 +63,7 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 						
 						zipOutputStream.putNextEntry(zipEntry);
 						
-						write(outputStream, bookPageInputFileWrapper);
+						write(zipOutputStream, bookPageInputFileWrapper);
 						
 						zipOutputStream.closeEntry();
 					} else {
@@ -128,16 +128,14 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 			}
 			
 			zipOutputStream.flush();
-		    
-			zipOutputStream.close();
 		} catch (Exception e) {
 			logger.error("Error.", e);
 			
     		throw new WebApplicationException(e, 500);
 		} finally {
-    		if(outputStream != null) {
+    		if(zipOutputStream != null) {
     			try {
-	    			outputStream.close();
+    				zipOutputStream.close();
     			} catch(Exception e) {
 					// pass
 				}
