@@ -23,6 +23,8 @@ import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkStatus;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.GraphDto;
 import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
+import com.gitlab.jeeto.oboco.common.Linkable;
+import com.gitlab.jeeto.oboco.common.LinkableDto;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.PageableListDtoHelper;
@@ -66,7 +68,7 @@ public class BookByBookCollectionResource {
 	@Operation(
 		description = "Get the books of the bookCollection.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "The books.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BooksDto.class))),
+    		@ApiResponse(responseCode = "200", description = "The books.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookPageableListDto.class))),
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
@@ -114,7 +116,7 @@ public class BookByBookCollectionResource {
 	@Operation(
 		description = "Get the books in the neighbourhood of the book of the bookCollection.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "The books.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BooksDto.class))),
+    		@ApiResponse(responseCode = "200", description = "The books.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookLinkableDto.class))),
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
@@ -140,11 +142,11 @@ public class BookByBookCollectionResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		PageableList<Book> bookPageableList = bookService.getBooksByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId, bookId);
-		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);
+		Linkable<Book> bookLinkable = bookService.getBooksByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId, bookId);
+		LinkableDto<BookDto> bookLinkableDto = bookDtoMapper.getBooksDto(bookLinkable, graphDto);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
-		responseBuilder.entity(bookPageableListDto);
+		responseBuilder.entity(bookLinkableDto);
 		
 		return responseBuilder.build();
 	}

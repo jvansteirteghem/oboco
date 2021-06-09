@@ -25,7 +25,7 @@ import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDto;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
-import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionsDto;
+import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionPageableListDto;
 import com.gitlab.jeeto.oboco.common.GraphDto;
 import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
@@ -301,7 +301,7 @@ public class UserResource {
 	@Operation(
 		description = "Get a pageable list of users.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "A pageable list of users.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UsersDto.class))),
+    		@ApiResponse(responseCode = "200", description = "A pageable list of users.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserPageableListDto.class))),
     		@ApiResponse(responseCode = "400", description = "A problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
@@ -367,7 +367,7 @@ public class UserResource {
 	@Operation(
 		description = "Get the root bookCollections.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "The bookCollections.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookCollectionsDto.class))),
+    		@ApiResponse(responseCode = "200", description = "The bookCollections.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookCollectionPageableListDto.class))),
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),

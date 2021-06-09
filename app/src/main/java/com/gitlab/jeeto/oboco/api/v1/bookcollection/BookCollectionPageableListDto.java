@@ -7,9 +7,9 @@ import com.gitlab.jeeto.oboco.common.PageableListDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "BookCollections", description = "A pageable list of bookCollections.")
-@XmlRootElement(name = "BookCollections")
+@Schema(name = "BookCollectionPageableList", description = "A pageable list of bookCollections.")
+@XmlRootElement(name = "BookCollectionPageableList")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BookCollectionsDto extends PageableListDto<BookCollectionDto> {
+public class BookCollectionPageableListDto extends PageableListDto<BookCollectionDto> {
 
 }
