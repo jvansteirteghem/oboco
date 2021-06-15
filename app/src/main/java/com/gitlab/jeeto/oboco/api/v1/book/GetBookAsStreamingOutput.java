@@ -7,6 +7,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.ws.rs.WebApplicationException;
 
+import org.eclipse.jetty.io.EofException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +122,9 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 			}
 			
 			zipOutputStream.flush();
-		} catch (Exception e) {
+		} catch(EofException e) {
+			// pass
+		} catch(Exception e) {
 			logger.error("Error.", e);
 			
     		throw new WebApplicationException(e, 500);

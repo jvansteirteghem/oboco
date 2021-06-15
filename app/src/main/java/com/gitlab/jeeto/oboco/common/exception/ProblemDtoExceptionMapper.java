@@ -25,9 +25,8 @@ public abstract class ProblemDtoExceptionMapper implements ExceptionMapper<Excep
 			problemDto.setCode(problem.getCode());
 			problemDto.setDescription(problem.getDescription());
 		} else if(e instanceof WebApplicationException) {
-			logger.error("Error.", e);
-			
 			WebApplicationException wae = (WebApplicationException) e;
+			
 			problemDto = new ProblemDto();
 			problemDto.setStatusCode(wae.getResponse().getStatus());
 			problemDto.setCode("PROBLEM");
