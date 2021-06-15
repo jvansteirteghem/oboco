@@ -1,6 +1,5 @@
 package com.gitlab.jeeto.oboco.api.v1.book;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
@@ -14,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.gitlab.jeeto.oboco.common.configuration.Configuration;
 import com.gitlab.jeeto.oboco.common.configuration.ConfigurationManager;
 import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.FileWrapper;
 import com.gitlab.jeeto.oboco.plugin.PluginManager;
+import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderFactory;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager;
@@ -44,10 +43,7 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 		try {
 			zipOutputStream = new ZipOutputStream(outputStream);
 			
-			File bookInputFile = new File(book.getFilePath());
-			FileType bookInputFileType = FileType.getFileType(bookInputFile);
-			
-			FileWrapper<File> bookInputFileWrapper = new FileWrapper<File>(bookInputFile, bookInputFileType);
+			TypeableFile bookInputFile = new TypeableFile(book.getFilePath());
 			
 			PluginManager pluginManager = PluginManager.getInstance();
 			
@@ -55,45 +51,43 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 	    	ArchiveReader archiveReader = null;
 			try {
 				for(Integer page = 1; page <= book.getNumberOfPages(); page = page + 1) {
-					FileWrapper<File> bookPageInputFileWrapper = createBookPageFileWrapper(page);
-					File bookPageInputFile = bookPageInputFileWrapper.getFile();
+					TypeableFile bookPageInputFile = createBookPageFile(page);
 					
 					if(bookPageInputFile.isFile()) {
-						ZipEntry zipEntry = new ZipEntry(page + bookPageInputFileWrapper.getFileType().getExtension());
+						ZipEntry zipEntry = new ZipEntry(page + ".cbz");
 						
 						zipOutputStream.putNextEntry(zipEntry);
 						
-						write(zipOutputStream, bookPageInputFileWrapper);
+						write(zipOutputStream, bookPageInputFile);
 						
 						zipOutputStream.closeEntry();
 					} else {
 						if(archiveReader == null) {
-							archiveReader = archiveReaderFactory.getArchiveReader(bookInputFileWrapper.getFileType());
-							archiveReader.openArchive(bookInputFileWrapper);
+							archiveReader = archiveReaderFactory.getArchiveReader(bookInputFile.getFileType());
+							archiveReader.openArchive(bookInputFile);
 						}
 						
-						FileWrapper<File> bookPageInputFileWrapper2 = null;
+						TypeableFile bookPageInputFile2 = null;
 						try {
-							bookPageInputFileWrapper2 = archiveReader.readFile(page - 1);
+							bookPageInputFile2 = archiveReader.readFile(page - 1);
 							
-							ZipEntry zipEntry = new ZipEntry(page + bookPageInputFileWrapper2.getFileType().getExtension());
+							ZipEntry zipEntry = new ZipEntry(page + ".jpg");
 							
 							zipOutputStream.putNextEntry(zipEntry);
 							
-							if(FileType.JPG.equals(bookPageInputFileWrapper2.getFileType())) {
-								write(zipOutputStream, bookPageInputFileWrapper2);
+							if(FileType.JPG.equals(bookPageInputFile2.getFileType())) {
+								write(zipOutputStream, bookPageInputFile2);
 							} else {
-								FileWrapper<File> bookPageInputFileWrapper3 = null;
+								TypeableFile bookPageInputFile3 = null;
 								try {
-									bookPageInputFileWrapper3 = createBookPage(bookPageInputFileWrapper2);
+									bookPageInputFile3 = createBookPage(bookPageInputFile2);
 									
-									write(zipOutputStream, bookPageInputFileWrapper3);
+									write(zipOutputStream, bookPageInputFile3);
 								} finally {
 									try {
-										if(bookPageInputFileWrapper3 != null) {
-											File bookPageOutputFile3 = bookPageInputFileWrapper3.getFile();
-											if(bookPageOutputFile3.isFile()) {
-												bookPageOutputFile3.delete();
+										if(bookPageInputFile3 != null) {
+											if(bookPageInputFile3.isFile()) {
+												bookPageInputFile3.delete();
 											}
 										}
 									} catch(Exception e) {
@@ -105,8 +99,7 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 							zipOutputStream.closeEntry();
 						} finally {
 							try {
-								if(bookPageInputFileWrapper2 != null) {
-									File bookPageInputFile2 = bookPageInputFileWrapper2.getFile();
+								if(bookPageInputFile2 != null) {
 									if(bookPageInputFile2.isFile()) {
 										bookPageInputFile2.delete();
 									}
@@ -143,27 +136,24 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 		}
 	}
 	
-	private FileWrapper<File> createBookPageFileWrapper(Integer page) throws Exception {
+	private TypeableFile createBookPageFile(Integer page) throws Exception {
     	String directoryPath = getConfiguration().getAsString("data.path", "./data");
     	
     	String bookPageFilePath = book.getFileId().substring(0, 2) + "/" + book.getFileId().substring(2) + "/" + page + ".jpg";
         
-		File bookPageFile = new File(directoryPath, bookPageFilePath);
-		FileType bookPageFileType = FileType.JPG;
+    	TypeableFile bookPageFile = new TypeableFile(directoryPath, bookPageFilePath);
 		
-		FileWrapper<File> bookPageFileWrapper = new FileWrapper<File>(bookPageFile, bookPageFileType);
-		
-		return bookPageFileWrapper;
+		return bookPageFile;
     }
 	
-	private FileWrapper<File> createBookPage(FileWrapper<File> bookPageInputFileWrapper) throws Exception {
+	private TypeableFile createBookPage(TypeableFile bookPageInputFile) throws Exception {
 		PluginManager pluginManager = PluginManager.getInstance();
 		
 		ImageManagerFactory imageManagerFactory = pluginManager.getFactory(ImageManagerFactory.class);
-    	ImageManager imageManager = imageManagerFactory.getImageManager(bookPageInputFileWrapper.getFileType(), FileType.JPG);
+    	ImageManager imageManager = imageManagerFactory.getImageManager(bookPageInputFile.getFileType(), FileType.JPG);
 		
-    	FileWrapper<File> bookPageOutputFileWrapper = imageManager.createImage(bookPageInputFileWrapper, FileType.JPG);
+    	TypeableFile bookPageOutputFile = imageManager.createImage(bookPageInputFile, FileType.JPG);
 		
-		return bookPageOutputFileWrapper;
+		return bookPageOutputFile;
 	}
 }

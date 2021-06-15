@@ -15,8 +15,8 @@ import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 
 import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.FileWrapper;
 import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
+import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 
@@ -29,36 +29,32 @@ public class JdkArchivePlugin extends Plugin {
     @Extension
     public static class JdkArchiveReader extends ArchiveReaderBase implements ArchiveReader.ZipArchiveReader {
 		private ZipFile zipFile = null;
-        private ArrayList<FileWrapper<ZipEntry>> listZipEntryWrapper;
+        private ArrayList<ZipEntry> zipEntryList;
         
 		@Override
-		public void openArchive(FileWrapper<File> inputFileWrapper) throws Exception {
+		public void openArchive(TypeableFile inputFile) throws Exception {
 			List<FileType> listOutputFileType = new ArrayList<FileType>();
 			listOutputFileType.add(FileType.JPG);
 			listOutputFileType.add(FileType.PNG);
-	    	
-			File inputFile = inputFileWrapper.getFile();
 			
 			zipFile = new ZipFile(inputFile);
-			listZipEntryWrapper = new ArrayList<FileWrapper<ZipEntry>>();
+			zipEntryList = new ArrayList<ZipEntry>();
 
 	        Enumeration<? extends ZipEntry> e = zipFile.entries();
 	        while (e.hasMoreElements()) {
 	            ZipEntry zipEntry = e.nextElement();
 	            if (zipEntry.isDirectory() == false) {
-	            	FileType outputFileType = FileType.getFileType(zipFile.getInputStream(zipEntry));
+	            	FileType outputFileType = FileType.getFileType(zipEntry.getName());
 	            	if(listOutputFileType.contains(outputFileType)) {
-	            		FileWrapper<ZipEntry> zipEntryWrapper = new FileWrapper<ZipEntry>(zipEntry, outputFileType);
-	            		
-	            		listZipEntryWrapper.add(zipEntryWrapper);
+	            		zipEntryList.add(zipEntry);
 	            	}
 	            }
 	        }
 	        
-	        listZipEntryWrapper.sort(new NaturalOrderComparator<FileWrapper<ZipEntry>>() {
+	        zipEntryList.sort(new NaturalOrderComparator<ZipEntry>() {
 	        	@Override
-	    		public String toString(FileWrapper<ZipEntry> o) {
-					return o.getFile().getName();
+	    		public String toString(ZipEntry o) {
+					return o.getName();
 	        	}
 			});
 		}
@@ -71,17 +67,15 @@ public class JdkArchivePlugin extends Plugin {
 		}
 		
 		@Override
-		public FileWrapper<File> readFile(Integer index) throws Exception {
+		public TypeableFile readFile(Integer index) throws Exception {
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
 			try {
-				FileWrapper<ZipEntry> zipEntryWrapper = listZipEntryWrapper.get(index);
+				ZipEntry zipEntry = zipEntryList.get(index);
 				
-				FileType outputFileType = zipEntryWrapper.getFileType();
+				inputStream = zipFile.getInputStream(zipEntry);
 				
-				inputStream = zipFile.getInputStream(zipEntryWrapper.getFile());
-				
-				File outputFile = File.createTempFile("oboco-plugin-archive-jdk-", ".tmp");
+				TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-jdk-", ".tmp"));
 				outputStream = new FileOutputStream(outputFile);
 				
 			    byte[] buffer = new byte[8 * 1024];
@@ -90,9 +84,7 @@ public class JdkArchivePlugin extends Plugin {
 			    	outputStream.write(buffer, 0, bufferSize);
 			    }
 			    
-			    FileWrapper<File> outputFileWrapper = new FileWrapper<File>(outputFile, outputFileType);
-			    
-			    return outputFileWrapper;
+			    return outputFile;
 			} catch(Exception e) {
 				throw e;
 			} finally {
@@ -116,7 +108,7 @@ public class JdkArchivePlugin extends Plugin {
 
 		@Override
 		public Integer readSize() throws Exception {
-			return listZipEntryWrapper.size();
+			return zipEntryList.size();
 		}
     }
 }

@@ -15,8 +15,8 @@ import org.pf4j.PluginWrapper;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.FileWrapper;
 import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
+import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 
@@ -29,15 +29,13 @@ public class JUnrarArchivePlugin extends Plugin {
     @Extension
     public static class JUnrarArchiveReader extends ArchiveReaderBase implements ArchiveReader.RarArchiveReader {
     	private Archive archive = null;
-    	private List<FileWrapper<FileHeader>> listFileHeaderWrapper = new ArrayList<FileWrapper<FileHeader>>();
+    	private List<FileHeader> fileHeaderList = new ArrayList<FileHeader>();
     	
 		@Override
-		public void openArchive(FileWrapper<File> inputFileWrapper) throws Exception {
+		public void openArchive(TypeableFile inputFile) throws Exception {
 			List<FileType> listOutputFileType = new ArrayList<FileType>();
 			listOutputFileType.add(FileType.JPG);
 			listOutputFileType.add(FileType.PNG);
-			
-			File inputFile = inputFileWrapper.getFile();
 			
 			FileInputStream fileInputStream = new FileInputStream(inputFile);
 			
@@ -46,32 +44,30 @@ public class JUnrarArchivePlugin extends Plugin {
 			FileHeader fileHeader = archive.nextFileHeader();
 	        while (fileHeader != null) {
 	            if (!fileHeader.isDirectory()) {
-	            	FileType outputFileType = FileType.getFileType(archive.getInputStream(fileHeader));
+	            	FileType outputFileType = FileType.getFileType(getName(fileHeader));
 	            	if(listOutputFileType.contains(outputFileType)) {
-	            		FileWrapper<FileHeader> fileHeaderWrapper = new FileWrapper<FileHeader>(fileHeader, outputFileType);
-	            		
-	            		listFileHeaderWrapper.add(fileHeaderWrapper);
+	            		fileHeaderList.add(fileHeader);
 	            	}
 	            }
 
 	            fileHeader = archive.nextFileHeader();
 	        }
 	        
-	        listFileHeaderWrapper.sort(new NaturalOrderComparator<FileWrapper<FileHeader>>() {
-	        	private String getName(FileHeader fileHeader) {
-	        		if(fileHeader.isUnicode()) {
-	        			return fileHeader.getFileNameW();
-	        		} else {
-	        			return fileHeader.getFileNameString();
-	        		}
-	            }
-	        	
+	        fileHeaderList.sort(new NaturalOrderComparator<FileHeader>() {
 	        	@Override
-	    		public String toString(FileWrapper<FileHeader> o) {
-					return getName(o.getFile());
+	    		public String toString(FileHeader o) {
+					return getName(o);
 	        	}
 			});
 		}
+		
+		private String getName(FileHeader fileHeader) {
+    		if(fileHeader.isUnicode()) {
+    			return fileHeader.getFileNameW();
+    		} else {
+    			return fileHeader.getFileNameString();
+    		}
+        }
 
 		@Override
 		public void closeArchive() throws Exception {
@@ -81,17 +77,15 @@ public class JUnrarArchivePlugin extends Plugin {
 		}
 
 		@Override
-		public FileWrapper<File> readFile(Integer index) throws Exception {
+		public TypeableFile readFile(Integer index) throws Exception {
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
 			try {
-				FileWrapper<FileHeader> fileHeaderFileTypeWrapper = listFileHeaderWrapper.get(index);
+				FileHeader fileHeader = fileHeaderList.get(index);
 				
-				FileType outputFileType = fileHeaderFileTypeWrapper.getFileType();
+				inputStream = archive.getInputStream(fileHeader);
 				
-				inputStream = archive.getInputStream(fileHeaderFileTypeWrapper.getFile());
-				
-				File outputFile = File.createTempFile("oboco-plugin-archive-junrar-", ".tmp");
+				TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-junrar-", ".tmp"));
 				outputStream = new FileOutputStream(outputFile);
 				
 			    byte[] buffer = new byte[8 * 1024];
@@ -100,9 +94,7 @@ public class JUnrarArchivePlugin extends Plugin {
 			    	outputStream.write(buffer, 0, bufferSize);
 			    }
 			    
-			    FileWrapper<File> outputFileWrapper = new FileWrapper<File>(outputFile, outputFileType);
-			    
-			    return outputFileWrapper;
+			    return outputFile;
 			} catch(Exception e) {
 				throw e;
 			} finally {
@@ -126,7 +118,7 @@ public class JUnrarArchivePlugin extends Plugin {
 
 		@Override
 		public Integer readSize() throws Exception {
-			return listFileHeaderWrapper.size();
+			return fileHeaderList.size();
 		}
     }
 }

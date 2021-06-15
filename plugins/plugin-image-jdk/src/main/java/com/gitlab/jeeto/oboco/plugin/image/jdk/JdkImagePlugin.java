@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.FileWrapper;
+import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManagerBase;
 import com.gitlab.jeeto.oboco.plugin.image.ScaleType;
@@ -173,9 +173,8 @@ public class JdkImagePlugin extends Plugin {
 			return outputBufferedImage;
 		}
 		
-		private BufferedImage read(FileWrapper<File> inputFileWrapper) throws Exception {
-			FileType inputFileType = inputFileWrapper.getFileType();
-			File inputFile = inputFileWrapper.getFile();
+		private BufferedImage read(TypeableFile inputFile) throws Exception {
+			FileType inputFileType = inputFile.getFileType();
 			
 			ImageReader imageReader = null;
 			ImageReadParam imageReadParam = null;
@@ -218,9 +217,8 @@ public class JdkImagePlugin extends Plugin {
 			return bufferedImage;
 		}
 		
-		private void write(FileWrapper<File> outputFileWrapper, BufferedImage outputImage) throws Exception {
-			FileType outputFileType = outputFileWrapper.getFileType();
-			File outputFile = outputFileWrapper.getFile();
+		private void write(TypeableFile outputFile, BufferedImage outputImage) throws Exception {
+			FileType outputFileType = outputFile.getFileType();
 			
 			ImageWriter imageWriter = null;
 			ImageWriteParam imageWriteParam = null;
@@ -264,24 +262,20 @@ public class JdkImagePlugin extends Plugin {
 		}
 		
 		@Override
-		public FileWrapper<File> createImage(FileWrapper<File> inputFileWrapper, FileType outputFileType, ScaleType outputScaleType, Integer outputScaleWidth, Integer outputScaleHeight) throws Exception {
-			FileWrapper<File> outputFileWrapper = null;
-			
-			BufferedImage inputBufferedImage = read(inputFileWrapper);
+		public TypeableFile createImage(TypeableFile inputFile, FileType outputFileType, ScaleType outputScaleType, Integer outputScaleWidth, Integer outputScaleHeight) throws Exception {
+			BufferedImage inputBufferedImage = read(inputFile);
 			
 			BufferedImage outputBufferedImage = scale(inputBufferedImage, outputScaleType, outputScaleWidth, outputScaleHeight);
 			
 			inputBufferedImage.flush();
 			
-			File outputFile = File.createTempFile("oboco-plugin-image-jdk-", ".tmp");
+			TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-image-jdk-", ".tmp"), outputFileType);
 			
-			outputFileWrapper = new FileWrapper<File>(outputFile, outputFileType);
-			
-			write(outputFileWrapper, outputBufferedImage);
+			write(outputFile, outputBufferedImage);
 			
 			outputBufferedImage.flush();
 			
-			return outputFileWrapper;
+			return outputFile;
 		}
 	}
 }
