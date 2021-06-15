@@ -33,9 +33,9 @@ public class JdkArchivePlugin extends Plugin {
         
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			List<FileType> listOutputFileType = new ArrayList<FileType>();
-			listOutputFileType.add(FileType.JPG);
-			listOutputFileType.add(FileType.PNG);
+			List<FileType> outputFileTypeList = new ArrayList<FileType>();
+			outputFileTypeList.add(FileType.JPG);
+			outputFileTypeList.add(FileType.PNG);
 			
 			zipFile = new ZipFile(inputFile);
 			zipEntryList = new ArrayList<ZipEntry>();
@@ -45,7 +45,7 @@ public class JdkArchivePlugin extends Plugin {
 	            ZipEntry zipEntry = e.nextElement();
 	            if (zipEntry.isDirectory() == false) {
 	            	FileType outputFileType = FileType.getFileType(zipEntry.getName());
-	            	if(listOutputFileType.contains(outputFileType)) {
+	            	if(outputFileTypeList.contains(outputFileType)) {
 	            		zipEntryList.add(zipEntry);
 	            	}
 	            }

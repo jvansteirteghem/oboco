@@ -33,9 +33,9 @@ public class JUnrarArchivePlugin extends Plugin {
     	
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			List<FileType> listOutputFileType = new ArrayList<FileType>();
-			listOutputFileType.add(FileType.JPG);
-			listOutputFileType.add(FileType.PNG);
+			List<FileType> outputFileTypeList = new ArrayList<FileType>();
+			outputFileTypeList.add(FileType.JPG);
+			outputFileTypeList.add(FileType.PNG);
 			
 			FileInputStream fileInputStream = new FileInputStream(inputFile);
 			
@@ -45,7 +45,7 @@ public class JUnrarArchivePlugin extends Plugin {
 	        while (fileHeader != null) {
 	            if (!fileHeader.isDirectory()) {
 	            	FileType outputFileType = FileType.getFileType(getName(fileHeader));
-	            	if(listOutputFileType.contains(outputFileType)) {
+	            	if(outputFileTypeList.contains(outputFileType)) {
 	            		fileHeaderList.add(fileHeader);
 	            	}
 	            }
