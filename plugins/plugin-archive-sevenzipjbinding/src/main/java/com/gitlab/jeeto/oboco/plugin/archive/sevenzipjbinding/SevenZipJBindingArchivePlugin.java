@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gitlab.jeeto.oboco.plugin.FileType;
+import com.gitlab.jeeto.oboco.plugin.FileType.Type;
 import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
@@ -51,9 +52,7 @@ public class SevenZipJBindingArchivePlugin extends Plugin {
     	
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			List<FileType> outputFileTypeList = new ArrayList<FileType>();
-			outputFileTypeList.add(FileType.JPG);
-			outputFileTypeList.add(FileType.PNG);
+			List<FileType> outputFileTypeList = FileType.getFileTypeList(Type.IMAGE);
 			
 			randomAccessFileIn = new RandomAccessFile(inputFile, "r");
 			
@@ -67,7 +66,7 @@ public class SevenZipJBindingArchivePlugin extends Plugin {
 			
 			simpleInArchiveItemList = new ArrayList<ISimpleInArchiveItem>();
             for (ISimpleInArchiveItem simpleInArchiveItem : simpleInArchive.getArchiveItems()) {
-                if (!simpleInArchiveItem.isFolder()) {
+                if (simpleInArchiveItem.isFolder() == false) {
                 	FileType outputFileType = FileType.getFileType(simpleInArchiveItem.getPath());
             		if(outputFileTypeList.contains(outputFileType)) {
             			simpleInArchiveItemList.add(simpleInArchiveItem);

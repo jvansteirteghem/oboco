@@ -17,6 +17,7 @@ import org.pf4j.PluginWrapper;
 import com.gitlab.jeeto.oboco.plugin.FileType;
 import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.plugin.FileType.Type;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 
@@ -33,9 +34,7 @@ public class JdkArchivePlugin extends Plugin {
         
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			List<FileType> outputFileTypeList = new ArrayList<FileType>();
-			outputFileTypeList.add(FileType.JPG);
-			outputFileTypeList.add(FileType.PNG);
+			List<FileType> outputFileTypeList = FileType.getFileTypeList(Type.IMAGE);
 			
 			zipFile = new ZipFile(inputFile);
 			zipEntryList = new ArrayList<ZipEntry>();

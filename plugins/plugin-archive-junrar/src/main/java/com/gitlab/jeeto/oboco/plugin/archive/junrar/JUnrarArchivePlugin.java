@@ -17,6 +17,7 @@ import com.github.junrar.rarfile.FileHeader;
 import com.gitlab.jeeto.oboco.plugin.FileType;
 import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.plugin.FileType.Type;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 
@@ -33,9 +34,7 @@ public class JUnrarArchivePlugin extends Plugin {
     	
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			List<FileType> outputFileTypeList = new ArrayList<FileType>();
-			outputFileTypeList.add(FileType.JPG);
-			outputFileTypeList.add(FileType.PNG);
+			List<FileType> outputFileTypeList = FileType.getFileTypeList(Type.IMAGE);
 			
 			FileInputStream fileInputStream = new FileInputStream(inputFile);
 			
@@ -43,7 +42,7 @@ public class JUnrarArchivePlugin extends Plugin {
 			
 			FileHeader fileHeader = archive.nextFileHeader();
 	        while (fileHeader != null) {
-	            if (!fileHeader.isDirectory()) {
+	            if (fileHeader.isDirectory() == false) {
 	            	FileType outputFileType = FileType.getFileType(getName(fileHeader));
 	            	if(outputFileTypeList.contains(outputFileType)) {
 	            		fileHeaderList.add(fileHeader);
