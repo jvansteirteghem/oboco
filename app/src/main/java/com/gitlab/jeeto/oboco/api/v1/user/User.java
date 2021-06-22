@@ -105,14 +105,14 @@ public class User implements Serializable {
 	public void setRootBookCollection(BookCollection rootBookCollection) {
 		this.rootBookCollection = rootBookCollection;
 	}
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	public List<BookMarkReference> getBookMarkReferences() {
 		return bookMarkReferences;
 	}
 	public void setBookMarkReferences(List<BookMarkReference> bookMarkReferences) {
 		this.bookMarkReferences = bookMarkReferences;
 	}
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	public List<BookMark> getBookMarks() {
 		return bookMarks;
 	}

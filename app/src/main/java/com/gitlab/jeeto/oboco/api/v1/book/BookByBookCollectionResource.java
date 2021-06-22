@@ -95,14 +95,12 @@ public class BookByBookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
 		PageableList<Book> bookPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("bookMarkStatus")) {
-			bookPageableList = bookService.getBooksByBookCollectionIdAndUserIdAndBookMarkStatus(rootBookCollectionId, bookCollectionId, user.getId(), bookMarkStatus, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndBookCollectionIdAndBookMarkStatus(user, bookCollectionId, bookMarkStatus, page, pageSize);
 		} else {
-			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, page, pageSize);
 		}
 		
 		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);;
@@ -140,9 +138,7 @@ public class BookByBookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
-		Linkable<Book> bookLinkable = bookService.getBooksByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId, bookId);
+		Linkable<Book> bookLinkable = bookService.getBooksByUserAndBookCollectionIdAndId(user, bookCollectionId, bookId);
 		LinkableDto<BookDto> bookLinkableDto = bookDtoMapper.getBooksDto(bookLinkable, graphDto);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
@@ -175,11 +171,9 @@ public class BookByBookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
 		Book book = null;
 		
-		PageableList<Book> bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, 1, 1);
+		PageableList<Book> bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, 1, 1);
 		
 		if(bookPageableList.getElements() != null && bookPageableList.getElements().size() == 1) {
 			book = bookPageableList.getElements().get(0);

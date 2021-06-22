@@ -88,14 +88,12 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
 		PageableList<Book> bookPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("name")) {
-			bookPageableList = bookService.getBooksByBookCollectionIdAndName(rootBookCollectionId, name, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndName(user, name, page, pageSize);
 		} else {
-			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByUser(user, page, pageSize);
 		}
 		
 		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);
@@ -133,9 +131,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
-		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -170,9 +166,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
-		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -232,9 +226,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
-		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));

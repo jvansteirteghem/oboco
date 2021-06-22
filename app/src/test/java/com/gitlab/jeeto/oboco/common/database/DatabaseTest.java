@@ -100,10 +100,10 @@ public class DatabaseTest extends TestCase {
 			
 			BookMarkReference bookMarkReference = new BookMarkReference();
 			bookMarkReference.setUser(user);
-			bookMarkReference.setFileId("0000000000");
 			bookMarkReference.setUpdateDate(updateDate);
 			bookMarkReference.setBook(book);
 			bookMarkReference.setBookMark(bookMark);
+			bookMarkReference.setBookCollection(bookCollection);
 			bookMarkReference.setRootBookCollection(bookCollection);
 			
 			entityManager.persist(bookMarkReference);

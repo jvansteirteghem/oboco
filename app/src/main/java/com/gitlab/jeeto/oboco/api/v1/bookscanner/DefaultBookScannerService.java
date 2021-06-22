@@ -24,8 +24,6 @@ import com.gitlab.jeeto.oboco.api.v1.book.Book;
 import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
-import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMark;
-import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkReference;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkService;
 import com.gitlab.jeeto.oboco.common.NameHelper;
 import com.gitlab.jeeto.oboco.common.configuration.Configuration;
@@ -33,10 +31,10 @@ import com.gitlab.jeeto.oboco.common.configuration.ConfigurationManager;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 import com.gitlab.jeeto.oboco.plugin.FileType;
+import com.gitlab.jeeto.oboco.plugin.FileType.Type;
 import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.plugin.PluginManager;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
-import com.gitlab.jeeto.oboco.plugin.FileType.Type;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderFactory;
 import com.gitlab.jeeto.oboco.plugin.hash.HashManager;
@@ -282,7 +280,7 @@ public class DefaultBookScannerService implements BookScannerService {
 			
 			logger.info("delete bookMarkReferences");
 	        
-	        bookMarkService.deleteBookMarkReferenceByUpdateDate(updateDate);
+	        bookMarkService.deleteBookMarkReferencesByUpdateDate(updateDate);
 	        
 	        logger.info("delete books");
 	        
@@ -447,20 +445,7 @@ public class DefaultBookScannerService implements BookScannerService {
 						
 						book = bookService.createBook(book);
 						
-						List<BookMark> bookMarkList = bookMarkService.getBookMarksByFileId(book.getFileId());
-						for(BookMark bookMark: bookMarkList) {
-							logger.info("create bookMarkReference");
-							
-							BookMarkReference bookMarkReference = new BookMarkReference();
-							bookMarkReference.setUser(bookMark.getUser());
-							bookMarkReference.setFileId(bookMark.getFileId());
-							bookMarkReference.setUpdateDate(updateDate);
-							bookMarkReference.setBook(book);
-							bookMarkReference.setBookMark(bookMark);
-							bookMarkReference.setRootBookCollection(rootBookCollection);
-							
-							bookMarkReference = bookMarkService.createBookMarkReference(bookMarkReference);
-						}
+						bookMarkService.createBookMarkReferencesByBook(book);
 					} else {
 						logger.info("update book " + path);
 						
@@ -501,14 +486,7 @@ public class DefaultBookScannerService implements BookScannerService {
 						
 						book = bookService.updateBook(book);
 						
-						List<BookMarkReference> bookMarkReferenceList = bookMarkService.getBookMarkReferencesByFileId(book.getFileId());
-						for(BookMarkReference bookMarkReference: bookMarkReferenceList) {
-							logger.info("update bookMarkReference");
-							
-							bookMarkReference.setUpdateDate(updateDate);
-							
-							bookMarkReference = bookMarkService.updateBookMarkReference(bookMarkReference);
-						}
+						bookMarkService.updateBookMarkReferencesByBook(book);
 					}
 				}
 			}

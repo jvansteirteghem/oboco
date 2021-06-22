@@ -8,6 +8,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 
+import com.gitlab.jeeto.oboco.api.v1.book.Book;
+import com.gitlab.jeeto.oboco.api.v1.book.BookService;
+import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
+import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
@@ -15,52 +19,20 @@ import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 public class BookMarkService {
 	@Inject
 	private EntityManager entityManager;
+	@Inject
+	private BookService bookService;
 	
 	public BookMarkService() {
 		super();
 	}
 	
-	// bookMarkReference
-	
-	public BookMarkReference createBookMarkReference(BookMarkReference bookMarkReference) throws ProblemException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
-		try {
-			entityManager.persist(bookMarkReference);
-			
-			entityTransaction.commit();
-		} catch(Exception e) {
-			entityTransaction.rollback();
-			
-			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
-		}
-		
-        return bookMarkReference;
-	}
-	
-	public BookMarkReference updateBookMarkReference(BookMarkReference bookMarkReference) throws ProblemException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
-		try {
-			bookMarkReference = entityManager.merge(bookMarkReference);
-			
-			entityTransaction.commit();
-		} catch(Exception e) {
-			entityTransaction.rollback();
-			
-			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
-		}
-		
-        return bookMarkReference;
-	}
-	
-	public BookMarkReference getLastBookMarkReferenceByBookCollectionIdAndUserId(Long rootBookCollectionId, Long userId) throws ProblemException {
+	public BookMarkReference getLastestBookMarkReferenceByUser(User user) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
 			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId order by bmr.bookMark.updateDate desc", BookMarkReference.class)
-				.setParameter("rootBookCollectionId", rootBookCollectionId)
-				.setParameter("userId", userId)
+				.setParameter("rootBookCollectionId", user.getRootBookCollection().getId())
+				.setParameter("userId", user.getId())
 				.setMaxResults(1)
 				.getSingleResult();
 		} catch(NoResultException e) {
@@ -70,30 +42,14 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public BookMarkReference getBookMarkReferenceByBookCollectionIdAndUserIdAndId(Long rootBookCollectionId, Long userId, Long id) throws ProblemException {
-		BookMarkReference bookMarkReference = null;
-		
-		try {
-			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId and bmr.id = :id", BookMarkReference.class)
-				.setParameter("rootBookCollectionId", rootBookCollectionId)
-				.setParameter("userId", userId)
-				.setParameter("id", id)
-				.getSingleResult();
-		} catch(NoResultException e) {
-			
-		}
-		
-        return bookMarkReference;
-	}
-	
-	public BookMarkReference getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(Long rootBookCollectionId, Long userId, Long bookId) throws ProblemException {
+	public BookMarkReference getBookMarkReferenceByUserAndBook(User user, Book book) throws ProblemException {
 		BookMarkReference bookMarkReference = null;
 		
 		try {
 			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId and bmr.book.id = :bookId", BookMarkReference.class)
-				.setParameter("rootBookCollectionId", rootBookCollectionId)
-				.setParameter("userId", userId)
-				.setParameter("bookId", bookId)
+				.setParameter("rootBookCollectionId", user.getRootBookCollection().getId())
+				.setParameter("userId", user.getId())
+				.setParameter("bookId", book.getId())
 				.getSingleResult();
 		} catch(NoResultException e) {
 			
@@ -102,15 +58,15 @@ public class BookMarkService {
         return bookMarkReference;
 	}
 	
-	public PageableList<BookMarkReference> getBookMarkReferencesByBookCollectionIdAndUserId(Long rootBookCollectionId, Long userId, Integer page, Integer pageSize) throws ProblemException {
+	public PageableList<BookMarkReference> getBookMarkReferencesByUser(User user, Integer page, Integer pageSize) throws ProblemException {
 		Long bookMarkListSize = (Long) entityManager.createQuery("select count(bmr.id) from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId")
-				.setParameter("rootBookCollectionId", rootBookCollectionId)
-				.setParameter("userId", userId)
+				.setParameter("rootBookCollectionId", user.getRootBookCollection().getId())
+				.setParameter("userId", user.getId())
 				.getSingleResult();
 		
 		List<BookMarkReference> bookMarkList = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId order by bmr.bookMark.updateDate desc", BookMarkReference.class)
-				.setParameter("rootBookCollectionId", rootBookCollectionId)
-				.setParameter("userId", userId)
+				.setParameter("rootBookCollectionId", user.getRootBookCollection().getId())
+				.setParameter("userId", user.getId())
 				.setFirstResult((page - 1) * pageSize)
 				.setMaxResults(pageSize)
 				.getResultList();
@@ -120,15 +76,15 @@ public class BookMarkService {
         return bookMarkPageableList;
 	}
 	
-	public List<BookMarkReference> getBookMarkReferencesByFileId(String fileId) throws ProblemException {
-		List<BookMarkReference> bookMarkReferenceList = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.fileId = :fileId", BookMarkReference.class)
-				.setParameter("fileId", fileId)
+	public List<BookMarkReference> getBookMarkReferencesByBookId(Long bookId) throws ProblemException {
+		List<BookMarkReference> bookMarkReferenceList = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.book.id = :bookId", BookMarkReference.class)
+				.setParameter("bookId", bookId)
 				.getResultList();
 		
         return bookMarkReferenceList;
 	}
 	
-	public void deleteBookMarkReferenceByUpdateDate(Date updateDate) throws ProblemException {
+	public void deleteBookMarkReferencesByUpdateDate(Date updateDate) throws ProblemException {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
@@ -144,67 +100,17 @@ public class BookMarkService {
 		}
 	}
 	
-	// bookMark
-	
-	public BookMark createBookMark(BookMark bookMark) throws ProblemException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
-		try {
-			entityManager.persist(bookMark);
-			
-			entityTransaction.commit();
-		} catch(Exception e) {
-			entityTransaction.rollback();
-			
-			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
-		}
-		
-        return bookMark;
-	}
-	
-	public BookMark updateBookMark(BookMark bookMark) throws ProblemException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
-		try {
-			bookMark = entityManager.merge(bookMark);
-			
-			entityTransaction.commit();
-		} catch(Exception e) {
-			entityTransaction.rollback();
-			
-			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
-		}
-		
-        return bookMark;
-	}
-	
-	public void deleteBookMark(BookMark bookMark) throws ProblemException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
-		try {
-			bookMark = entityManager.merge(bookMark);
-			
-			entityManager.remove(bookMark);
-			
-			entityTransaction.commit();
-		} catch(Exception e) {
-			entityTransaction.rollback();
-			
-			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
-		}
-	}
-	
-	public void deleteBookMarkByUserId(Long userId) throws ProblemException {
+	public void deleteBookMarksByUser(User user) throws ProblemException {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
 			entityManager.createQuery("delete from BookMarkReference bmr where bmr.user.id = :userId")
-				.setParameter("userId", userId)
+				.setParameter("userId", user.getId())
 				.executeUpdate();
 			
 			entityManager.createQuery("delete from BookMark bm where bm.user.id = :userId")
-			.setParameter("userId", userId)
-			.executeUpdate();
+				.setParameter("userId", user.getId())
+				.executeUpdate();
 			
 			entityTransaction.commit();
 		} catch(Exception e) {
@@ -212,6 +118,21 @@ public class BookMarkService {
 			
 			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
 		}
+	}
+	
+	public BookMark getBookMarkByUserAndFileId(User user, String fileId) throws ProblemException {
+		BookMark bookMark = null;
+		
+		try {
+			bookMark = entityManager.createQuery("select bm from BookMark bm where bm.user.id = :userId and bm.fileId = :fileId", BookMark.class)
+				.setParameter("userId", user.getId())
+				.setParameter("fileId", fileId)
+				.getSingleResult();
+		} catch(NoResultException e) {
+			
+		}
+		
+        return bookMark;
 	}
 	
 	public List<BookMark> getBookMarksByFileId(String fileId) throws ProblemException {
@@ -220,5 +141,189 @@ public class BookMarkService {
 				.getResultList();
 		
         return bookMarkList;
+	}
+	
+	public void createBookMarkReferencesByBook(Book book) throws ProblemException {
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		try {
+			List<BookMark> bookMarkList = getBookMarksByFileId(book.getFileId());
+			
+			for(BookMark bookMark: bookMarkList) {
+				BookMarkReference bookMarkReference = new BookMarkReference();
+				bookMarkReference.setUser(bookMark.getUser());
+				bookMarkReference.setBook(book);
+				bookMarkReference.setBookCollection(book.getBookCollection());
+				bookMarkReference.setRootBookCollection(book.getRootBookCollection());
+				bookMarkReference.setBookMark(bookMark);
+				bookMarkReference.setUpdateDate(book.getUpdateDate());
+				
+				entityManager.persist(bookMarkReference);
+			}
+			
+			entityTransaction.commit();
+		} catch(Exception e) {
+			entityTransaction.rollback();
+			
+			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
+		}
+	}
+	
+	public void updateBookMarkReferencesByBook(Book book) throws ProblemException {
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		try {
+			List<BookMarkReference> bookMarkReferenceList = getBookMarkReferencesByBookId(book.getId());
+			
+			for(BookMarkReference bookMarkReference: bookMarkReferenceList) {
+				bookMarkReference.setUpdateDate(book.getUpdateDate());
+				
+				bookMarkReference = entityManager.merge(bookMarkReference);
+			}
+			
+			entityTransaction.commit();
+		} catch(Exception e) {
+			entityTransaction.rollback();
+			
+			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
+		}
+	}
+	
+	public void createOrUpdateBookMarksByUserAndBookCollection(User user, BookCollection bookCollection) throws ProblemException {
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		try {
+			Date updateDate = new Date();
+			
+			List<Book> bookList = bookCollection.getBooks();
+			
+			for(Book book: bookList) {
+				BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+				
+				if(bookMark == null) {
+					bookMark = new BookMark();
+					bookMark.setUser(user);
+					bookMark.setFileId(book.getFileId());
+					bookMark.setUpdateDate(updateDate);
+					bookMark.setPage(book.getNumberOfPages());
+					
+					entityManager.persist(bookMark);
+					
+					List<Book> referencedBookList = bookService.getBooksByFileId(book.getFileId());
+					
+					for(Book referencedBook: referencedBookList) {
+						BookMarkReference bookMarkReference = new BookMarkReference();
+						bookMarkReference.setUser(user);
+						bookMarkReference.setBook(referencedBook);
+						bookMarkReference.setBookCollection(referencedBook.getBookCollection());
+						bookMarkReference.setRootBookCollection(referencedBook.getRootBookCollection());
+						bookMarkReference.setBookMark(bookMark);
+						bookMarkReference.setUpdateDate(updateDate);
+						
+						entityManager.persist(bookMarkReference);
+					}
+				} else {
+					bookMark.setUpdateDate(updateDate);
+					bookMark.setPage(book.getNumberOfPages());
+					
+					bookMark = entityManager.merge(bookMark);
+				}
+			}
+			
+			entityTransaction.commit();
+		} catch(Exception e) {
+			entityTransaction.rollback();
+			
+			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
+		}
+	}
+	
+	public void deleteBookMarksByUserAndBookCollection(User user, BookCollection bookCollection) throws ProblemException {
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		try {
+			List<Book> bookList = bookCollection.getBooks();
+			
+			for(Book book: bookList) {
+				BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+				
+				if(bookMark != null) {
+					entityManager.remove(bookMark);
+				}
+			}
+			
+			entityTransaction.commit();
+		} catch(Exception e) {
+			entityTransaction.rollback();
+			
+			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
+		}
+	}
+	
+	public BookMarkReference createOrUpdateBookMarkByUserAndBook(User user, Book book, Integer bookPage) throws ProblemException {
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		try {
+			Date updateDate = new Date();
+			
+			BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+			
+			if(bookMark == null) {
+				bookMark = new BookMark();
+				bookMark.setUser(user);
+				bookMark.setFileId(book.getFileId());
+				bookMark.setUpdateDate(updateDate);
+				bookMark.setPage(bookPage);
+				
+				entityManager.persist(bookMark);
+				
+				List<Book> referencedBookList = bookService.getBooksByFileId(book.getFileId());
+				
+				for(Book referencedBook: referencedBookList) {
+					BookMarkReference bookMarkReference = new BookMarkReference();
+					bookMarkReference.setUser(user);
+					bookMarkReference.setBook(referencedBook);
+					bookMarkReference.setBookCollection(referencedBook.getBookCollection());
+					bookMarkReference.setRootBookCollection(referencedBook.getRootBookCollection());
+					bookMarkReference.setBookMark(bookMark);
+					bookMarkReference.setUpdateDate(updateDate);
+					
+					entityManager.persist(bookMarkReference);
+				}
+			} else {
+				bookMark.setUpdateDate(updateDate);
+				bookMark.setPage(bookPage);
+				
+				bookMark = entityManager.merge(bookMark);
+			}
+			
+			entityTransaction.commit();
+		} catch(Exception e) {
+			entityTransaction.rollback();
+			
+			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
+		}
+		
+		BookMarkReference bookMarkReference = getBookMarkReferenceByUserAndBook(user, book);
+		
+		return bookMarkReference;
+	}
+	
+	public void deleteBookMarkByUserAndBook(User user, Book book) throws ProblemException {
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		try {
+			BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+			
+			if(bookMark != null) {
+				entityManager.remove(bookMark);
+			}
+			
+			entityTransaction.commit();
+		} catch(Exception e) {
+			entityTransaction.rollback();
+			
+			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
+		}
 	}
 }

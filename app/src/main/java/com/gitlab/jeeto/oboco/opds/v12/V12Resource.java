@@ -98,16 +98,14 @@ public class V12Resource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
 		PageableList<BookCollection> bookCollectionPageableList = null;
 		
 		boolean hasParentBookCollectionId = uriInfo.getQueryParameters().containsKey("parentBookCollectionId");
 		
 		if(hasParentBookCollectionId) {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, parentBookCollectionId, page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, parentBookCollectionId, page, pageSize);
 		} else {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, page, pageSize);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -178,16 +176,14 @@ public class V12Resource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
 		PageableList<Book> bookPageableList = null;
 		
 		boolean hasBookCollectionId = uriInfo.getQueryParameters().containsKey("bookCollectionId");
 		
 		if(hasBookCollectionId) {
-			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, bookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, page, pageSize);
 		} else {
-			bookPageableList = bookService.getBooksByBookCollectionId(rootBookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByUser(user, page, pageSize);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -244,9 +240,7 @@ public class V12Resource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
-		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -270,9 +264,7 @@ public class V12Resource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
-		Book book = bookService.getBookByBookCollectionIdAndId(rootBookCollectionId, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));

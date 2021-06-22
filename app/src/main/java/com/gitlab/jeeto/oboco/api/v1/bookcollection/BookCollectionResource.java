@@ -84,21 +84,19 @@ public class BookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
 		PageableList<BookCollection> bookCollectionPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("parentBookCollectionId")) {
 			if(uriInfo.getQueryParameters().containsKey("name")) {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionIdAndName(rootBookCollectionId, parentBookCollectionId, name, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndName(user, parentBookCollectionId, name, page, pageSize);
 			} else {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, parentBookCollectionId, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, parentBookCollectionId, page, pageSize);
 			}
 		} else {
 			if(uriInfo.getQueryParameters().containsKey("name")) {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionIdAndName(rootBookCollectionId, name, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndName(user, name, page, pageSize);
 			} else {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByBookCollectionId(rootBookCollectionId, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, page, pageSize);
 			}
 		}
 		
@@ -153,6 +151,47 @@ public class BookCollectionResource {
 	}
 	
 	@Operation(
+		description = "Get the latest bookCollections.",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "The latest bookCollections.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookCollectionPageableListDto.class))),
+			@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+			@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+			@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+			@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+			@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+		}
+	)
+	@Path("LATEST/bookCollections")
+	@GET
+	public Response getLatestBookCollections(
+			@Parameter(name = "name", description = "The name of the bookCollection.", required = false) @QueryParam("name") String name, 
+			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
+			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
+			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection,bookCollections,books).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+		PageableListDtoHelper.validatePageableList(page, pageSize);
+		
+		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
+		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(parentBookCollection,bookCollections,books)");
+		
+		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		
+		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
+		
+		if(user.getRootBookCollection() == null) {
+			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
+		}
+		
+		PageableList<BookCollection> bookCollectionPageableList = bookCollectionService.getLatestBookCollectionsByUserAndName(user, name, page, pageSize);
+		
+		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionPageableList, graphDto);
+		
+		ResponseBuilder responseBuilder = Response.status(200);
+		responseBuilder.entity(bookCollectionPageableListDto);
+		
+		return responseBuilder.build();
+	}
+	
+	@Operation(
 		description = "Get the bookCollection.",
     	responses = {
     		@ApiResponse(responseCode = "200", description = "The bookCollection.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookCollectionDto.class))),
@@ -179,9 +218,7 @@ public class BookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Long rootBookCollectionId = user.getRootBookCollection().getId();
-		
-		BookCollection bookCollection = bookCollectionService.getBookCollectionByBookCollectionIdAndId(rootBookCollectionId, bookCollectionId);
+		BookCollection bookCollection = bookCollectionService.getBookCollectionByUserAndId(user, bookCollectionId);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_COLLECTION_NOT_FOUND", "The bookCollection is not found."));

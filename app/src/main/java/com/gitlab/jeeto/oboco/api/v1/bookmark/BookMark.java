@@ -24,6 +24,7 @@ import com.gitlab.jeeto.oboco.api.v1.user.User;
 @Table(
 	name = "bookMarks",
 	indexes = {
+		@Index(name = "bookMarkUserIdFileId", columnList = "userId,fileId", unique = true),
 		@Index(name = "bookMarkFileId", columnList = "fileId", unique = false),
 		@Index(name = "bookMarkUpdateDate", columnList = "updateDate", unique = false)
 	}
@@ -77,7 +78,7 @@ public class BookMark {
 	public void setPage(Integer page) {
 		this.page = page;
 	}
-	@OneToMany(mappedBy = "bookMark", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "bookMark", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	public List<BookMarkReference> getBookMarkReferences() {
 		return bookMarkReferences;
 	}

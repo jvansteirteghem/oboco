@@ -23,18 +23,17 @@ import com.gitlab.jeeto.oboco.api.v1.user.User;
 @Table(
 	name = "bookMarkReferences",
 	indexes = {
-		@Index(name = "bookMarkReferenceUserIdBookIdBookMarkId", columnList = "userId,bookId,bookMarkId", unique = true),
-		@Index(name = "bookMarkReferenceFileId", columnList = "fileId", unique = false),
+		@Index(name = "bookMarkReferenceUserIdBookId", columnList = "userId,bookId", unique = true),
 		@Index(name = "bookMarkReferenceUpdateDate", columnList = "updateDate", unique = false)
 	}
 )
 public class BookMarkReference {
 	private Long id;
 	private User user;
-	private String fileId;
 	private Date updateDate;
 	private Book book;
 	private BookMark bookMark;
+	private BookCollection bookCollection;
 	private BookCollection rootBookCollection;
 	public BookMarkReference() {
 		super();
@@ -55,13 +54,6 @@ public class BookMarkReference {
 	}
 	public void setUser(User user) {
 		this.user = user;
-	}
-	@Column(name = "fileId", length = 64, nullable = false)
-	public String getFileId() {
-		return fileId;
-	}
-	public void setFileId(String fileId) {
-		this.fileId = fileId;
 	}
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "updateDate", nullable = false)
@@ -86,6 +78,14 @@ public class BookMarkReference {
 	}
 	public void setBookMark(BookMark bookMark) {
 		this.bookMark = bookMark;
+	}
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "bookCollectionId", referencedColumnName = "id", nullable = false)
+	public BookCollection getBookCollection() {
+		return bookCollection;
+	}
+	public void setBookCollection(BookCollection bookCollection) {
+		this.bookCollection = bookCollection;
 	}
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "rootBookCollectionId", referencedColumnName = "id", nullable = false)

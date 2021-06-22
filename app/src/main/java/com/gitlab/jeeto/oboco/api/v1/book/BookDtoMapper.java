@@ -85,9 +85,7 @@ public class BookDtoMapper {
 						throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 					}
 					
-					Long rootBookCollectionId = user.getRootBookCollection().getId();
-					
-					BookMarkReference bookMarkReference = getBookMarkService().getBookMarkReferenceByBookCollectionIdAndUserIdAndBookId(rootBookCollectionId, user.getId(), book.getId());
+					BookMarkReference bookMarkReference = getBookMarkService().getBookMarkReferenceByUserAndBook(user, book);
 					BookMarkDto bookMarkDto = getBookMarkDtoMapper().getBookMarkDto(bookMarkReference, nestedGraphDto);
 					
 					bookDto.setBookMark(bookMarkDto);
