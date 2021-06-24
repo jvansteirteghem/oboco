@@ -112,9 +112,9 @@ public class BookByBookCollectionResource {
 	}
 	
 	@Operation(
-		description = "Get the books in the neighbourhood of the book of the bookCollection.",
+		description = "Get the previous and next books of the book of the bookCollection.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "The books.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookLinkableDto.class))),
+    		@ApiResponse(responseCode = "200", description = "The previous and next books.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookLinkableDto.class))),
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
@@ -122,7 +122,7 @@ public class BookByBookCollectionResource {
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("{bookId}/NEIGHBOURHOOD")
+	@Path("{bookId}/books")
 	@GET
 	public Response getBooksByBookCollectionAndBook(
 			@Parameter(name = "bookId", description = "The id of the book.", required = false) @PathParam("bookId") Long bookId, 

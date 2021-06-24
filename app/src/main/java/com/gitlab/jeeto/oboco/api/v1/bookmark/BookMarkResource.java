@@ -13,6 +13,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
+import com.gitlab.jeeto.oboco.api.v1.book.Book;
+import com.gitlab.jeeto.oboco.api.v1.book.BookDto;
+import com.gitlab.jeeto.oboco.api.v1.book.BookDtoMapper;
+import com.gitlab.jeeto.oboco.api.v1.book.BookPageableListDto;
+import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.GraphDto;
 import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
@@ -43,7 +48,11 @@ public class BookMarkResource {
 	@Inject
 	private BookMarkService bookMarkService;
 	@Inject
+	private BookService bookService;
+	@Inject
 	private BookMarkDtoMapper bookMarkDtoMapper;
+	@Inject
+	private BookDtoMapper bookDtoMapper;
 	
 	@Operation(
 		description = "Delete the bookMarks.",
@@ -110,22 +119,24 @@ public class BookMarkResource {
 	}
 	
 	@Operation(
-		description = "Get the lastest bookMark.",
+		description = "Get the books of the lastest bookMark.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "The lastest bookMark.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookMarkDto.class))),
-    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "200", description = "The books of the lastest bookMark.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookPageableListDto.class))),
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND, PROBLEM_BOOK_MARK_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("LASTEST")
+	@Path("LASTEST/books")
 	@GET
-	public Response getLastBookMark(
-			@Parameter(name = "graph", description = "The graph. The full graph is (book(bookCollection)).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+	public Response getLastestBookMark(
+			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
+			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
+			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(book(bookCollection))");
+		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(bookCollection,bookMark)");
 		
 		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
 		
@@ -135,16 +146,18 @@ public class BookMarkResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		BookMarkReference bookMarkReference = bookMarkService.getLastestBookMarkReferenceByUser(user);
+		BookMark bookMark = bookMarkService.getLatestBookMarkByUser(user);
 		
-		if(bookMarkReference == null) {
+		if(bookMark == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_MARK_NOT_FOUND", "The bookMark is not found."));
 		}
 		
-		BookMarkDto bookMarkDto = bookMarkDtoMapper.getBookMarkDto(bookMarkReference, graphDto);
+		PageableList<Book> bookPageableList = bookService.getBooksByUserAndBookMark(user, bookMark, page, pageSize);
+		
+		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);
 	        
 		ResponseBuilder responseBuilder = Response.status(200);
-		responseBuilder.entity(bookMarkDto);
+		responseBuilder.entity(bookPageableListDto);
 		
 		return responseBuilder.build();
 	}

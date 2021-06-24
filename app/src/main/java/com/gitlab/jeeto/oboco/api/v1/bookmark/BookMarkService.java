@@ -26,11 +26,11 @@ public class BookMarkService {
 		super();
 	}
 	
-	public BookMarkReference getLastestBookMarkReferenceByUser(User user) throws ProblemException {
-		BookMarkReference bookMarkReference = null;
+	public BookMark getLatestBookMarkByUser(User user) throws ProblemException {
+		BookMark bookMark = null;
 		
 		try {
-			bookMarkReference = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId order by bmr.bookMark.updateDate desc", BookMarkReference.class)
+			bookMark = entityManager.createQuery("select bmr.bookMark from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId order by bmr.bookMark.updateDate desc", BookMark.class)
 				.setParameter("rootBookCollectionId", user.getRootBookCollection().getId())
 				.setParameter("userId", user.getId())
 				.setMaxResults(1)
@@ -39,7 +39,7 @@ public class BookMarkService {
 			
 		}
 		
-        return bookMarkReference;
+		return bookMark;
 	}
 	
 	public BookMarkReference getBookMarkReferenceByUserAndBook(User user, Book book) throws ProblemException {

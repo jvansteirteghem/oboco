@@ -10,6 +10,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMark;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkStatus;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.Linkable;
@@ -291,5 +292,25 @@ public class BookService {
 			
 			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
 		}
+	}
+	
+	public PageableList<Book> getBooksByUserAndBookMark(User user, BookMark bookMark, Integer page, Integer pageSize) throws ProblemException {
+		Long bookListSize = (Long) entityManager.createQuery("select count(bmr.book.id) from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId and bmr.bookMark.id = :bookMarkId")
+				.setParameter("rootBookCollectionId", user.getRootBookCollection().getId())
+				.setParameter("userId", user.getId())
+				.setParameter("bookMarkId", bookMark.getId())
+				.getSingleResult();
+		
+		List<Book> bookList = entityManager.createQuery("select bmr.book from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId and bmr.bookMark.id = :bookMarkId order by bmr.book.number asc", Book.class)
+				.setParameter("rootBookCollectionId", user.getRootBookCollection().getId())
+				.setParameter("userId", user.getId())
+				.setParameter("bookMarkId", bookMark.getId())
+				.setFirstResult((page - 1) * pageSize)
+				.setMaxResults(pageSize)
+				.getResultList();
+        
+        PageableList<Book> bookPageableList = new PageableList<Book>(bookList, bookListSize, page, pageSize);
+        
+        return bookPageableList;
 	}
 }
