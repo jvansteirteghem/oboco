@@ -3,30 +3,13 @@ package com.gitlab.jeeto.oboco.api.v1.bookcollection;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import com.gitlab.jeeto.oboco.api.v1.book.Book;
-import com.gitlab.jeeto.oboco.api.v1.book.BookDto;
-import com.gitlab.jeeto.oboco.api.v1.book.BookDtoMapper;
-import com.gitlab.jeeto.oboco.common.GraphDto;
+import com.gitlab.jeeto.oboco.common.Graph;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 
 public class BookCollectionDtoMapper {
-	private BookDtoMapper bookDtoMapper;
-	@Inject
-	private Provider<BookDtoMapper> bookDtoMapperProvider;
-	
-	private BookDtoMapper getBookDtoMapper() {
-		if(bookDtoMapper == null) {
-			bookDtoMapper = bookDtoMapperProvider.get();
-		}
-		return bookDtoMapper;
-	}
-	
-	public BookCollectionDto getBookCollectionDto(BookCollection bookCollection, GraphDto graphDto) throws ProblemException {
+	public BookCollectionDto getBookCollectionDto(BookCollection bookCollection, Graph graph) throws ProblemException {
 		BookCollectionDto bookCollectionDto = null;
 		if(bookCollection != null) {
 			bookCollectionDto = new BookCollectionDto();
@@ -36,32 +19,14 @@ public class BookCollectionDtoMapper {
 			bookCollectionDto.setNumberOfBookCollections(bookCollection.getNumberOfBookCollections());
 			bookCollectionDto.setNumberOfBooks(bookCollection.getNumberOfBooks());
 			
-			if(graphDto != null) {
-				if(graphDto.containsKey("parentBookCollection")) {
-					GraphDto nestedGraphDto = graphDto.get("parentBookCollection");
+			if(graph != null) {
+				if(graph.containsKey("parentBookCollection")) {
+					Graph parentBookCollectionGraph = graph.get("parentBookCollection");
 					
 					BookCollection parentBookCollection = bookCollection.getParentBookCollection();
-					BookCollectionDto parentBookCollectionDto = getBookCollectionDto(parentBookCollection, nestedGraphDto);
+					BookCollectionDto parentBookCollectionDto = getBookCollectionDto(parentBookCollection, parentBookCollectionGraph);
 					
 					bookCollectionDto.setParentBookCollection(parentBookCollectionDto);
-				}
-				
-				if(graphDto.containsKey("bookCollections")) {
-					GraphDto nestedGraphDto = graphDto.get("bookCollections");
-					
-					List<BookCollection> bookCollectionList = bookCollection.getBookCollections();
-					List<BookCollectionDto> bookCollectionListDto = getBookCollectionsDto(bookCollectionList, nestedGraphDto);
-					
-					bookCollectionDto.setBookCollections(bookCollectionListDto);
-				}
-				
-				if(graphDto.containsKey("books")) {
-					GraphDto nestedGraphDto = graphDto.get("books");
-					
-					List<Book> bookList = bookCollection.getBooks();
-					List<BookDto> bookListDto = getBookDtoMapper().getBooksDto(bookList, nestedGraphDto);
-					
-					bookCollectionDto.setBooks(bookListDto);
 				}
 			}
 		}
@@ -69,13 +34,13 @@ public class BookCollectionDtoMapper {
 		return bookCollectionDto;
 	}
 	
-	public List<BookCollectionDto> getBookCollectionsDto(List<BookCollection> bookCollectionList, GraphDto graphDto) throws ProblemException {
+	public List<BookCollectionDto> getBookCollectionsDto(List<BookCollection> bookCollectionList, Graph graph) throws ProblemException {
 		List<BookCollectionDto> bookCollectionListDto = null;
 		if(bookCollectionList != null) {
 			bookCollectionListDto = new ArrayList<BookCollectionDto>();
 			
 			for(BookCollection bookCollection: bookCollectionList) {
-				BookCollectionDto bookCollectionDto = getBookCollectionDto(bookCollection, graphDto);
+				BookCollectionDto bookCollectionDto = getBookCollectionDto(bookCollection, graph);
 				
 				bookCollectionListDto.add(bookCollectionDto);
 			}
@@ -84,14 +49,14 @@ public class BookCollectionDtoMapper {
 		return bookCollectionListDto;
 	}
 	
-	public PageableListDto<BookCollectionDto> getBookCollectionsDto(PageableList<BookCollection> bookCollectionPageableList, GraphDto graphDto) throws ProblemException {
+	public PageableListDto<BookCollectionDto> getBookCollectionsDto(PageableList<BookCollection> bookCollectionPageableList, Graph graph) throws ProblemException {
 		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = null;
 		if(bookCollectionPageableList != null) {
 			bookCollectionPageableListDto = new PageableListDto<BookCollectionDto>();
 			
 			List<BookCollectionDto> bookCollectionListDto = new ArrayList<BookCollectionDto>();
 			for(BookCollection bookCollection: bookCollectionPageableList.getElements()) {
-				BookCollectionDto bookCollectionDto = getBookCollectionDto(bookCollection, graphDto);
+				BookCollectionDto bookCollectionDto = getBookCollectionDto(bookCollection, graph);
 				
 				bookCollectionListDto.add(bookCollectionDto);
 			}

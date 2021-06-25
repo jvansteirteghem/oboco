@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.api.v1.user.UserService;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.exception.ProblemDto;
 
 @Authentication
@@ -131,7 +133,9 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					return;
 				}
 		    	
-		    	User user = userService.getUserByName(accessToken.getName());
+		    	Graph graph = GraphHelper.createGraph("(rootBookCollection)");
+		    	
+		    	User user = userService.getUserByName(accessToken.getName(), graph);
 				
 				if(user == null) {
 					ResponseBuilder responseBuilder = Response.status(401);

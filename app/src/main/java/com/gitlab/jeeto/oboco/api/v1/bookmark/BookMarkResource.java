@@ -19,8 +19,8 @@ import com.gitlab.jeeto.oboco.api.v1.book.BookDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.book.BookPageableListDto;
 import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
-import com.gitlab.jeeto.oboco.common.GraphDto;
-import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.PageableListDtoHelper;
@@ -97,10 +97,10 @@ public class BookMarkResource {
 			@Parameter(name = "graph", description = "The graph. The full graph is (book(bookCollection)).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(book(bookCollection))");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(book(bookCollection))");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -108,9 +108,9 @@ public class BookMarkResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		PageableList<BookMarkReference> bookMarkReferencePageableList = bookMarkService.getBookMarkReferencesByUser(user, page, pageSize);
+		PageableList<BookMarkReference> bookMarkReferencePageableList = bookMarkService.getBookMarkReferencesByUser(user, page, pageSize, graph);
 		
-		PageableListDto<BookMarkDto> bookMarkPageableListDto = bookMarkDtoMapper.getBookMarksDto(bookMarkReferencePageableList, graphDto);
+		PageableListDto<BookMarkDto> bookMarkPageableListDto = bookMarkDtoMapper.getBookMarksDto(bookMarkReferencePageableList, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookMarkPageableListDto);
@@ -135,10 +135,10 @@ public class BookMarkResource {
 			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
 			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
 			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(bookCollection,bookMark)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(bookCollection,bookMark)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -152,9 +152,9 @@ public class BookMarkResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_MARK_NOT_FOUND", "The bookMark is not found."));
 		}
 		
-		PageableList<Book> bookPageableList = bookService.getBooksByUserAndBookMark(user, bookMark, page, pageSize);
+		PageableList<Book> bookPageableList = bookService.getBooksByUserAndBookMark(user, bookMark, page, pageSize, graph);
 		
-		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);
+		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graph);
 	        
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookPageableListDto);

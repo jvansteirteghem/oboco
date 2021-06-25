@@ -9,7 +9,7 @@ import javax.inject.Provider;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDto;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDtoMapper;
-import com.gitlab.jeeto.oboco.common.GraphDto;
+import com.gitlab.jeeto.oboco.common.Graph;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
@@ -26,7 +26,7 @@ public class UserDtoMapper {
 		return bookCollectionDtoMapper;
 	}
 	
-	public UserDto getUserDto(User user, GraphDto graphDto) throws ProblemException {
+	public UserDto getUserDto(User user, Graph graph) throws ProblemException {
 		UserDto userDto = null;
 		if(user != null) {
 			userDto = new UserDto();
@@ -35,12 +35,12 @@ public class UserDtoMapper {
 			userDto.setRoles(user.getRoles());
 			userDto.setUpdateDate(user.getUpdateDate());
 			
-			if(graphDto != null) {
-				if(graphDto.containsKey("rootBookCollection")) {
-					GraphDto nestedGraphDto = graphDto.get("rootBookCollection");
+			if(graph != null) {
+				if(graph.containsKey("rootBookCollection")) {
+					Graph rootBookCollectionGraph = graph.get("rootBookCollection");
 					
 					BookCollection rootBookCollection = user.getRootBookCollection();
-					BookCollectionDto rootBookCollectionDto = getBookCollectionDtoMapper().getBookCollectionDto(rootBookCollection, nestedGraphDto);
+					BookCollectionDto rootBookCollectionDto = getBookCollectionDtoMapper().getBookCollectionDto(rootBookCollection, rootBookCollectionGraph);
 					
 					userDto.setRootBookCollection(rootBookCollectionDto);
 				}
@@ -50,14 +50,14 @@ public class UserDtoMapper {
 		return userDto;
 	}
 	
-	public PageableListDto<UserDto> getUsersDto(PageableList<User> userPageableList, GraphDto graphDto) throws ProblemException {
+	public PageableListDto<UserDto> getUsersDto(PageableList<User> userPageableList, Graph graph) throws ProblemException {
 		PageableListDto<UserDto> userPageableListDto = null;
 		if(userPageableList != null) {
 			userPageableListDto = new PageableListDto<UserDto>();
 			
 			List<UserDto> userListDto = new ArrayList<UserDto>();
 			for(User user: userPageableList.getElements()) {
-				UserDto userDto = getUserDto(user, graphDto);
+				UserDto userDto = getUserDto(user, graph);
 				
 				userListDto.add(userDto);
 			}

@@ -26,8 +26,8 @@ import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDto;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionPageableListDto;
-import com.gitlab.jeeto.oboco.common.GraphDto;
-import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.PageableListDtoHelper;
@@ -76,20 +76,20 @@ public class UserResource {
 	@GET
 	public Response getAuthenticatedUser(
 			@Parameter(name = "graph", description = "A graph. A full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(rootBookCollection)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		String userName = securityContext.getUserPrincipal().getName();
 		
-		User user = userService.getUserByName(userName);
+		User user = userService.getUserByName(userName, graph);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));
 		}
 		
-		UserDto userDto = userDtoMapper.getUserDto(user, graphDto);
+		UserDto userDto = userDtoMapper.getUserDto(user, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(userDto);
@@ -114,14 +114,14 @@ public class UserResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateAuthenticatedUserPassword( 
 			@Parameter(name = "userPassword", description = "A userPassword.", required = true) UserPasswordDto userPasswordDto) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto("()");
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(rootBookCollection)");
+		Graph graph = GraphHelper.createGraph("()");
+		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		String userName = securityContext.getUserPrincipal().getName();
 		
-		User user = userService.getUserByName(userName);
+		User user = userService.getUserByName(userName, null);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));
@@ -144,9 +144,9 @@ public class UserResource {
 		user.setPassword(userPasswordDto.getUpdatePassword());
 		user.setUpdateDate(new Date());
 		
-		user = userService.updateUser(user);
+		user = userService.updateUser(user, graph);
 		
-		UserDto userDto = userDtoMapper.getUserDto(user, graphDto);
+		UserDto userDto = userDtoMapper.getUserDto(user, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(userDto);
@@ -168,10 +168,10 @@ public class UserResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(
 			@Parameter(name = "user", description = "A user.", required = true) UserDto userDto) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto("()");
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(rootBookCollection)");
+		Graph graph = GraphHelper.createGraph("()");
+		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		if(userDto.getName() == null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_USER_NAME_INVALID", "The user.name is invalid: user.name is null."));
@@ -181,7 +181,7 @@ public class UserResource {
 			throw new ProblemException(new Problem(400, "PROBLEM_USER_NAME_INVALID", "The user.name is invalid: user.name is ''."));
 		}
 		
-		User user = userService.getUserByName(userDto.getName());
+		User user = userService.getUserByName(userDto.getName(), null);
 		
 		if(user != null) {
 			throw new ProblemException(new Problem(400, "PROBLEM_USER_NAME_INVALID", "The user.name is invalid: user.name is not unique."));
@@ -202,14 +202,14 @@ public class UserResource {
 		user.setUpdateDate(new Date());
 		
 		if(userDto.getRootBookCollection() != null) {
-			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId());
+			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId(), null);
 			
 			user.setRootBookCollection(rootBookCollection);
 		}
 		
-		user = userService.createUser(user);
+		user = userService.createUser(user, graph);
 		
-		userDto = userDtoMapper.getUserDto(user, graphDto);
+		userDto = userDtoMapper.getUserDto(user, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(userDto);
@@ -234,12 +234,12 @@ public class UserResource {
 	public Response updateUser(
 			@Parameter(name = "id", description = "An id.", required = true) @PathParam("id") Long id, 
 			@Parameter(name = "user", description = "A user.", required = true) UserDto userDto) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto("()");
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(rootBookCollection)");
+		Graph graph = GraphHelper.createGraph("()");
+		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
-		User user = userService.getUserById(id);
+		User user = userService.getUserById(id, null);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));
@@ -256,14 +256,14 @@ public class UserResource {
 		user.setUpdateDate(new Date());
 		
 		if(userDto.getRootBookCollection() != null) {
-			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId());
+			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId(), null);
 			
 			user.setRootBookCollection(rootBookCollection);
 		}
 		
-		user = userService.updateUser(user);
+		user = userService.updateUser(user, graph);
 		
-		userDto = userDtoMapper.getUserDto(user, graphDto);
+		userDto = userDtoMapper.getUserDto(user, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(userDto);
@@ -285,7 +285,7 @@ public class UserResource {
 	@DELETE
 	public Response deleteUser(
 			@Parameter(name = "id", description = "An id.", required = true) @PathParam("id") Long id) throws ProblemException {
-		User user = userService.getUserById(id);
+		User user = userService.getUserById(id, null);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));
@@ -315,13 +315,13 @@ public class UserResource {
 			@Parameter(name = "graph", description = "A graph. A full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(rootBookCollection)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
-		PageableList<User> userPageableList = userService.getUsers(page, pageSize);
-		PageableListDto<UserDto> userPageableListDto = userDtoMapper.getUsersDto(userPageableList, graphDto);
+		PageableList<User> userPageableList = userService.getUsers(page, pageSize, graph);
+		PageableListDto<UserDto> userPageableListDto = userDtoMapper.getUsersDto(userPageableList, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(userPageableListDto);
@@ -345,18 +345,18 @@ public class UserResource {
 	public Response getUser(
 			@Parameter(name = "id", description = "An id.", required = true) @PathParam("id") Long id, 
 			@Parameter(name = "graph", description = "A graph. A full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(rootBookCollection)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
-		User user = userService.getUserById(id);
+		User user = userService.getUserById(id, graph);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));
 		}
 		
-		UserDto userDto = userDtoMapper.getUserDto(user, graphDto);
+		UserDto userDto = userDtoMapper.getUserDto(user, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(userDto);
@@ -377,15 +377,15 @@ public class UserResource {
 	@Path("bookCollections")
 	@GET
 	public Response getRootBookCollections(
-			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection,bookCollections,books).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(parentBookCollection,bookCollections,books)");
+			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(parentBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
-		List<BookCollection> bookCollectionList = bookCollectionService.getRootBookCollections();
+		List<BookCollection> bookCollectionList = bookCollectionService.getRootBookCollections(graph);
 		
-		List<BookCollectionDto> bookCollectionListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionList, graphDto);
+		List<BookCollectionDto> bookCollectionListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionList, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookCollectionListDto);

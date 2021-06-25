@@ -18,8 +18,8 @@ import javax.ws.rs.core.UriInfo;
 import com.gitlab.jeeto.oboco.api.v1.book.BookByBookCollectionResource;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkByBookCollectionResource;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
-import com.gitlab.jeeto.oboco.common.GraphDto;
-import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.PageableListDtoHelper;
@@ -70,13 +70,13 @@ public class BookCollectionResource {
 			@Parameter(name = "name", description = "The name of the bookCollection.", required = false) @QueryParam("name") String name, 
 			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
 			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
-			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection,bookCollections,books).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(parentBookCollection,bookCollections,books)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(parentBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -88,19 +88,19 @@ public class BookCollectionResource {
 		
 		if(uriInfo.getQueryParameters().containsKey("parentBookCollectionId")) {
 			if(uriInfo.getQueryParameters().containsKey("name")) {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndName(user, parentBookCollectionId, name, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndName(user, parentBookCollectionId, name, page, pageSize, graph);
 			} else {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, parentBookCollectionId, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, parentBookCollectionId, page, pageSize, graph);
 			}
 		} else {
 			if(uriInfo.getQueryParameters().containsKey("name")) {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndName(user, name, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndName(user, name, page, pageSize, graph);
 			} else {
-				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, page, pageSize);
+				bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, page, pageSize, graph);
 			}
 		}
 		
-		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionPageableList, graphDto);
+		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionPageableList, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookCollectionPageableListDto);
@@ -122,11 +122,11 @@ public class BookCollectionResource {
 	@Path("ROOT")
 	@GET
 	public Response getRootBookCollection(
-			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection,bookCollections,books).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(parentBookCollection,bookCollections,books)");
+			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(parentBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -136,13 +136,13 @@ public class BookCollectionResource {
 		
 		Long rootBookCollectionId = user.getRootBookCollection().getId();
 		
-		BookCollection bookCollection = bookCollectionService.getRootBookCollectionById(rootBookCollectionId);
+		BookCollection bookCollection = bookCollectionService.getRootBookCollectionById(rootBookCollectionId, graph);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_COLLECTION_NOT_FOUND", "The bookCollection is not found."));
 		}
 		
-		BookCollectionDto bookCollectionDto = bookCollectionDtoMapper.getBookCollectionDto(bookCollection, graphDto);
+		BookCollectionDto bookCollectionDto = bookCollectionDtoMapper.getBookCollectionDto(bookCollection, graph);
 	        
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookCollectionDto);
@@ -167,13 +167,13 @@ public class BookCollectionResource {
 			@Parameter(name = "name", description = "The name of the bookCollection.", required = false) @QueryParam("name") String name, 
 			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
 			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
-			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection,bookCollections,books).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(parentBookCollection,bookCollections,books)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(parentBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -181,9 +181,9 @@ public class BookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		PageableList<BookCollection> bookCollectionPageableList = bookCollectionService.getLatestBookCollectionsByUserAndName(user, name, page, pageSize);
+		PageableList<BookCollection> bookCollectionPageableList = bookCollectionService.getLatestBookCollectionsByUserAndName(user, name, page, pageSize, graph);
 		
-		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionPageableList, graphDto);
+		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionPageableList, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookCollectionPageableListDto);
@@ -206,11 +206,11 @@ public class BookCollectionResource {
 	@GET
 	public Response getBookCollection(
 			@Parameter(name = "bookCollectionId", description = "The id of the bookCollection.", required = true) @PathParam("bookCollectionId") Long bookCollectionId, 
-			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection,bookCollections,books).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(parentBookCollection,bookCollections,books)");
+			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(parentBookCollection)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -218,13 +218,13 @@ public class BookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		BookCollection bookCollection = bookCollectionService.getBookCollectionByUserAndId(user, bookCollectionId);
+		BookCollection bookCollection = bookCollectionService.getBookCollectionByUserAndId(user, bookCollectionId, graph);
 		
 		if(bookCollection == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_COLLECTION_NOT_FOUND", "The bookCollection is not found."));
 		}
 		
-		BookCollectionDto bookCollectionDto = bookCollectionDtoMapper.getBookCollectionDto(bookCollection, graphDto);
+		BookCollectionDto bookCollectionDto = bookCollectionDtoMapper.getBookCollectionDto(bookCollection, graph);
 	        
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookCollectionDto);

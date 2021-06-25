@@ -22,8 +22,8 @@ import javax.ws.rs.core.UriInfo;
 
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkByBookResource;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
-import com.gitlab.jeeto.oboco.common.GraphDto;
-import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.PageableListDtoHelper;
@@ -77,10 +77,10 @@ public class BookResource {
 			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(bookCollection,bookMark)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(bookCollection,bookMark)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -91,12 +91,12 @@ public class BookResource {
 		PageableList<Book> bookPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("name")) {
-			bookPageableList = bookService.getBooksByUserAndName(user, name, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndName(user, name, page, pageSize, graph);
 		} else {
-			bookPageableList = bookService.getBooksByUser(user, page, pageSize);
+			bookPageableList = bookService.getBooksByUser(user, page, pageSize, graph);
 		}
 		
-		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);
+		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookPageableListDto);
@@ -120,10 +120,10 @@ public class BookResource {
 	public Response getBook(
 			@Parameter(name = "bookId", description = "The id of the book.", required = true) @PathParam("bookId") Long bookId, 
 			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(bookCollection,bookMark)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(bookCollection,bookMark)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -131,13 +131,13 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, graph);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
 		}
 		
-		BookDto bookDto = bookDtoMapper.getBookDto(book, graphDto);
+		BookDto bookDto = bookDtoMapper.getBookDto(book, graph);
 	        
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookDto);
@@ -166,7 +166,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, null);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -226,7 +226,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, null);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));

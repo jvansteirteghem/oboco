@@ -17,8 +17,8 @@ import javax.ws.rs.core.SecurityContext;
 import com.gitlab.jeeto.oboco.api.v1.book.Book;
 import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
-import com.gitlab.jeeto.oboco.common.GraphDto;
-import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
@@ -70,10 +70,10 @@ public class BookMarkByBookResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createOrUpdateBookMark(
 			@Parameter(name = "bookMark", description = "The bookMark.", required = true) BookMarkDto bookMarkDto) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto("()");
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(book(bookCollection))");
+		Graph graph = GraphHelper.createGraph("()");
+		Graph fullGraph = GraphHelper.createGraph("(book(bookCollection))");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -81,7 +81,7 @@ public class BookMarkByBookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, null);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -95,9 +95,9 @@ public class BookMarkByBookResource {
 			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_MARK_PAGE_INVALID", "The bookMark.page is invalid: bookMark.page is < 0 or bookMark.page is > book.numberOfPages."));
 		}
 		
-		BookMarkReference bookMarkReference = bookMarkService.createOrUpdateBookMarkByUserAndBook(user, book, bookMarkDto.getPage());
+		BookMarkReference bookMarkReference = bookMarkService.createOrUpdateBookMarkByUserAndBook(user, book, bookMarkDto.getPage(), graph);
 		
-		bookMarkDto = bookMarkDtoMapper.getBookMarkDto(bookMarkReference, graphDto);
+		bookMarkDto = bookMarkDtoMapper.getBookMarkDto(bookMarkReference, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookMarkDto);
@@ -123,7 +123,7 @@ public class BookMarkByBookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, null);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -150,10 +150,10 @@ public class BookMarkByBookResource {
 	@GET
 	public Response getBookMark(
 			@Parameter(name = "graph", description = "The graph. The full graph is (book(bookCollection)).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(book(bookCollection))");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(book(bookCollection))");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -161,19 +161,19 @@ public class BookMarkByBookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, null);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
 		}
 		
-		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserAndBook(user, book);
+		BookMarkReference bookMarkReference = bookMarkService.getBookMarkReferenceByUserAndBook(user, book, graph);
 		
 		if(bookMarkReference == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_MARK_NOT_FOUND", "The bookMark is not found."));
 		}
 		
-		BookMarkDto bookMarkDto = bookMarkDtoMapper.getBookMarkDto(bookMarkReference, graphDto);
+		BookMarkDto bookMarkDto = bookMarkDtoMapper.getBookMarkDto(bookMarkReference, graph);
 	        
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookMarkDto);

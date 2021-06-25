@@ -103,9 +103,9 @@ public class V12Resource {
 		boolean hasParentBookCollectionId = uriInfo.getQueryParameters().containsKey("parentBookCollectionId");
 		
 		if(hasParentBookCollectionId) {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, parentBookCollectionId, page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, parentBookCollectionId, page, pageSize, null);
 		} else {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, page, pageSize);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, page, pageSize, null);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -181,9 +181,9 @@ public class V12Resource {
 		boolean hasBookCollectionId = uriInfo.getQueryParameters().containsKey("bookCollectionId");
 		
 		if(hasBookCollectionId) {
-			bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, page, pageSize, null);
 		} else {
-			bookPageableList = bookService.getBooksByUser(user, page, pageSize);
+			bookPageableList = bookService.getBooksByUser(user, page, pageSize, null);
 		}
 		
 		Feed.Builder feedBuilder = Feed.builder()
@@ -240,7 +240,7 @@ public class V12Resource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, null);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -264,7 +264,7 @@ public class V12Resource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId);
+		Book book = bookService.getBookByUserAndId(user, bookId, null);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));

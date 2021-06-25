@@ -21,8 +21,8 @@ import javax.ws.rs.core.UriInfo;
 
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkStatus;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
-import com.gitlab.jeeto.oboco.common.GraphDto;
-import com.gitlab.jeeto.oboco.common.GraphDtoHelper;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.Linkable;
 import com.gitlab.jeeto.oboco.common.LinkableDto;
 import com.gitlab.jeeto.oboco.common.PageableList;
@@ -84,10 +84,10 @@ public class BookByBookCollectionResource {
 			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(bookCollection,bookMark)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(bookCollection,bookMark)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -98,12 +98,12 @@ public class BookByBookCollectionResource {
 		PageableList<Book> bookPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("bookMarkStatus")) {
-			bookPageableList = bookService.getBooksByUserAndBookCollectionIdAndBookMarkStatus(user, bookCollectionId, bookMarkStatus, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndBookCollectionIdAndBookMarkStatus(user, bookCollectionId, bookMarkStatus, page, pageSize, graph);
 		} else {
-			bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, page, pageSize);
+			bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, page, pageSize, graph);
 		}
 		
-		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graphDto);;
+		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookPageableListDto);
@@ -127,10 +127,10 @@ public class BookByBookCollectionResource {
 	public Response getBooksByBookCollectionAndBook(
 			@Parameter(name = "bookId", description = "The id of the book.", required = false) @PathParam("bookId") Long bookId, 
 			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
-		GraphDto graphDto = GraphDtoHelper.createGraphDto(graphValue);
-		GraphDto fullGraphDto = GraphDtoHelper.createGraphDto("(bookCollection,bookMark)");
+		Graph graph = GraphHelper.createGraph(graphValue);
+		Graph fullGraph = GraphHelper.createGraph("(bookCollection,bookMark)");
 		
-		GraphDtoHelper.validateGraphDto(graphDto, fullGraphDto);
+		GraphHelper.validateGraph(graph, fullGraph);
 		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
@@ -138,8 +138,8 @@ public class BookByBookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Linkable<Book> bookLinkable = bookService.getBooksByUserAndBookCollectionIdAndId(user, bookCollectionId, bookId);
-		LinkableDto<BookDto> bookLinkableDto = bookDtoMapper.getBooksDto(bookLinkable, graphDto);
+		Linkable<Book> bookLinkable = bookService.getBooksByUserAndBookCollectionIdAndId(user, bookCollectionId, bookId, graph);
+		LinkableDto<BookDto> bookLinkableDto = bookDtoMapper.getBooksDto(bookLinkable, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
 		responseBuilder.entity(bookLinkableDto);
@@ -173,7 +173,7 @@ public class BookByBookCollectionResource {
 		
 		Book book = null;
 		
-		PageableList<Book> bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, 1, 1);
+		PageableList<Book> bookPageableList = bookService.getBooksByUserAndBookCollectionId(user, bookCollectionId, 1, 1, null);
 		
 		if(bookPageableList.getElements() != null && bookPageableList.getElements().size() == 1) {
 			book = bookPageableList.getElements().get(0);
