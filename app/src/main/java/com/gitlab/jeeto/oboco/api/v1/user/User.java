@@ -80,7 +80,7 @@ public class User implements Serializable {
 	public void setPasswordHash(String passwordHash) {
 		this.passwordHash = passwordHash;
 	}
-	@ElementCollection(fetch = FetchType.EAGER)
+	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(name = "userRoles", joinColumns = @JoinColumn(name = "userId", referencedColumnName = "id"))
 	@Column(name = "role", length = 255, nullable = false)
 	public List<String> getRoles() {
@@ -97,7 +97,7 @@ public class User implements Serializable {
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
 	}
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "rootBookCollectionId", referencedColumnName = "id", nullable = true)
 	public BookCollection getRootBookCollection() {
 		return rootBookCollection;
