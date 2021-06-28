@@ -33,6 +33,7 @@ public class UserDtoMapper {
 			userDto.setId(user.getId());
 			userDto.setName(user.getName());
 			userDto.setRoles(user.getRoles());
+			userDto.setCreateDate(user.getCreateDate());
 			userDto.setUpdateDate(user.getUpdateDate());
 			
 			if(graph != null) {

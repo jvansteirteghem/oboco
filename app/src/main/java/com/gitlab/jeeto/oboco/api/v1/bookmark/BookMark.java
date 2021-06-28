@@ -26,6 +26,7 @@ import com.gitlab.jeeto.oboco.api.v1.user.User;
 	indexes = {
 		@Index(name = "bookMarkUserIdFileId", columnList = "userId,fileId", unique = true),
 		@Index(name = "bookMarkFileId", columnList = "fileId", unique = false),
+		@Index(name = "bookMarkCreateDate", columnList = "createDate", unique = false),
 		@Index(name = "bookMarkUpdateDate", columnList = "updateDate", unique = false)
 	}
 )
@@ -33,6 +34,7 @@ public class BookMark {
 	private Long id;
 	private User user;
 	private String fileId;
+	private Date createDate;
 	private Date updateDate;
 	private Integer page;
 	private List<BookMarkReference> bookMarkReferences;
@@ -62,6 +64,14 @@ public class BookMark {
 	}
 	public void setFileId(String fileId) {
 		this.fileId = fileId;
+	}
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "createDate", nullable = false)
+	public Date getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "updateDate", nullable = false)

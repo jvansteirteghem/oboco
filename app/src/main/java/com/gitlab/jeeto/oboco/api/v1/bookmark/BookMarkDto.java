@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookMarkDto {
 	private Long id;
+	private Date createDate;
 	private Date updateDate;
 	private Integer page;
 	private BookDto book;
@@ -28,6 +29,14 @@ public class BookMarkDto {
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	@Schema(name = "createDate")
+	@XmlElement(name = "createDate")
+	public Date getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 	@Schema(name = "updateDate")
 	@XmlElement(name = "updateDate")

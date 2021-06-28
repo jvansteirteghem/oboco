@@ -142,7 +142,10 @@ public class UserResource {
 		}
 		
 		user.setPassword(userPasswordDto.getUpdatePassword());
-		user.setUpdateDate(new Date());
+		
+		Date updateDate = new Date();
+		
+		user.setUpdateDate(updateDate);
 		
 		user = userService.updateUser(user, graph);
 		
@@ -199,7 +202,11 @@ public class UserResource {
 		user.setName(userDto.getName());
 		user.setPassword(userDto.getPassword());
 		user.setRoles(userDto.getRoles());
-		user.setUpdateDate(new Date());
+		
+		Date updateDate = new Date();
+		
+		user.setCreateDate(updateDate);
+		user.setUpdateDate(updateDate);
 		
 		if(userDto.getRootBookCollection() != null) {
 			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId(), null);
@@ -253,7 +260,10 @@ public class UserResource {
 		
 		user.setPassword(userDto.getPassword());
 		user.setRoles(userDto.getRoles());
-		user.setUpdateDate(new Date());
+		
+		Date updateDate = new Date();
+		
+		user.setUpdateDate(updateDate);
 		
 		if(userDto.getRootBookCollection() != null) {
 			BookCollection rootBookCollection = bookCollectionService.getRootBookCollectionById(userDto.getRootBookCollection().getId(), null);

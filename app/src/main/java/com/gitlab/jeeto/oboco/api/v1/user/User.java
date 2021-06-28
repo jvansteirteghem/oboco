@@ -32,6 +32,7 @@ import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkReference;
 	name = "users",
 	indexes = {
 		@Index(name = "userName", columnList = "name", unique = true),
+		@Index(name = "userCreateDate", columnList = "createDate", unique = false),
 		@Index(name = "userUpdateDate", columnList = "updateDate", unique = false)
 	}
 )
@@ -42,6 +43,7 @@ public class User implements Serializable {
 	private String password;
 	private String passwordHash;
 	private List<String> roles;
+	private Date createDate;
 	private Date updateDate;
 	private BookCollection rootBookCollection;
 	private List<BookMarkReference> bookMarkReferences;
@@ -88,6 +90,14 @@ public class User implements Serializable {
 	}
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
+	}
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "createDate", nullable = false)
+	public Date getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "updateDate", nullable = false)

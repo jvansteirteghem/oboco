@@ -195,6 +195,7 @@ public class BookMarkService {
 				bookMarkReference.setBookCollection(book.getBookCollection());
 				bookMarkReference.setRootBookCollection(book.getRootBookCollection());
 				bookMarkReference.setBookMark(bookMark);
+				bookMarkReference.setCreateDate(book.getUpdateDate());
 				bookMarkReference.setUpdateDate(book.getUpdateDate());
 				
 				entityManager.persist(bookMarkReference);
@@ -243,6 +244,7 @@ public class BookMarkService {
 					bookMark = new BookMark();
 					bookMark.setUser(user);
 					bookMark.setFileId(book.getFileId());
+					bookMark.setCreateDate(updateDate);
 					bookMark.setUpdateDate(updateDate);
 					bookMark.setPage(book.getNumberOfPages());
 					
@@ -257,6 +259,7 @@ public class BookMarkService {
 						bookMarkReference.setBookCollection(referencedBook.getBookCollection());
 						bookMarkReference.setRootBookCollection(referencedBook.getRootBookCollection());
 						bookMarkReference.setBookMark(bookMark);
+						bookMarkReference.setCreateDate(updateDate);
 						bookMarkReference.setUpdateDate(updateDate);
 						
 						entityManager.persist(bookMarkReference);
@@ -311,6 +314,7 @@ public class BookMarkService {
 				bookMark = new BookMark();
 				bookMark.setUser(user);
 				bookMark.setFileId(book.getFileId());
+				bookMark.setCreateDate(updateDate);
 				bookMark.setUpdateDate(updateDate);
 				bookMark.setPage(bookPage);
 				
@@ -325,6 +329,7 @@ public class BookMarkService {
 					bookMarkReference.setBookCollection(referencedBook.getBookCollection());
 					bookMarkReference.setRootBookCollection(referencedBook.getRootBookCollection());
 					bookMarkReference.setBookMark(bookMark);
+					bookMarkReference.setCreateDate(updateDate);
 					bookMarkReference.setUpdateDate(updateDate);
 					
 					entityManager.persist(bookMarkReference);

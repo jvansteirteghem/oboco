@@ -51,6 +51,7 @@ public class BookDtoMapper {
 		if(book != null) {
 			bookDto = new BookDto();
 			bookDto.setId(book.getId());
+			bookDto.setCreateDate(book.getCreateDate());
 			bookDto.setUpdateDate(book.getUpdateDate());
 			bookDto.setName(book.getName());
 			bookDto.setNumberOfPages(book.getNumberOfPages());

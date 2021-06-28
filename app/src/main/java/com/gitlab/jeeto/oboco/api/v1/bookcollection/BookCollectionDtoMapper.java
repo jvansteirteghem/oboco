@@ -14,6 +14,7 @@ public class BookCollectionDtoMapper {
 		if(bookCollection != null) {
 			bookCollectionDto = new BookCollectionDto();
 			bookCollectionDto.setId(bookCollection.getId());
+			bookCollectionDto.setCreateDate(bookCollection.getCreateDate());
 			bookCollectionDto.setUpdateDate(bookCollection.getUpdateDate());
 			bookCollectionDto.setName(bookCollection.getName());
 			bookCollectionDto.setNumberOfBookCollections(bookCollection.getNumberOfBookCollections());

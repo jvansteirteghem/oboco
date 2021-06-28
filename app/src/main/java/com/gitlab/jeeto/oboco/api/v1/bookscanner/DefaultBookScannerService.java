@@ -237,6 +237,7 @@ public class DefaultBookScannerService implements BookScannerService {
 					bookCollection.setDirectoryPath("");
 					bookCollection.setRootBookCollection(null);
 					bookCollection.setParentBookCollection(null);
+					bookCollection.setCreateDate(updateDate);
 					bookCollection.setUpdateDate(updateDate);
 					
 					bookCollection.setName(name);
@@ -354,6 +355,7 @@ public class DefaultBookScannerService implements BookScannerService {
 					String normalizedName = NameHelper.getNormalizedName(name);
 					
 					bookCollection.setNormalizedName(normalizedName);
+					bookCollection.setCreateDate(updateDate);
 					bookCollection.setUpdateDate(updateDate);
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
@@ -436,6 +438,7 @@ public class DefaultBookScannerService implements BookScannerService {
 					    	book.setNumberOfPages(bookUpdate.getNumberOfPages());
 						}
 				    	
+						book.setCreateDate(updateDate);
 				    	book.setUpdateDate(updateDate);
 						
 						numberOfBooks = numberOfBooks + 1;

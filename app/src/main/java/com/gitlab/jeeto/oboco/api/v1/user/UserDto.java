@@ -19,6 +19,7 @@ public class UserDto {
 	private String name;
 	private String password;
 	private List<String> roles;
+	private Date createDate;
 	private Date updateDate;
 	private BookCollectionDto rootBookCollection;
 	public UserDto() {
@@ -55,6 +56,14 @@ public class UserDto {
 	}
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
+	}
+	@Schema(name = "createDate")
+	@XmlElement(name = "createDate")
+	public Date getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 	@Schema(name = "updateDate")
 	@XmlElement(name = "updateDate")
