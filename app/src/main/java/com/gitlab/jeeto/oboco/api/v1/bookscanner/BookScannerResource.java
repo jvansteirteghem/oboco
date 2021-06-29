@@ -130,21 +130,23 @@ public class BookScannerResource {
 			@Parameter(name = "bookScannerId", description = "The id of the bookScanner.", required = true) @PathParam("bookScannerId") String bookScannerId, 
 			@Suspended AsyncResponse asyncResponse) {
 		try {
+			for(BookScannerService bookScannerService: bookScannerServiceProvider) {
+    			if(bookScannerService.getStatus().equals(BookScannerServiceStatus.STOPPED) == false) {
+    				throw new ProblemException(new Problem(400, "PROBLEM_BOOK_SCANNER_STATUS_INVALID", "The bookScanner.status is invalid: " + bookScannerService.getStatus() + "."));
+    			}
+    		}
+			
 			BookScannerService bookScannerService = bookScannerServiceProvider.named(bookScannerId).get();
 			
 			if(bookScannerService == null) {
 				throw new ProblemException(new Problem(404, "PROBLEM_BOOK_SCANNER_NOT_FOUND", "The bookScanner is not found."));
 			}
 			
-			if(bookScannerService.getStatus().equals(BookScannerServiceStatus.STOPPED)) {
-				bookScannerService.start();
-				
-				ResponseBuilder responseBuilder = Response.status(200);
-				
-				asyncResponse.resume(responseBuilder.build());
-			} else {
-				throw new ProblemException(new Problem(400, "PROBLEM_BOOK_SCANNER_STATUS_INVALID", "The bookScanner.status is invalid."));
-			}
+			bookScannerService.start();
+			
+			ResponseBuilder responseBuilder = Response.status(200);
+			
+			asyncResponse.resume(responseBuilder.build());
 		} catch(ProblemException e) {
 			Problem problem = e.getProblem();
 			
@@ -188,7 +190,7 @@ public class BookScannerResource {
 			
 			return responseBuilder.build();
 		} else {
-			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_SCANNER_STATUS_INVALID", "The bookScanner.status is invalid."));
+			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_SCANNER_STATUS_INVALID", "The bookScanner.status is invalid: " + bookScannerService.getStatus() + "."));
 		}
 	}
 }
