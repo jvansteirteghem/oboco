@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
 
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDto;
@@ -22,8 +20,6 @@ import com.gitlab.jeeto.oboco.common.PageableListDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 
 public class BookDtoMapper {
-	@Context
-    private SecurityContext securityContext;
 	private BookCollectionDtoMapper bookCollectionDtoMapper;
 	@Inject
 	private Provider<BookCollectionDtoMapper> bookCollectionDtoMapperProvider;

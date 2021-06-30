@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -24,8 +25,16 @@ import com.gitlab.jeeto.oboco.common.exception.ProblemException;
 public class BookMarkService {
 	@Inject
 	private EntityManager entityManager;
-	@Inject
 	private BookService bookService;
+	@Inject
+	private Provider<BookService> bookServiceProvider;
+	
+	private BookService getBookService() {
+		if(bookService == null) {
+			bookService = bookServiceProvider.get();
+		}
+		return bookService;
+	}
 	
 	public BookMarkService() {
 		super();
@@ -250,7 +259,7 @@ public class BookMarkService {
 					
 					entityManager.persist(bookMark);
 					
-					List<Book> referencedBookList = bookService.getBooksByFileId(book.getFileId());
+					List<Book> referencedBookList = getBookService().getBooksByFileId(book.getFileId());
 					
 					for(Book referencedBook: referencedBookList) {
 						BookMarkReference bookMarkReference = new BookMarkReference();
@@ -320,7 +329,7 @@ public class BookMarkService {
 				
 				entityManager.persist(bookMark);
 				
-				List<Book> referencedBookList = bookService.getBooksByFileId(book.getFileId());
+				List<Book> referencedBookList = getBookService().getBooksByFileId(book.getFileId());
 				
 				for(Book referencedBook: referencedBookList) {
 					BookMarkReference bookMarkReference = new BookMarkReference();
