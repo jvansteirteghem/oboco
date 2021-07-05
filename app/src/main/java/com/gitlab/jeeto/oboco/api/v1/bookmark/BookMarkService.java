@@ -244,7 +244,7 @@ public class BookMarkService {
 		try {
 			Date updateDate = new Date();
 			
-			List<Book> bookList = bookCollection.getBooks();
+			List<Book> bookList = getBookService().getBooksByUserAndBookCollectionId(user, bookCollection.getId());
 			
 			for(Book book: bookList) {
 				BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
@@ -293,7 +293,7 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			List<Book> bookList = bookCollection.getBooks();
+			List<Book> bookList = getBookService().getBooksByUserAndBookCollectionId(user, bookCollection.getId());
 			
 			for(Book book: bookList) {
 				BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
