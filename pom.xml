@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitlab.jeeto.oboco</groupId>
 	<artifactId>oboco</artifactId>
-	<version>1.5.2-SNAPSHOT</version> <!--MOD4DEL-->
+	<version>1.5.3-SNAPSHOT</version> <!--MOD4DEL-->
 	<packaging>pom</packaging>
 	<name>oboco</name>
 	<url>https://gitlab.com/jeeto/oboco</url>
