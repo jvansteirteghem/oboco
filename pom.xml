@@ -42,9 +42,9 @@
 				<version>2.5.3</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<tagNameFormat>${project.artifactId}-1.5.3</tagNameFormat>
-					<releaseVersion>1.5.3</releaseVersion>
-					<developmentVersion>1.5.4-SNAPSHOT</developmentVersion>
+					<tagNameFormat>${project.artifactId}-1.5.4</tagNameFormat>
+					<releaseVersion>1.5.4</releaseVersion>
+					<developmentVersion>1.5.5-SNAPSHOT</developmentVersion>
 					<scmCommentPrefix>[skip ci]</scmCommentPrefix>
 				</configuration>
 			</plugin>
