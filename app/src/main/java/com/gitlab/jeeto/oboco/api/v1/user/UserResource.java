@@ -64,18 +64,18 @@ public class UserResource {
 		description = "Get the authenticated user.",
     	responses = {
     		@ApiResponse(responseCode = "200", description = "The authenticated user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
-    		@ApiResponse(responseCode = "400", description = "A problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "A problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "500", description = "A problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
 	@Authorization(roles = { "ADMINISTRATOR", "USER" })
 	@Path("ME")
 	@GET
 	public Response getAuthenticatedUser(
-			@Parameter(name = "graph", description = "A graph. A full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+			@Parameter(name = "graph", description = "The graph. The full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		Graph graph = GraphHelper.createGraph(graphValue);
 		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 		
@@ -101,11 +101,11 @@ public class UserResource {
 		description = "Update the password of the authenticated user.",
     	responses = {
     		@ApiResponse(responseCode = "200", description = "The authenticated user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
-    		@ApiResponse(responseCode = "400", description = "A problem: PROBLEM_USER_PASSWORD_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "A problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "500", description = "A problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_USER_PASSWORD_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
 	@Authorization(roles = { "ADMINISTRATOR", "USER" })
@@ -113,7 +113,7 @@ public class UserResource {
 	@PATCH
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateAuthenticatedUserPassword( 
-			@Parameter(name = "userPassword", description = "A userPassword.", required = true) UserPasswordDto userPasswordDto) throws ProblemException {
+			@Parameter(name = "userPassword", description = "The userPassword.", required = true) UserPasswordDto userPasswordDto) throws ProblemException {
 		Graph graph = GraphHelper.createGraph("()");
 		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 
@@ -158,19 +158,19 @@ public class UserResource {
 	}
 	
 	@Operation(
-		description = "Create a user.",
+		description = "Create the user.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "A user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
-    		@ApiResponse(responseCode = "400", description = "A problem: PROBLEM_USER_NAME_INVALID, PROBLEM_USER_PASSWORD_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "500", description = "A problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+    		@ApiResponse(responseCode = "200", description = "The user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_USER_NAME_INVALID, PROBLEM_USER_PASSWORD_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(
-			@Parameter(name = "user", description = "A user.", required = true) UserDto userDto) throws ProblemException {
+			@Parameter(name = "user", description = "The user.", required = true) UserDto userDto) throws ProblemException {
 		Graph graph = GraphHelper.createGraph("()");
 		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 
@@ -225,28 +225,28 @@ public class UserResource {
 	}
 	
 	@Operation(
-		description = "Update a user.",
+		description = "Update the user.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "A user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
-    		@ApiResponse(responseCode = "400", description = "A problem: PROBLEM_USER_PASSWORD_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "A problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "500", description = "A problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+    		@ApiResponse(responseCode = "200", description = "The user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_USER_PASSWORD_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("{id}")
+	@Path("{userId}")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(
-			@Parameter(name = "id", description = "An id.", required = true) @PathParam("id") Long id, 
-			@Parameter(name = "user", description = "A user.", required = true) UserDto userDto) throws ProblemException {
+			@Parameter(name = "userId", description = "The id of the user.", required = true) @PathParam("userId") Long userId, 
+			@Parameter(name = "user", description = "The user.", required = true) UserDto userDto) throws ProblemException {
 		Graph graph = GraphHelper.createGraph("()");
 		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 
 		GraphHelper.validateGraph(graph, fullGraph);
 		
-		User user = userService.getUserById(id, null);
+		User user = userService.getUserById(userId, null);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));
@@ -282,20 +282,20 @@ public class UserResource {
 	}
 	
 	@Operation(
-		description = "Delete a user.",
+		description = "Delete the user.",
     	responses = {
     		@ApiResponse(responseCode = "200"),
-    		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "A problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "500", description = "A problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+    		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("{id}")
+	@Path("{userId}")
 	@DELETE
 	public Response deleteUser(
-			@Parameter(name = "id", description = "An id.", required = true) @PathParam("id") Long id) throws ProblemException {
-		User user = userService.getUserById(id, null);
+			@Parameter(name = "userId", description = "The id of the user.", required = true) @PathParam("userId") Long userId) throws ProblemException {
+		User user = userService.getUserById(userId, null);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));
@@ -309,20 +309,20 @@ public class UserResource {
 	}
 	
 	@Operation(
-		description = "Get a pageable list of users.",
+		description = "Get the users.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "A pageable list of users.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserPageableListDto.class))),
-    		@ApiResponse(responseCode = "400", description = "A problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "500", description = "A problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+    		@ApiResponse(responseCode = "200", description = "The pageable list of users.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserPageableListDto.class))),
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
 	@GET
 	public Response getUsers(
-			@Parameter(name = "page", description = "A page. A page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
-			@Parameter(name = "pageSize", description = "A pageSize. A pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
-			@Parameter(name = "graph", description = "A graph. A full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
+			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
+			@Parameter(name = "graph", description = "The graph. The full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		PageableListDtoHelper.validatePageableList(page, pageSize);
 		
 		Graph graph = GraphHelper.createGraph(graphValue);
@@ -340,27 +340,27 @@ public class UserResource {
 	}
 	
 	@Operation(
-		description = "Get a user.",
+		description = "Get the user.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "A user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
-    		@ApiResponse(responseCode = "400", description = "A problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "401", description = "A problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "403", description = "A problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "404", description = "A problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
-    		@ApiResponse(responseCode = "500", description = "A problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
+    		@ApiResponse(responseCode = "200", description = "The user.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
+    		@ApiResponse(responseCode = "500", description = "The problem: PROBLEM", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("{id}")
+	@Path("{userId}")
 	@GET
 	public Response getUser(
-			@Parameter(name = "id", description = "An id.", required = true) @PathParam("id") Long id, 
-			@Parameter(name = "graph", description = "A graph. A full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
+			@Parameter(name = "userId", description = "The id of the user.", required = true) @PathParam("userId") Long userId, 
+			@Parameter(name = "graph", description = "The graph. The full graph is (rootBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		Graph graph = GraphHelper.createGraph(graphValue);
 		Graph fullGraph = GraphHelper.createGraph("(rootBookCollection)");
 		
 		GraphHelper.validateGraph(graph, fullGraph);
 		
-		User user = userService.getUserById(id, graph);
+		User user = userService.getUserById(userId, graph);
 		
 		if(user == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_NOT_FOUND", "The user is not found."));

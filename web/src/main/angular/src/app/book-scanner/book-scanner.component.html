@@ -2,6 +2,14 @@
 
 <mat-error *ngIf="error">{{error}}</mat-error>
 
+<mat-form-field appearance="standard">
+    <mat-label>mode</mat-label>
+    <mat-select [(value)]="selectedMode">
+        <mat-option value="CREATE">CREATE</mat-option>
+        <mat-option value="UPDATE">UPDATE</mat-option>
+    </mat-select>
+</mat-form-field>
+
 <div *ngIf="bookScanners && bookScanners.length > 0">
     <mat-list>
         <mat-list-item *ngFor="let bookScanner of bookScanners">

@@ -16,8 +16,8 @@ export class BookScannerService {
     this.url = environment.baseUrl + '/api/v1/';
   }
 
-  startBookScanner(id: string): Observable<any> {
-    return this.http.post(this.url + "bookScanners/" + id + "/start", {});
+  startBookScanner(id: string, mode: string): Observable<any> {
+    return this.http.post(this.url + "bookScanners/" + id + "/start?mode=" + mode, {});
   }
 
   stopBookScanner(id: string): Observable<any> {

@@ -10,6 +10,7 @@ import { BookScannerService } from './book-scanner.service';
 export class BookScannerComponent implements OnInit {
   bookScanners: BookScanner[];
   error: string = "";
+  selectedMode: string= "UPDATE";
 
   constructor(private bookScannerService: BookScannerService) { }
 
@@ -32,7 +33,7 @@ export class BookScannerComponent implements OnInit {
   }
 
   onBookScannerStart(selectedBookScanner: BookScanner) {
-    this.bookScannerService.startBookScanner(selectedBookScanner.id)
+    this.bookScannerService.startBookScanner(selectedBookScanner.id, this.selectedMode)
     .subscribe(
       () => {
       },
