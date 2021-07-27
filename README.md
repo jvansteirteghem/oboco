@@ -87,7 +87,7 @@ you are required to configure "application.properties/security.authentication.se
 
 - configure application.properties
 	- security.authentication.secret: the secret of the authentication.
-	- security.authentication.idToken.age: the age of the id token of the authentication (in seconds).
+	- security.authentication.accessToken.age: the age of the access token of the authentication (in seconds).
 	- security.authentication.refreshToken.age: the age of the refresh token of the authentication (in seconds).
 
 ### plugins
