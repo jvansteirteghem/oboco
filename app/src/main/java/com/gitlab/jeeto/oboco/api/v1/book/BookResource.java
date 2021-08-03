@@ -117,7 +117,7 @@ public class BookResource {
     		@ApiResponse(responseCode = "503", description = "The problem: PROBLEM_BOOK_SCANNER_STATUS_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("{bookId}")
+	@Path("{bookId: [0-9]+}")
 	@GET
 	public Response getBook(
 			@Parameter(name = "bookId", description = "The id of the book.", required = true) @PathParam("bookId") Long bookId, 
@@ -158,7 +158,7 @@ public class BookResource {
     		@ApiResponse(responseCode = "503", description = "The problem: PROBLEM_BOOK_SCANNER_STATUS_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("{bookId}.cbz")
+	@Path("{bookId: [0-9]+}.cbz")
 	@GET
 	public Response getBookAs(
 			@Parameter(name = "bookId", description = "The id of the book.", required = true) @PathParam("bookId") Long bookId, 
@@ -215,7 +215,7 @@ public class BookResource {
     		@ApiResponse(responseCode = "503", description = "The problem: PROBLEM_BOOK_SCANNER_STATUS_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("{bookId}/pages/{page}.jpg")
+	@Path("{bookId: [0-9]+}/pages/{page: [0-9]+}.jpg")
 	@GET
 	public Response getBookPageAs(
 			@Parameter(name = "bookId", description = "The id of the book.", required = true) @PathParam("bookId") Long bookId, 
@@ -276,7 +276,7 @@ public class BookResource {
 		return responseBuilder.build();
 	}
 	
-	@Path("{bookId}/bookMark")
+	@Path("{bookId: [0-9]+}/bookMark")
 	public BookMarkByBookResource getBookMarkByBookResource(
 			@Parameter(name = "bookId", description = "The id of the book.", required = true) @PathParam("bookId") Long bookId) {
 		return resourceContext.initResource(new BookMarkByBookResource(bookId));

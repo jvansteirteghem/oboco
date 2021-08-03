@@ -38,7 +38,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.3.1</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<!-- Add frontend folder to war package -->
@@ -53,7 +53,7 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.8.0</version>
+				<version>1.12.0</version>
 				<configuration>
 					<workingDirectory>${angular.src}</workingDirectory>
 					<installDirectory>${angular.target}</installDirectory>
@@ -66,7 +66,7 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
-							<nodeVersion>v10.16.3</nodeVersion>
+							<nodeVersion>v14.17.4</nodeVersion>
 						</configuration>
 					</execution>
 	
