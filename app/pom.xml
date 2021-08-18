@@ -247,6 +247,7 @@
 									<includes>
 								        <include>**/application.bat</include>
 								        <include>**/application.sh</include>
+										<include>**/applicationService.sh</include>
 								    </includes>
 								</resource>
 								<resource>
@@ -256,6 +257,7 @@
 										<exclude>**/.gitignore</exclude>
 										<exclude>**/application.bat</exclude>
 								        <exclude>**/application.sh</exclude>
+										<include>**/applicationService.sh</include>
 								    </excludes>
 								</resource>
 							</resources>
