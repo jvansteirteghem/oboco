@@ -124,7 +124,7 @@ public class BookMarkService {
         return bookMarkPageableList;
 	}
 	
-	public List<BookMarkReference> getBookMarkReferencesByBookId(Long bookId) throws ProblemException {
+	public List<BookMarkReference> getBookMarkReferencesByBook(Long bookId) throws ProblemException {
 		List<BookMarkReference> bookMarkReferenceList = entityManager.createQuery("select bmr from BookMarkReference bmr where bmr.book.id = :bookId", BookMarkReference.class)
 				.setParameter("bookId", bookId)
 				.getResultList();
@@ -132,7 +132,7 @@ public class BookMarkService {
         return bookMarkReferenceList;
 	}
 	
-	public void deleteBookMarkReferencesByUpdateDate(Date updateDate) throws ProblemException {
+	public void deleteBookMarkReferences(Date updateDate) throws ProblemException {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
@@ -168,7 +168,7 @@ public class BookMarkService {
 		}
 	}
 	
-	public BookMark getBookMarkByUserAndFileId(User user, String fileId) throws ProblemException {
+	public BookMark getBookMarkByUserAndFile(User user, String fileId) throws ProblemException {
 		BookMark bookMark = null;
 		
 		try {
@@ -183,7 +183,7 @@ public class BookMarkService {
         return bookMark;
 	}
 	
-	public List<BookMark> getBookMarksByFileId(String fileId) throws ProblemException {
+	public List<BookMark> getBookMarksByFile(String fileId) throws ProblemException {
 		List<BookMark> bookMarkList = entityManager.createQuery("select bm from BookMark bm where bm.fileId = :fileId", BookMark.class)
 				.setParameter("fileId", fileId)
 				.getResultList();
@@ -195,7 +195,7 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			List<BookMark> bookMarkList = getBookMarksByFileId(book.getFileId());
+			List<BookMark> bookMarkList = getBookMarksByFile(book.getFileId());
 			
 			for(BookMark bookMark: bookMarkList) {
 				BookMarkReference bookMarkReference = new BookMarkReference();
@@ -222,7 +222,7 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			List<BookMarkReference> bookMarkReferenceList = getBookMarkReferencesByBookId(book.getId());
+			List<BookMarkReference> bookMarkReferenceList = getBookMarkReferencesByBook(book.getId());
 			
 			for(BookMarkReference bookMarkReference: bookMarkReferenceList) {
 				bookMarkReference.setUpdateDate(book.getUpdateDate());
@@ -244,10 +244,10 @@ public class BookMarkService {
 		try {
 			Date updateDate = new Date();
 			
-			List<Book> bookList = getBookService().getBooksByUserAndBookCollectionId(user, bookCollection.getId());
+			List<Book> bookList = getBookService().getBooksByUserAndBookCollection(user, bookCollection.getId());
 			
 			for(Book book: bookList) {
-				BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+				BookMark bookMark = getBookMarkByUserAndFile(user, book.getFileId());
 				
 				if(bookMark == null) {
 					bookMark = new BookMark();
@@ -259,7 +259,7 @@ public class BookMarkService {
 					
 					entityManager.persist(bookMark);
 					
-					List<Book> referencedBookList = getBookService().getBooksByFileId(book.getFileId());
+					List<Book> referencedBookList = getBookService().getBooksByFile(book.getFileId());
 					
 					for(Book referencedBook: referencedBookList) {
 						BookMarkReference bookMarkReference = new BookMarkReference();
@@ -293,10 +293,10 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			List<Book> bookList = getBookService().getBooksByUserAndBookCollectionId(user, bookCollection.getId());
+			List<Book> bookList = getBookService().getBooksByUserAndBookCollection(user, bookCollection.getId());
 			
 			for(Book book: bookList) {
-				BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+				BookMark bookMark = getBookMarkByUserAndFile(user, book.getFileId());
 				
 				if(bookMark != null) {
 					entityManager.remove(bookMark);
@@ -317,7 +317,7 @@ public class BookMarkService {
 		try {
 			Date updateDate = new Date();
 			
-			BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+			BookMark bookMark = getBookMarkByUserAndFile(user, book.getFileId());
 			
 			if(bookMark == null) {
 				bookMark = new BookMark();
@@ -329,7 +329,7 @@ public class BookMarkService {
 				
 				entityManager.persist(bookMark);
 				
-				List<Book> referencedBookList = getBookService().getBooksByFileId(book.getFileId());
+				List<Book> referencedBookList = getBookService().getBooksByFile(book.getFileId());
 				
 				for(Book referencedBook: referencedBookList) {
 					BookMarkReference bookMarkReference = new BookMarkReference();
@@ -366,7 +366,7 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			BookMark bookMark = getBookMarkByUserAndFileId(user, book.getFileId());
+			BookMark bookMark = getBookMarkByUserAndFile(user, book.getFileId());
 			
 			if(bookMark != null) {
 				entityManager.remove(bookMark);

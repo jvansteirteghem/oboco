@@ -17,7 +17,7 @@ export class BookCollectionService {
   }
 
   getBookCollectionList(parentBookCollectionId: number, page: number, pageSize: number): Observable<PageableList<BookCollection>> {
-    return this.http.get<PageableList<BookCollection>>(this.url + "bookCollections?parentBookCollectionId=" + parentBookCollectionId + "&page=" + page + "&pageSize=" + pageSize + "&graph=()");
+    return this.http.get<PageableList<BookCollection>>(this.url + "bookCollections/" + parentBookCollectionId + "/bookCollections?page=" + page + "&pageSize=" + pageSize + "&graph=()");
   }
 
   getBookCollection(id: number): Observable<BookCollection> {

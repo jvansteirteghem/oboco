@@ -121,9 +121,9 @@ public class BookMarkResource {
 	}
 	
 	@Operation(
-		description = "Get the books of the lastest bookMark.",
+		description = "Get the books of the latest bookMark.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "The books of the lastest bookMark.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookPageableListDto.class))),
+    		@ApiResponse(responseCode = "200", description = "The books of the latest bookMark.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookPageableListDto.class))),
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_PAGE_INVALID, PROBLEM_PAGE_SIZE_INVALID, PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
@@ -132,9 +132,9 @@ public class BookMarkResource {
     		@ApiResponse(responseCode = "503", description = "The problem: PROBLEM_BOOK_SCANNER_STATUS_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class)))
     	}
     )
-	@Path("LASTEST/books")
+	@Path("LATEST/books")
 	@GET
-	public Response getLastestBookMark(
+	public Response getBooksByLatestBookMark(
 			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
 			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
 			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {

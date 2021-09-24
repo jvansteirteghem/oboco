@@ -92,7 +92,7 @@ public class BookResource {
 		PageableList<Book> bookPageableList = null;
 		
 		if(uriInfo.getQueryParameters().containsKey("name")) {
-			bookPageableList = bookService.getBooksByUserAndName(user, name, page, pageSize, graph);
+			bookPageableList = bookService.getBooksByUser(user, name, page, pageSize, graph);
 		} else {
 			bookPageableList = bookService.getBooksByUser(user, page, pageSize, graph);
 		}
@@ -133,7 +133,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId, graph);
+		Book book = bookService.getBookByUser(user, bookId, graph);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -169,7 +169,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId, null);
+		Book book = bookService.getBookByUser(user, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -230,7 +230,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId, null);
+		Book book = bookService.getBookByUser(user, bookId);
 		
         if(book == null) {
         	throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));

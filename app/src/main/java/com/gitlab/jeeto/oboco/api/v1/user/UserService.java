@@ -60,7 +60,7 @@ public class UserService {
 			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
 		}
 		
-		user = getUserById(user.getId(), graph);
+		user = getUser(user.getId(), graph);
         
         return user;
 	}
@@ -84,12 +84,12 @@ public class UserService {
 			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
 		}
 		
-		user = getUserById(user.getId(), graph);
+		user = getUser(user.getId(), graph);
 		
 		return user;
 	}
 	
-	public User getUserById(Long id, Graph graph) throws ProblemException {
+	public User getUser(Long id, Graph graph) throws ProblemException {
 		User user = null;
 		
 		try {
@@ -111,6 +111,10 @@ public class UserService {
 		}
 		
         return user;
+	}
+	
+	public User getUserByName(String name) throws ProblemException {
+		return getUserByName(name, null);
 	}
 	
 	public User getUserByName(String name, Graph graph) throws ProblemException {
@@ -138,11 +142,21 @@ public class UserService {
 	}
 	
 	public User getUserByNameAndPassword(String name, String password) throws ProblemException {
+		return getUserByNameAndPassword(name, password, null);
+	}
+	
+	public User getUserByNameAndPassword(String name, String password, Graph graph) throws ProblemException {
 		User user = null;
 		
 		try {
 			EntityGraph<User> entityGraph = entityManager.createEntityGraph(User.class);
 			entityGraph.addAttributeNodes("roles");
+			
+			if(graph != null) {
+				if(graph.containsKey("rootBookCollection")) {
+					entityGraph.addSubgraph("rootBookCollection", BookCollection.class);
+				}
+			}
 			
 			user = entityManager.createQuery("select u from User u where u.name = :name", User.class)
 					.setParameter("name", name)
@@ -151,15 +165,9 @@ public class UserService {
 		} catch(NoResultException e) {
 			
 		}
-        
-        return getUserByNameAndPassword(user, password);
-	}
-	
-	public User getUserByNameAndPassword(User user, String password) throws ProblemException {
+		
 		if(user != null) {
-			String passwordHash = user.getPasswordHash();
-			
-			if(isPassword(password, passwordHash) == false) {
+			if(isPassword(password, user.getPasswordHash()) == false) {
 				user = null;
 			}
 		}
@@ -212,7 +220,7 @@ public class UserService {
 		}
 	}
 	
-	public void delete() throws ProblemException {
+	public void deleteUsers() throws ProblemException {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {

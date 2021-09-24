@@ -69,7 +69,7 @@ public class BookMarkByBookResource {
     )
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createOrUpdateBookMark(
+	public Response createOrUpdateBookMarkByBook(
 			@Parameter(name = "bookMark", description = "The bookMark.", required = true) BookMarkDto bookMarkDto) throws ProblemException {
 		Graph graph = GraphHelper.createGraph("()");
 		Graph fullGraph = GraphHelper.createGraph("(book(bookCollection))");
@@ -82,7 +82,7 @@ public class BookMarkByBookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId, null);
+		Book book = bookService.getBookByUser(user, bookId);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -118,14 +118,14 @@ public class BookMarkByBookResource {
     	}
     )
 	@DELETE
-	public Response deleteBookMark() throws ProblemException {
+	public Response deleteBookMarkByBook() throws ProblemException {
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
 		if(user.getRootBookCollection() == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId, null);
+		Book book = bookService.getBookByUser(user, bookId);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
@@ -151,7 +151,7 @@ public class BookMarkByBookResource {
     	}
     )
 	@GET
-	public Response getBookMark(
+	public Response getBookMarkByBook(
 			@Parameter(name = "graph", description = "The graph. The full graph is (book(bookCollection)).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
 		Graph graph = GraphHelper.createGraph(graphValue);
 		Graph fullGraph = GraphHelper.createGraph("(book(bookCollection))");
@@ -164,7 +164,7 @@ public class BookMarkByBookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		Book book = bookService.getBookByUserAndId(user, bookId, null);
+		Book book = bookService.getBookByUser(user, bookId);
 		
 		if(book == null) {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_NOT_FOUND", "The book is not found."));
