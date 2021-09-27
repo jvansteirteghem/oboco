@@ -67,7 +67,8 @@ public class BookCollectionResource {
     )
 	@GET
 	public Response getBookCollections(
-			@Parameter(name = "name", description = "The name of the bookCollection.", required = false) @QueryParam("name") String name, 
+			@Parameter(name = "searchType", description = "The searchType. The searchType is NAME.", required = false) @QueryParam("searchType") BookCollectionSearchType searchType, 
+			@Parameter(name = "search", description = "The search.", required = false) @QueryParam("search") String search, 
 			@Parameter(name = "filterType", description = "The filterType. The filterType is ALL, NEW or LATEST_READ.", required = false) @QueryParam("filterType") BookCollectionFilterType filterType, 
 			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
 			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
@@ -88,13 +89,19 @@ public class BookCollectionResource {
 		PageableList<BookCollection> bookCollectionPageableList;
 		
 		if(BookCollectionFilterType.ALL.equals(filterType)) {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, name, page, pageSize, graph);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, searchType, search, page, pageSize, graph);
 		} else if(BookCollectionFilterType.NEW.equals(filterType)) {
-			bookCollectionPageableList = bookCollectionService.getNewBookCollectionsByUser(user, name, page, pageSize, graph);
+			bookCollectionPageableList = bookCollectionService.getNewBookCollectionsByUser(user, searchType, search, page, pageSize, graph);
 		} else if(BookCollectionFilterType.LATEST_READ.equals(filterType)) {
-			bookCollectionPageableList = bookCollectionService.getLatestReadBookCollectionsByUser(user, name, page, pageSize, graph);
+			bookCollectionPageableList = bookCollectionService.getLatestReadBookCollectionsByUser(user, searchType, search, page, pageSize, graph);
+		} else if(BookCollectionFilterType.READ.equals(filterType)) {
+			bookCollectionPageableList = bookCollectionService.getReadBookCollectionsByUser(user, searchType, search, page, pageSize, graph);
+		} else if(BookCollectionFilterType.READING.equals(filterType)) {
+			bookCollectionPageableList = bookCollectionService.getReadingBookCollectionsByUser(user, searchType, search, page, pageSize, graph);
+		} else if(BookCollectionFilterType.UNREAD.equals(filterType)) {
+			bookCollectionPageableList = bookCollectionService.getUnreadBookCollectionsByUser(user, searchType, search, page, pageSize, graph);
 		} else {
-			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, name, page, pageSize, graph);
+			bookCollectionPageableList = bookCollectionService.getBookCollectionsByUser(user, searchType, search, page, pageSize, graph);
 		}
 		
 		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionPageableList, graph);
@@ -206,7 +213,8 @@ public class BookCollectionResource {
 	@GET
 	public Response getBookCollectionsByBookCollection(
 			@Parameter(name = "bookCollectionId", description = "The id of the bookCollection.", required = true) @PathParam("bookCollectionId") Long bookCollectionId, 
-			@Parameter(name = "name", description = "The name of the bookCollection.", required = false) @QueryParam("name") String name, 
+			@Parameter(name = "searchType", description = "The searchType. The searchType is NAME.", required = false) @QueryParam("searchType") BookCollectionSearchType searchType, 
+			@Parameter(name = "search", description = "The search.", required = false) @QueryParam("search") String search, 
 			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
 			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
 			@Parameter(name = "graph", description = "The graph. The full graph is (parentBookCollection).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
@@ -223,7 +231,7 @@ public class BookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		PageableList<BookCollection> bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndParentBookCollection(user, bookCollectionId, name, page, pageSize, graph);
+		PageableList<BookCollection> bookCollectionPageableList = bookCollectionService.getBookCollectionsByUserAndParentBookCollection(user, bookCollectionId, searchType, search, page, pageSize, graph);
 		
 		PageableListDto<BookCollectionDto> bookCollectionPageableListDto = bookCollectionDtoMapper.getBookCollectionsDto(bookCollectionPageableList, graph);
 		

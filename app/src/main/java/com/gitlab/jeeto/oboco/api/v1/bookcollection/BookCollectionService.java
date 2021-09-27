@@ -167,10 +167,10 @@ public class BookCollectionService {
 	}
 	
 	public PageableList<BookCollection> getBookCollectionsByUserAndParentBookCollection(User user, Long parentBookCollectionId, Integer page, Integer pageSize, Graph graph) throws ProblemException {
-        return getBookCollectionsByUserAndParentBookCollection(user, parentBookCollectionId, null, page, pageSize, graph);
+        return getBookCollectionsByUserAndParentBookCollection(user, parentBookCollectionId, null, null, page, pageSize, graph);
 	}
 	
-	public PageableList<BookCollection> getBookCollectionsByUserAndParentBookCollection(User user, Long parentBookCollectionId, String name, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+	public PageableList<BookCollection> getBookCollectionsByUserAndParentBookCollection(User user, Long parentBookCollectionId, BookCollectionSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
 		EntityGraph<BookCollection> entityGraph = entityManager.createEntityGraph(BookCollection.class);
 		
 		if(graph != null) {
@@ -189,10 +189,13 @@ public class BookCollectionService {
 			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.parentBookCollection.id = :parentBookCollectionId";
 		}
 		
-		String normalizedName = NameHelper.getNormalizedName(name);
-		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.normalizedName like :normalizedName";
+		String normalizedName = null;
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			normalizedName = NameHelper.getNormalizedName(search);
+			
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQueryString = bookCollectionListQueryString + " and bc.normalizedName like :normalizedName";
+			}
 		}
 		
 		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc" + bookCollectionListQueryString);
@@ -202,8 +205,10 @@ public class BookCollectionService {
 			bookCollectionListSizeQuery.setParameter("parentBookCollectionId", parentBookCollectionId);
 		}
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
@@ -215,8 +220,10 @@ public class BookCollectionService {
 			bookCollectionListQuery.setParameter("parentBookCollectionId", parentBookCollectionId);
 		}
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
@@ -231,10 +238,10 @@ public class BookCollectionService {
 	}
 	
 	public PageableList<BookCollection> getBookCollectionsByUser(User user, Integer page, Integer pageSize, Graph graph) throws ProblemException {
-        return getBookCollectionsByUser(user, null, page, pageSize, graph);
+        return getBookCollectionsByUser(user, null, null, page, pageSize, graph);
 	}
 	
-	public PageableList<BookCollection> getBookCollectionsByUser(User user, String name, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+	public PageableList<BookCollection> getBookCollectionsByUser(User user, BookCollectionSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
 		EntityGraph<BookCollection> entityGraph = entityManager.createEntityGraph(BookCollection.class);
 		
 		if(graph != null) {
@@ -247,17 +254,22 @@ public class BookCollectionService {
 		
 		bookCollectionListQueryString = bookCollectionListQueryString + " and (bc.id = :rootBookCollectionId or bc.rootBookCollection.id = :rootBookCollectionId)";
 		
-		String normalizedName = NameHelper.getNormalizedName(name);
-		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQueryString = bookCollectionListQueryString + " and bc.normalizedName like :normalizedName";
+		String normalizedName = null;
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			normalizedName = NameHelper.getNormalizedName(search);
+			
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQueryString = bookCollectionListQueryString + " and bc.normalizedName like :normalizedName";
+			}
 		}
 		
 		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc" + bookCollectionListQueryString);
 		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
@@ -265,8 +277,10 @@ public class BookCollectionService {
 		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select bc from BookCollection bc" + bookCollectionListQueryString + " order by bc.number asc", BookCollection.class);
 		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
@@ -280,7 +294,7 @@ public class BookCollectionService {
         return bookCollectionPageableList;
 	}
 	
-	public PageableList<BookCollection> getNewBookCollectionsByUser(User user, String name, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+	public PageableList<BookCollection> getNewBookCollectionsByUser(User user, BookCollectionSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
 		EntityGraph<BookCollection> entityGraph = entityManager.createEntityGraph(BookCollection.class);
 		
 		if(graph != null) {
@@ -289,47 +303,71 @@ public class BookCollectionService {
 			}
 		}
 		
-		String bookCollectionListQueryString = " where 1 = 1";
+		PageableList<BookCollection> bookCollectionPageableList;
 		
-		bookCollectionListQueryString = bookCollectionListQueryString + " and b.rootBookCollection.id = :rootBookCollectionId";
-		
-		String normalizedName = NameHelper.getNormalizedName(name);
-		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQueryString = bookCollectionListQueryString + " and b.bookCollection.normalizedName like :normalizedName";
+		try {
+			Query createDateQuery = entityManager.createQuery("select max(b.createDate) from Book b");
+			
+			Date createDate = (Date) createDateQuery.getSingleResult();
+			
+			String bookCollectionListQueryString = " where 1 = 1";
+			
+			bookCollectionListQueryString = bookCollectionListQueryString + " and b.rootBookCollection.id = :rootBookCollectionId";
+			
+			String normalizedName = null;
+			if(BookCollectionSearchType.NAME.equals(searchType)) {
+				normalizedName = NameHelper.getNormalizedName(search);
+				
+				if(normalizedName != null && "".equals(normalizedName) == false) {
+					bookCollectionListQueryString = bookCollectionListQueryString + " and b.bookCollection.normalizedName like :normalizedName";
+				}
+			}
+			
+			bookCollectionListQueryString = bookCollectionListQueryString + " and b.createDate = :createDate";
+			
+			Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct b.bookCollection.id) from Book b" + bookCollectionListQueryString);
+			bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+			
+			if(BookCollectionSearchType.NAME.equals(searchType)) {
+				if(normalizedName != null && "".equals(normalizedName) == false) {
+					bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+				}
+			}
+			
+			bookCollectionListSizeQuery.setParameter("createDate", createDate);
+			
+			Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
+			
+			TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select distinct b.bookCollection from Book b" + bookCollectionListQueryString + " order by b.bookCollection.number asc", BookCollection.class);
+			bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+			
+			if(BookCollectionSearchType.NAME.equals(searchType)) {
+				if(normalizedName != null && "".equals(normalizedName) == false) {
+					bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+				}
+			}
+			
+			bookCollectionListQuery.setParameter("createDate", createDate);
+			bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
+			bookCollectionListQuery.setFirstResult((page - 1) * pageSize);
+			bookCollectionListQuery.setMaxResults(pageSize);
+			
+			List<BookCollection> bookCollectionList = bookCollectionListQuery.getResultList();
+	        
+	        bookCollectionPageableList = new PageableList<BookCollection>(bookCollectionList, bookCollectionListSize, page, pageSize);
+		} catch(NoResultException e) {
+			Long bookCollectionListSize = 0L;
+			
+			List<BookCollection> bookCollectionList = new ArrayList<BookCollection>();
+			
+			bookCollectionPageableList = new PageableList<BookCollection>(bookCollectionList, bookCollectionListSize, page, pageSize);
 		}
-		
-		bookCollectionListQueryString = bookCollectionListQueryString + " and b.createDate in (select max(b.createDate) from Book b)";
-		
-		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct b.bookCollection.id) from Book b" + bookCollectionListQueryString);
-		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
-		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
-		}
-		
-		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
-		
-		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select distinct b.bookCollection from Book b" + bookCollectionListQueryString + " order by b.bookCollection.number asc", BookCollection.class);
-		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
-		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
-		}
-		
-		bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
-		bookCollectionListQuery.setFirstResult((page - 1) * pageSize);
-		bookCollectionListQuery.setMaxResults(pageSize);
-		
-		List<BookCollection> bookCollectionList = bookCollectionListQuery.getResultList();
-        
-        PageableList<BookCollection> bookCollectionPageableList = new PageableList<BookCollection>(bookCollectionList, bookCollectionListSize, page, pageSize);
         
         return bookCollectionPageableList;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public PageableList<BookCollection> getLatestReadBookCollectionsByUser(User user, String name, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+	public PageableList<BookCollection> getLatestReadBookCollectionsByUser(User user, BookCollectionSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
 		EntityGraph<BookCollection> entityGraph = entityManager.createEntityGraph(BookCollection.class);
 		
 		if(graph != null) {
@@ -340,20 +378,27 @@ public class BookCollectionService {
 		
 		String bookCollectionListQueryString = " where 1 = 1";
 		
-		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId";
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.rootBookCollection.id = :rootBookCollectionId";
 		
-		String normalizedName = NameHelper.getNormalizedName(name);
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.user.id = :userId";
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.bookCollection.normalizedName like :normalizedName";
+		String normalizedName = null;
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			normalizedName = NameHelper.getNormalizedName(search);
+			
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQueryString = bookCollectionListQueryString + " and b.bookCollection.normalizedName like :normalizedName";
+			}
 		}
 		
 		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct bmr.bookCollection.id) from BookMarkReference bmr" + bookCollectionListQueryString);
 		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListSizeQuery.setParameter("userId", user.getId());
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
@@ -362,8 +407,10 @@ public class BookCollectionService {
 		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListQuery.setParameter("userId", user.getId());
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
@@ -383,6 +430,181 @@ public class BookCollectionService {
 		PageableList<BookCollection> bookCollectionPageableList = new PageableList<BookCollection>(bookCollectionList, bookCollectionListSize, page, pageSize);
 		
 		return bookCollectionPageableList;
+	}
+	
+	public PageableList<BookCollection> getReadBookCollectionsByUser(User user, BookCollectionSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+		EntityGraph<BookCollection> entityGraph = entityManager.createEntityGraph(BookCollection.class);
+		
+		if(graph != null) {
+			if(graph.containsKey("parentBookCollection")) {
+				entityGraph.addSubgraph("parentBookCollection", BookCollection.class);
+			}
+		}
+		
+		String bookCollectionListQueryString = " where 1 = 1";
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.rootBookCollection.id = :rootBookCollectionId";
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.user.id = :userId";
+		
+		String normalizedName = null;
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			normalizedName = NameHelper.getNormalizedName(search);
+			
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.bookCollection.normalizedName like :normalizedName";
+			}
+		}
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.book.numberOfPages = bmr.bookMark.page";
+		
+		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct bmr.bookCollection.id) from BookMarkReference bmr" + bookCollectionListQueryString);
+		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+		bookCollectionListSizeQuery.setParameter("userId", user.getId());
+		
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
+		}
+		
+		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
+		
+		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select distinct bmr.bookCollection from BookMarkReference bmr" + bookCollectionListQueryString + " order by bmr.bookCollection.number asc", BookCollection.class);
+		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+		bookCollectionListQuery.setParameter("userId", user.getId());
+		
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
+		}
+		
+		bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
+		bookCollectionListQuery.setFirstResult((page - 1) * pageSize);
+		bookCollectionListQuery.setMaxResults(pageSize);
+		
+		List<BookCollection> bookCollectionList = bookCollectionListQuery.getResultList();
+        
+        PageableList<BookCollection> bookCollectionPageableList = new PageableList<BookCollection>(bookCollectionList, bookCollectionListSize, page, pageSize);
+        
+        return bookCollectionPageableList;
+	}
+	
+	public PageableList<BookCollection> getReadingBookCollectionsByUser(User user, BookCollectionSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+		EntityGraph<BookCollection> entityGraph = entityManager.createEntityGraph(BookCollection.class);
+		
+		if(graph != null) {
+			if(graph.containsKey("parentBookCollection")) {
+				entityGraph.addSubgraph("parentBookCollection", BookCollection.class);
+			}
+		}
+		
+		String bookCollectionListQueryString = " where 1 = 1";
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.rootBookCollection.id = :rootBookCollectionId";
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.user.id = :userId";
+		
+		String normalizedName = null;
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			normalizedName = NameHelper.getNormalizedName(search);
+			
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.bookCollection.normalizedName like :normalizedName";
+			}
+		}
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bmr.book.numberOfPages <> bmr.bookMark.page";
+		
+		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct bmr.bookCollection.id) from BookMarkReference bmr" + bookCollectionListQueryString);
+		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+		bookCollectionListSizeQuery.setParameter("userId", user.getId());
+		
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
+		}
+		
+		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
+		
+		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select distinct bmr.bookCollection from BookMarkReference bmr" + bookCollectionListQueryString + " order by bmr.bookCollection.number asc", BookCollection.class);
+		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+		bookCollectionListQuery.setParameter("userId", user.getId());
+		
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
+		}
+		
+		bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
+		bookCollectionListQuery.setFirstResult((page - 1) * pageSize);
+		bookCollectionListQuery.setMaxResults(pageSize);
+		
+		List<BookCollection> bookCollectionList = bookCollectionListQuery.getResultList();
+        
+        PageableList<BookCollection> bookCollectionPageableList = new PageableList<BookCollection>(bookCollectionList, bookCollectionListSize, page, pageSize);
+        
+        return bookCollectionPageableList;
+	}
+	
+	public PageableList<BookCollection> getUnreadBookCollectionsByUser(User user, BookCollectionSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+		EntityGraph<BookCollection> entityGraph = entityManager.createEntityGraph(BookCollection.class);
+		
+		if(graph != null) {
+			if(graph.containsKey("parentBookCollection")) {
+				entityGraph.addSubgraph("parentBookCollection", BookCollection.class);
+			}
+		}
+		
+		String bookCollectionListQueryString = " where 1 = 1";
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bc.rootBookCollection.id = :rootBookCollectionId";
+		
+		String normalizedName = null;
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			normalizedName = NameHelper.getNormalizedName(search);
+			
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQueryString = bookCollectionListQueryString + " and bc.normalizedName like :normalizedName";
+			}
+		}
+		
+		bookCollectionListQueryString = bookCollectionListQueryString + " and bc.numberOfBooks > 0 and bc.id not in (select distinct bmr.bookCollection.id from BookMarkReference bmr where bmr.rootBookCollection.id = :rootBookCollectionId and bmr.user.id = :userId)";
+		
+		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc" + bookCollectionListQueryString);
+		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+		bookCollectionListSizeQuery.setParameter("userId", user.getId());
+		
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
+		}
+		
+		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
+		
+		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select bc from BookCollection bc" + bookCollectionListQueryString + " order by bc.number asc", BookCollection.class);
+		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+		bookCollectionListQuery.setParameter("userId", user.getId());
+		
+		if(BookCollectionSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookCollectionListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
+		}
+		
+		bookCollectionListQuery.setHint("javax.persistence.loadgraph", entityGraph);
+		bookCollectionListQuery.setFirstResult((page - 1) * pageSize);
+		bookCollectionListQuery.setMaxResults(pageSize);
+		
+		List<BookCollection> bookCollectionList = bookCollectionListQuery.getResultList();
+        
+        PageableList<BookCollection> bookCollectionPageableList = new PageableList<BookCollection>(bookCollectionList, bookCollectionListSize, page, pageSize);
+        
+        return bookCollectionPageableList;
 	}
 	
 	public void deleteBookCollections() throws ProblemException {
