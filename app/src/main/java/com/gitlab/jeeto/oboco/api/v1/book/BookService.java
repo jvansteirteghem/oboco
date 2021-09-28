@@ -148,10 +148,10 @@ public class BookService {
 	}
 	
 	public PageableList<Book> getBooksByUser(User user, Integer page, Integer pageSize, Graph graph) throws ProblemException {
-        return getBooksByUser(user, null, page, pageSize, graph);
+        return getBooksByUser(user, null, null, page, pageSize, graph);
 	}
 	
-	public PageableList<Book> getBooksByUser(User user, String name, Integer page, Integer pageSize, Graph graph) throws ProblemException {
+	public PageableList<Book> getBooksByUser(User user, BookSearchType searchType, String search, Integer page, Integer pageSize, Graph graph) throws ProblemException {
 		EntityGraph<Book> entityGraph = entityManager.createEntityGraph(Book.class);
 		if(graph != null) {
 			if(graph.containsKey("bookCollection")) {
@@ -163,17 +163,22 @@ public class BookService {
 		
 		bookListQueryString = bookListQueryString + " and b.rootBookCollection.id = :rootBookCollectionId";
 		
-		String normalizedName = NameHelper.getNormalizedName(name);
-		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookListQueryString = bookListQueryString + " and b.normalizedName like :normalizedName";
+		String normalizedName = null;
+		if(BookSearchType.NAME.equals(searchType)) {
+			normalizedName = NameHelper.getNormalizedName(search);
+			
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookListQueryString = bookListQueryString + " and b.normalizedName like :normalizedName";
+			}
 		}
 		
 		Query bookListSizeQuery = entityManager.createQuery("select count(b.id) from Book b" + bookListQueryString);
 		bookListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookListSizeQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		Long bookListSize = (Long) bookListSizeQuery.getSingleResult();
@@ -181,8 +186,10 @@ public class BookService {
 		TypedQuery<Book> bookListQuery = entityManager.createQuery("select b from Book b" + bookListQueryString + " order by b.number asc", Book.class);
 		bookListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		
-		if(normalizedName != null && "".equals(normalizedName) == false) {
-			bookListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+		if(BookSearchType.NAME.equals(searchType)) {
+			if(normalizedName != null && "".equals(normalizedName) == false) {
+				bookListQuery.setParameter("normalizedName", "%" + normalizedName + "%");
+			}
 		}
 		
 		bookListQuery.setHint("javax.persistence.loadgraph", entityGraph);

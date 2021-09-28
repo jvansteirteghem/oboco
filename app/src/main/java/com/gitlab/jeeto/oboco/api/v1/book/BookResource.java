@@ -72,7 +72,8 @@ public class BookResource {
     )
 	@GET
 	public Response getBooks(
-			@Parameter(name = "name", description = "The name of the book.", required = false) @QueryParam("name") String name, 
+			@Parameter(name = "searchType", description = "The searchType. The searchType is NAME.", required = false) @QueryParam("searchType") BookSearchType searchType, 
+			@Parameter(name = "search", description = "The search.", required = false) @QueryParam("search") String search, 
 			@Parameter(name = "page", description = "The page. The page is >= 1.", required = false) @DefaultValue("1") @QueryParam("page") Integer page, 
 			@Parameter(name = "pageSize", description = "The pageSize. The pageSize is >= 1 and <= 100.", required = false) @DefaultValue("25") @QueryParam("pageSize") Integer pageSize, 
 			@Parameter(name = "graph", description = "The graph. The full graph is (bookCollection,bookMark).", required = false) @DefaultValue("()") @QueryParam("graph") String graphValue) throws ProblemException {
@@ -89,13 +90,7 @@ public class BookResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND", "The user.rootBookCollection is not found."));
 		}
 		
-		PageableList<Book> bookPageableList = null;
-		
-		if(uriInfo.getQueryParameters().containsKey("name")) {
-			bookPageableList = bookService.getBooksByUser(user, name, page, pageSize, graph);
-		} else {
-			bookPageableList = bookService.getBooksByUser(user, page, pageSize, graph);
-		}
+		PageableList<Book> bookPageableList = bookService.getBooksByUser(user, searchType, search, page, pageSize, graph);
 		
 		PageableListDto<BookDto> bookPageableListDto = bookDtoMapper.getBooksDto(bookPageableList, graph);
 		

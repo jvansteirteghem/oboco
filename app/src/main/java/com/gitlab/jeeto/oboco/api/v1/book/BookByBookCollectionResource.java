@@ -124,7 +124,7 @@ public class BookByBookCollectionResource {
 	@Operation(
 		description = "Get the linkable book of the bookCollection.",
     	responses = {
-    		@ApiResponse(responseCode = "200", description = "The previous and next books.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookLinkableDto.class))),
+    		@ApiResponse(responseCode = "200", description = "The linkable book.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookLinkableDto.class))),
     		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_GRAPH_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
