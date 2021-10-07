@@ -96,6 +96,7 @@ public class DatabaseTest extends TestCase {
 			bookMark.setFileId("0000000000");
 			bookMark.setCreateDate(updateDate);
 			bookMark.setUpdateDate(updateDate);
+			bookMark.setNumberOfPages(1);
 			bookMark.setPage(1);
 			
 			entityManager.persist(bookMark);
@@ -103,13 +104,10 @@ public class DatabaseTest extends TestCase {
 			System.out.println("created bookMark " + bookMark.getId());
 			
 			BookMarkReference bookMarkReference = new BookMarkReference();
-			bookMarkReference.setUser(user);
 			bookMarkReference.setCreateDate(updateDate);
 			bookMarkReference.setUpdateDate(updateDate);
 			bookMarkReference.setBook(book);
 			bookMarkReference.setBookMark(bookMark);
-			bookMarkReference.setBookCollection(bookCollection);
-			bookMarkReference.setRootBookCollection(bookCollection);
 			
 			entityManager.persist(bookMarkReference);
 			
