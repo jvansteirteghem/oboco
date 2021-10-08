@@ -386,7 +386,7 @@ public class BookCollectionService {
 			}
 		}
 		
-		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct bc.id) from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString);
+		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString);
 		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListSizeQuery.setParameter("userId", user.getId());
 		
@@ -398,7 +398,7 @@ public class BookCollectionService {
 		
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
 		
-		Query bookCollectionListQuery = entityManager.createQuery("select distinct bc, bcm.updateDate from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString + " order by bcm.updateDate desc, bc.number asc");
+		Query bookCollectionListQuery = entityManager.createQuery("select bc, bcm.updateDate from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString + " order by bcm.updateDate desc, bc.number asc");
 		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListQuery.setParameter("userId", user.getId());
 		
@@ -450,7 +450,7 @@ public class BookCollectionService {
 			}
 		}
 		
-		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct bc.id) from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString);
+		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString);
 		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListSizeQuery.setParameter("userId", user.getId());
 		
@@ -462,7 +462,7 @@ public class BookCollectionService {
 		
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
 		
-		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select distinct bc from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString + " order by bc.number asc", BookCollection.class);
+		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select bc from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString + " order by bc.number asc", BookCollection.class);
 		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListQuery.setParameter("userId", user.getId());
 		
@@ -505,7 +505,7 @@ public class BookCollectionService {
 			}
 		}
 		
-		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(distinct bc.id) from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString);
+		Query bookCollectionListSizeQuery = entityManager.createQuery("select count(bc.id) from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString);
 		bookCollectionListSizeQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListSizeQuery.setParameter("userId", user.getId());
 		
@@ -517,7 +517,7 @@ public class BookCollectionService {
 		
 		Long bookCollectionListSize = (Long) bookCollectionListSizeQuery.getSingleResult();
 		
-		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select distinct bc from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString + " order by bc.number asc", BookCollection.class);
+		TypedQuery<BookCollection> bookCollectionListQuery = entityManager.createQuery("select bc from BookCollection bc join bc.bookCollectionMarks bcm" + bookCollectionListQueryString + " order by bc.number asc", BookCollection.class);
 		bookCollectionListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
 		bookCollectionListQuery.setParameter("userId", user.getId());
 		
