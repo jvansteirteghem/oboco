@@ -256,7 +256,6 @@ public class DefaultBookScanner implements BookScanner {
 					bookCollection.setParentBookCollection(null);
 					bookCollection.setCreateDate(this.updateDate);
 					bookCollection.setUpdateDate(this.updateDate);
-					bookCollection.setChildBookCollections(new ArrayList<BookCollection>());
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
 					bookCollection.setNumber(number);
@@ -274,7 +273,6 @@ public class DefaultBookScanner implements BookScanner {
 					}
 					
 					bookCollection.setUpdateDate(this.updateDate);
-					bookCollection.setChildBookCollections(new ArrayList<BookCollection>());
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
 					bookCollection.setNumber(number);
@@ -288,13 +286,10 @@ public class DefaultBookScanner implements BookScanner {
 				
 				if(BookScannerStatus.STOPPING.equals(this.status)) {
 		    		logger.info("stopping!");
+		    		
 		    		return;
 				}
 	    	}
-			
-			logger.info("delete bookMarkReferences");
-	        
-	        bookMarkService.deleteBookMarkReferences(this.updateDate);
 	        
 	        logger.info("delete books");
 	        
@@ -329,7 +324,6 @@ public class DefaultBookScanner implements BookScanner {
 		
 		Integer numberOfBookCollections = parentBookCollection.getNumberOfBookCollections();
 		Integer numberOfBooks = parentBookCollection.getNumberOfBooks();
-		List<BookCollection> childBookCollections = parentBookCollection.getChildBookCollections();
 		
 		TypeableFile[] files = parentFile.listTypeableFiles();
     	
@@ -344,7 +338,8 @@ public class DefaultBookScanner implements BookScanner {
 		for(TypeableFile file: fileList) {
 			if(BookScannerStatus.STOPPING.equals(this.status)) {
 	    		logger.info("stopping!");
-	    		break;
+	    		
+	    		return number;
 			}
 			
 			String path = file.getPath();
@@ -371,7 +366,6 @@ public class DefaultBookScanner implements BookScanner {
 					bookCollection.setParentBookCollection(parentBookCollection);
 					bookCollection.setCreateDate(this.updateDate);
 					bookCollection.setUpdateDate(this.updateDate);
-					bookCollection.setChildBookCollections(new ArrayList<BookCollection>());
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
 					
@@ -403,7 +397,6 @@ public class DefaultBookScanner implements BookScanner {
 					}
 					
 					bookCollection.setUpdateDate(this.updateDate);
-					bookCollection.setChildBookCollections(new ArrayList<BookCollection>());
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
 					
@@ -415,11 +408,7 @@ public class DefaultBookScanner implements BookScanner {
 					bookCollection = bookCollectionService.updateBookCollection(bookCollection);
 				}
 				
-				childBookCollections.add(bookCollection);
-				
 				number = add(number, rootBookCollection, bookCollection, file);
-				
-				childBookCollections.addAll(bookCollection.getChildBookCollections());
 			} else {
 				FileType fileType = FileType.getFileType(file.getName());
 				
@@ -455,7 +444,7 @@ public class DefaultBookScanner implements BookScanner {
 						
 						book = bookService.createBook(book);
 						
-						bookMarkService.createBookMarkReferencesByBook(book);
+						bookMarkService.createBookMarkReferencesByBook(book, this.updateDate);
 					} else {
 						logger.info("update book " + path);
 						
@@ -488,7 +477,7 @@ public class DefaultBookScanner implements BookScanner {
 						
 						book = bookService.updateBook(book);
 						
-						bookMarkService.updateBookMarkReferencesByBook(book);
+						bookMarkService.updateBookMarkReferencesByBook(book, this.updateDate);
 					}
 				}
 			}
@@ -497,11 +486,12 @@ public class DefaultBookScanner implements BookScanner {
 		logger.info("update parentBookCollection");
 		
 		parentBookCollection.setUpdateDate(this.updateDate);
-		parentBookCollection.setChildBookCollections(childBookCollections);
 		parentBookCollection.setNumberOfBookCollections(numberOfBookCollections);
 		parentBookCollection.setNumberOfBooks(numberOfBooks);
 		
 		parentBookCollection = bookCollectionService.updateBookCollection(parentBookCollection);
+		
+		bookMarkService.createOrUpdateOrDeleteBookCollectionMarkByBookCollection(parentBookCollection, this.updateDate);
 		
 		return number;
     }
@@ -809,7 +799,8 @@ public class DefaultBookScanner implements BookScanner {
 			for(TypeableFile bookPageDirectory: bookPageDirectoryList) {
 				if(BookScannerStatus.STOPPING.equals(this.status)) {
 		    		logger.info("stopping!");
-		    		break;
+		    		
+		    		return;
 				}
 				
 				if(bookPageDirectory.isDirectory()) {
@@ -820,7 +811,8 @@ public class DefaultBookScanner implements BookScanner {
 					for(TypeableFile bookPageDirectory2: bookPageDirectoryList2) {
 						if(BookScannerStatus.STOPPING.equals(this.status)) {
 				    		logger.info("stopping!");
-				    		break;
+				    		
+				    		return;
 						}
 						
 						if(bookPageDirectory2.isDirectory()) {
