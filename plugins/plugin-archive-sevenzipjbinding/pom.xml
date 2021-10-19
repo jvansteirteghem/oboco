@@ -2,12 +2,12 @@
 	<parent>
         <groupId>com.gitlab.jeeto.oboco</groupId>
         <artifactId>oboco-plugins</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2-SNAPSHOT</version>
     </parent>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>oboco-plugin-archive-sevenzipjbinding</artifactId>
-	<version>1.7.1</version> <!--MOD4DEL-->
+	<version>1.7.2-SNAPSHOT</version> <!--MOD4DEL-->
 	<packaging>jar</packaging>
 
 	<name>oboco-plugin-archive-sevenzipjbinding</name>
