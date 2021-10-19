@@ -54,7 +54,7 @@
                     <mat-card-title>{{book.name}}</mat-card-title>
                   </mat-card-title-group>
                 </mat-card-header>
-                <img mat-card-image [attr.src]="'/api/v1/books/' + this.book.id + '/pages/1.jpg?scaleType=DEFAULT&scaleWidth=240&scaleHeight=330' | download | async" (click)="book_onSelect(book)">
+                <img mat-card-image [attr.src]="'/api/v1/books/' + this.book.id + '/pages/1.jpg?scaleType=FILL&scaleWidth=200&scaleHeight=300' | download | async" (click)="book_onSelect(book)">
                 <mat-card-content>
                   <p>
                     id: {{book.id}}<br>

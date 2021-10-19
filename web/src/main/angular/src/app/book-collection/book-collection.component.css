@@ -4,7 +4,7 @@
 }
 
 .example-card {
-    max-width: 240px;
+    width: 200px;
     -ms-word-break: break-all;
     word-break: break-all;
     word-break: break-word;

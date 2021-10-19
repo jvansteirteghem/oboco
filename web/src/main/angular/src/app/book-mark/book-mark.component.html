@@ -11,7 +11,7 @@
     </div>
     <mat-list>
         <mat-list-item *ngFor="let bookMark of bookMarks.elements" class="example-list-item">
-            <img class="example-list-avatar" [attr.src]="'/api/v1/books/' + bookMark.book.id + '/pages/1.jpg?scaleType=FILL&scaleWidth=300&scaleHeight=150' | download | async">
+            <img class="example-list-avatar" [attr.src]="'/api/v1/books/' + bookMark.book.id + '/pages/1.jpg?scaleType=FILL&scaleWidth=300&scaleHeight=200' | download | async">
             <div list-line-text>
                 <div mat-list-line>book: {{ bookMark.book.name }}</div>
                 <div mat-list-line>bookCollection: {{ bookMark.book.bookCollection.name }}</div>
