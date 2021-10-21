@@ -258,6 +258,7 @@ public class DefaultBookScanner implements BookScanner {
 					bookCollection.setUpdateDate(this.updateDate);
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
+					bookCollection.setNumberOfBookPages(0);
 					bookCollection.setNumber(number);
 			        
 			        bookCollection = bookCollectionService.createBookCollection(bookCollection);
@@ -275,6 +276,7 @@ public class DefaultBookScanner implements BookScanner {
 					bookCollection.setUpdateDate(this.updateDate);
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
+					bookCollection.setNumberOfBookPages(0);
 					bookCollection.setNumber(number);
 					
 					bookCollection = bookCollectionService.updateBookCollection(bookCollection);
@@ -324,6 +326,7 @@ public class DefaultBookScanner implements BookScanner {
 		
 		Integer numberOfBookCollections = parentBookCollection.getNumberOfBookCollections();
 		Integer numberOfBooks = parentBookCollection.getNumberOfBooks();
+		Integer numberOfBookPages = parentBookCollection.getNumberOfBookPages();
 		
 		TypeableFile[] files = parentFile.listTypeableFiles();
     	
@@ -368,6 +371,7 @@ public class DefaultBookScanner implements BookScanner {
 					bookCollection.setUpdateDate(this.updateDate);
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
+					bookCollection.setNumberOfBookPages(0);
 					
 					numberOfBookCollections = numberOfBookCollections + 1;
 					number = number + 1;
@@ -399,6 +403,7 @@ public class DefaultBookScanner implements BookScanner {
 					bookCollection.setUpdateDate(this.updateDate);
 					bookCollection.setNumberOfBookCollections(0);
 					bookCollection.setNumberOfBooks(0);
+					bookCollection.setNumberOfBookPages(0);
 					
 					numberOfBookCollections = numberOfBookCollections + 1;
 					number = number + 1;
@@ -438,6 +443,7 @@ public class DefaultBookScanner implements BookScanner {
 				    	book.setUpdateDate(this.updateDate);
 						
 						numberOfBooks = numberOfBooks + 1;
+						numberOfBookPages = numberOfBookPages + book.getNumberOfPages();
 						number = number + 1;
 						
 						book.setNumber(number);
@@ -471,6 +477,7 @@ public class DefaultBookScanner implements BookScanner {
 						book.setUpdateDate(this.updateDate);
 						
 						numberOfBooks = numberOfBooks + 1;
+						numberOfBookPages = numberOfBookPages + book.getNumberOfPages();
 						number = number + 1;
 						
 						book.setNumber(number);
@@ -488,6 +495,7 @@ public class DefaultBookScanner implements BookScanner {
 		parentBookCollection.setUpdateDate(this.updateDate);
 		parentBookCollection.setNumberOfBookCollections(numberOfBookCollections);
 		parentBookCollection.setNumberOfBooks(numberOfBooks);
+		parentBookCollection.setNumberOfBookPages(numberOfBookPages);
 		
 		parentBookCollection = bookCollectionService.updateBookCollection(parentBookCollection);
 		
