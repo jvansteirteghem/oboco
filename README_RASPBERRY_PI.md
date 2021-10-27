@@ -1,0 +1,50 @@
+# oboco on the raspberry pi
+
+## raspberry pi
+
+- java
+	- sudo apt update
+	- sudo apt install default-jdk
+	- java –version
+- oboco
+	- download oboco to /home/pi/Downloads
+	- unzip /home/pi/Downloads/artifacts.zip/app/target/oboco-x.x.x.zip to /home/pi/Downloads/oboco
+	- configure ssl
+		- bash /home/pi/Downloads/oboco/tools/ssl.sh
+			- DNS: the dns of the server
+			- IP: the ip of the server
+			- PASSWORD: the password of the ssl key store
+		- copy /home/pi/Downloads/oboco/tools/server.pem to /home/pi/Downloads/oboco
+	- configure data.properties
+	- configure application.properties
+		- server.ssl.port: the ssl port of the server
+		- server.ssl.keyStore.path: the path of the ssl key store
+		- server.ssl.keyStore.password: the password of the ssl key store
+	- configure applicationService.sh
+		- if data needs to be mounted and unmounted
+			- configure
+				- DATA_DEVICE
+				- DATA_DIRECTORY
+			- enable "mount_data" and "unmount_data"
+		- disable "nohup java -cp .."
+		- enable "nohup java -Dos.arch=armv71 -cp .."
+
+## android device
+
+- configure ssl
+	- copy /home/pi/Downloads/oboco/tools/server-ca.pem to the device storage
+	- select "settings"
+	- select "biometrics and security"
+	- select "other security settings"
+	- select "install from device storage"
+- raspi check
+	- install
+	- configure
+		- add pi
+		- add commands
+			- oboco start: cd /home/pi/Downloads/oboco && bash applicationService.sh start
+			- oboco stop: cd /home/pi/Downloads/oboco && bash applicationService.sh stop
+			- oboco status: cd /home/pi/Downloads/oboco && bash applicationService.sh status
+- oboco
+	- install
+	- configure
