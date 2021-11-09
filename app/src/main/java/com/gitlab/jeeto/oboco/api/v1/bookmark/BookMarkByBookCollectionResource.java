@@ -14,6 +14,8 @@ import javax.ws.rs.core.SecurityContext;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
+import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemDto;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
@@ -22,6 +24,7 @@ import com.gitlab.jeeto.oboco.common.security.authentication.UserPrincipal;
 import com.gitlab.jeeto.oboco.common.security.authorization.Authorization;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,6 +41,8 @@ public class BookMarkByBookCollectionResource {
 	private BookMarkService bookMarkService;
 	@Inject
 	private BookCollectionService bookCollectionService;
+	@Inject
+	private BookCollectionMarkDtoMapper bookCollectionMarkDtoMapper;
 	
 	private Long bookCollectionId;
 	
@@ -48,9 +53,10 @@ public class BookMarkByBookCollectionResource {
 	}
 	
 	@Operation(
-		description = "Create or update the bookMarks of the books of the bookCollection. The bookMark.page is the last page of the book.",
+		description = "Create or update the bookMarks of the books of the bookCollection.",
     	responses = {
-    		@ApiResponse(responseCode = "200"),
+    		@ApiResponse(responseCode = "200", description = "The bookCollectionMark.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookCollectionMarkDto.class))),
+    		@ApiResponse(responseCode = "400", description = "The problem: PROBLEM_BOOK_COLLECTION_MARK_PAGE_INVALID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "401", description = "The problem: PROBLEM_USER_NOT_AUTHENTICATED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "403", description = "The problem: PROBLEM_USER_NOT_AUTHORIZED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
     		@ApiResponse(responseCode = "404", description = "The problem: PROBLEM_USER_ROOT_BOOK_COLLECTION_NOT_FOUND, PROBLEM_BOOK_COLLECTION_NOT_FOUND", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDto.class))),
@@ -60,7 +66,13 @@ public class BookMarkByBookCollectionResource {
     )
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createOrUpdateBookMarksByBookCollection() throws ProblemException {
+	public Response createOrUpdateBookMarksByBookCollection(
+			@Parameter(name = "bookCollectionMark", description = "The bookCollectionMark.", required = true) BookCollectionMarkDto bookCollectionMarkDto) throws ProblemException {
+		Graph graph = GraphHelper.createGraph("()");
+		Graph fullGraph = GraphHelper.createGraph("(bookCollection(parentBookCollection))");
+		
+		GraphHelper.validateGraph(graph, fullGraph);
+		
 		User user = ((UserPrincipal) securityContext.getUserPrincipal()).getUser();
 		
 		if(user.getRootBookCollection() == null) {
@@ -73,9 +85,20 @@ public class BookMarkByBookCollectionResource {
 			throw new ProblemException(new Problem(404, "PROBLEM_BOOK_COLLECTION_NOT_FOUND", "The bookCollection is not found."));
 		}
 		
-		bookMarkService.createOrUpdateBookMarksByUserAndBookCollection(user, bookCollection);
+		if(bookCollectionMarkDto.getBookPage() == null) {
+			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_COLLECTION_MARK_PAGE_INVALID", "The bookCollectionMark.bookPage is invalid: bookCollectionMark.bookPage is null."));
+		}
+		
+		if(bookCollectionMarkDto.getBookPage() < -1 || bookCollectionMarkDto.getBookPage() > 0) {
+			throw new ProblemException(new Problem(400, "PROBLEM_BOOK_COLLECTION_MARK_PAGE_INVALID", "The bookCollectionMark.bookPage is invalid: bookCollectionMark.bookPage is < -1 or bookCollectionMark.bookPage is > 0."));
+		}
+		
+		BookCollectionMark bookCollectionMark = bookMarkService.createOrUpdateBookMarksByUserAndBookCollection(user, bookCollection, bookCollectionMarkDto.getBookPage(), graph);
+		
+		bookCollectionMarkDto = bookCollectionMarkDtoMapper.getBookCollectionMarkDto(bookCollectionMark, graph);
 		
 		ResponseBuilder responseBuilder = Response.status(200);
+		responseBuilder.entity(bookCollectionMarkDto);
 		
 		return responseBuilder.build();
 	}

@@ -9,6 +9,7 @@ import com.gitlab.jeeto.oboco.api.v1.book.BookDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
+import com.gitlab.jeeto.oboco.api.v1.bookmark.BookCollectionMarkDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkService;
 import com.gitlab.jeeto.oboco.api.v1.bookscanner.BookScanner;
@@ -30,6 +31,7 @@ public class ApiApplicationBinder extends AbstractBinder {
     	bind(BookCollectionDtoMapper.class).to(BookCollectionDtoMapper.class);
     	bind(BookMarkService.class).to(BookMarkService.class);
     	bind(BookMarkDtoMapper.class).to(BookMarkDtoMapper.class);
+    	bind(BookCollectionMarkDtoMapper.class).to(BookCollectionMarkDtoMapper.class);
     	bind(DefaultBookScanner.class).named("DEFAULT").to(BookScanner.class).in(Singleton.class);
         bind(UserService.class).to(UserService.class);
         bind(UserDtoMapper.class).to(UserDtoMapper.class);

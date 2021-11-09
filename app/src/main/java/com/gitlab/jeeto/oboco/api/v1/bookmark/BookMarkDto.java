@@ -17,6 +17,7 @@ public class BookMarkDto {
 	private Long id;
 	private Date createDate;
 	private Date updateDate;
+	private Integer numberOfPages;
 	private Integer page;
 	private BookDto book;
 	public BookMarkDto() {
@@ -45,6 +46,14 @@ public class BookMarkDto {
 	}
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
+	}
+	@Schema(name = "numberOfPages")
+	@XmlElement(name = "numberOfPages")
+	public Integer getNumberOfPages() {
+		return numberOfPages;
+	}
+	public void setNumberOfPages(Integer numberOfPages) {
+		this.numberOfPages = numberOfPages;
 	}
 	@Schema(name = "page")
 	@XmlElement(name = "page")

@@ -20,6 +20,7 @@ import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
 import com.gitlab.jeeto.oboco.common.Graph;
+import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
 import com.gitlab.jeeto.oboco.common.exception.Problem;
 import com.gitlab.jeeto.oboco.common.exception.ProblemException;
@@ -154,13 +155,29 @@ public class BookMarkService {
 		}
 	}
 	
-	public BookCollectionMark getBookCollectionMarkByUserAndBookCollection(User user, Long bookCollectionId) throws ProblemException {
+	public BookCollectionMark getBookCollectionMarkByUserAndBookCollection(User user, BookCollection bookCollection, Graph graph) throws ProblemException {
+		EntityGraph<BookCollectionMark> entityGraph = entityManager.createEntityGraph(BookCollectionMark.class);
+		
+		if(graph != null) {
+			if(graph.containsKey("bookCollection")) {
+				Subgraph<BookCollection> bookCollectionEntityGraph = entityGraph.addSubgraph("bookCollection", BookCollection.class);
+				
+				Graph bookCollectionGraph = graph.get("bookCollection");
+				if(bookCollectionGraph != null) {
+					if(bookCollectionGraph.containsKey("parentBookCollection")) {
+						bookCollectionEntityGraph.addSubgraph("parentBookCollection", BookCollection.class);
+					}
+				}
+			}
+		}
+		
 		BookCollectionMark bookCollectionMark = null;
 		
 		try {
 			bookCollectionMark = entityManager.createQuery("select bcm from BookCollectionMark bcm where bcm.user.id = :userId and bcm.bookCollection.id = :bookCollectionId", BookCollectionMark.class)
 				.setParameter("userId", user.getId())
-				.setParameter("bookCollectionId", bookCollectionId)
+				.setParameter("bookCollectionId", bookCollection.getId())
+				.setHint("javax.persistence.loadgraph", entityGraph)
 				.getSingleResult();
 		} catch(NoResultException e) {
 			
@@ -200,10 +217,16 @@ public class BookMarkService {
 			
 			for(BookMark bookMark: bookMarkList) {
 				if(bookMark.getNumberOfPages() != book.getNumberOfPages()) {
-					Integer page = bookMark.getPage() + book.getNumberOfPages() - bookMark.getNumberOfPages();
+					Integer page;
 					
-					if(page < 1) {
-						page = 1;
+					if(bookMark.getPage() == 0) {
+						page = 0;
+					} else {
+						page = bookMark.getPage() + book.getNumberOfPages() - bookMark.getNumberOfPages();
+						
+						if(page < 1) {
+							page = 1;
+						}
 					}
 					
 					bookMark.setNumberOfPages(book.getNumberOfPages());
@@ -235,10 +258,16 @@ public class BookMarkService {
 			
 			for(BookMark bookMark: bookMarkList) {
 				if(bookMark.getNumberOfPages() != book.getNumberOfPages()) {
-					Integer page = bookMark.getPage() + book.getNumberOfPages() - bookMark.getNumberOfPages();
+					Integer page;
 					
-					if(page < 1) {
-						page = 1;
+					if(bookMark.getPage() == 0) {
+						page = 0;
+					} else {
+						page = bookMark.getPage() + book.getNumberOfPages() - bookMark.getNumberOfPages();
+						
+						if(page < 1) {
+							page = 1;
+						}
 					}
 					
 					bookMark.setNumberOfPages(book.getNumberOfPages());
@@ -281,7 +310,9 @@ public class BookMarkService {
 	}
 	
 	public void createOrUpdateOrDeleteBookCollectionMarkByUserAndBookCollection(User user, BookCollection bookCollection, Date updateDate) throws ProblemException {
-		BookCollectionMark bookCollectionMark = getBookCollectionMarkByUserAndBookCollection(user, bookCollection.getId());
+		Graph graph = GraphHelper.createGraph("()");
+		
+		BookCollectionMark bookCollectionMark = getBookCollectionMarkByUserAndBookCollection(user, bookCollection, graph);
 		
 		try {
 			String bookCollectionMarkQueryString = " where 1 = 1";
@@ -331,7 +362,7 @@ public class BookMarkService {
 		}
 	}
 	
-	public void createOrUpdateBookMarksByUserAndBookCollection(User user, BookCollection bookCollection) throws ProblemException {
+	public BookCollectionMark createOrUpdateBookMarksByUserAndBookCollection(User user, BookCollection bookCollection, Integer bookPage, Graph graph) throws ProblemException {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
@@ -351,7 +382,11 @@ public class BookMarkService {
 					bookMark.setCreateDate(updateDate);
 					bookMark.setUpdateDate(updateDate);
 					bookMark.setNumberOfPages(book.getNumberOfPages());
-					bookMark.setPage(book.getNumberOfPages());
+					if(bookPage == -1) {
+						bookMark.setPage(book.getNumberOfPages());
+					} else {
+						bookMark.setPage(bookPage);
+					}
 					
 					entityManager.persist(bookMark);
 					
@@ -368,7 +403,12 @@ public class BookMarkService {
 					}
 				} else {
 					bookMark.setUpdateDate(updateDate);
-					bookMark.setPage(book.getNumberOfPages());
+					bookMark.setNumberOfPages(book.getNumberOfPages());
+					if(bookPage == -1) {
+						bookMark.setPage(book.getNumberOfPages());
+					} else {
+						bookMark.setPage(bookPage);
+					}
 					
 					bookMark = entityManager.merge(bookMark);
 					
@@ -392,6 +432,10 @@ public class BookMarkService {
 			
 			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
 		}
+		
+		BookCollectionMark bookCollectionMark = getBookCollectionMarkByUserAndBookCollection(user, bookCollection, graph);
+		
+		return bookCollectionMark;
 	}
 	
 	public void deleteBookMarksByUserAndBookCollection(User user, BookCollection bookCollection) throws ProblemException {
@@ -447,7 +491,11 @@ public class BookMarkService {
 				bookMark.setCreateDate(updateDate);
 				bookMark.setUpdateDate(updateDate);
 				bookMark.setNumberOfPages(book.getNumberOfPages());
-				bookMark.setPage(bookPage);
+				if(bookPage == -1) {
+					bookMark.setPage(book.getNumberOfPages());
+				} else {
+					bookMark.setPage(bookPage);
+				}
 				
 				entityManager.persist(bookMark);
 				
@@ -464,7 +512,12 @@ public class BookMarkService {
 				}
 			} else {
 				bookMark.setUpdateDate(updateDate);
-				bookMark.setPage(bookPage);
+				bookMark.setNumberOfPages(book.getNumberOfPages());
+				if(bookPage == -1) {
+					bookMark.setPage(book.getNumberOfPages());
+				} else {
+					bookMark.setPage(bookPage);
+				}
 				
 				bookMark = entityManager.merge(bookMark);
 				
@@ -522,6 +575,49 @@ public class BookMarkService {
 			entityTransaction.rollback();
 			
 			throw new ProblemException(new Problem(500, "PROBLEM", "Problem."), e);
+		}
+	}
+	
+	public void loadBookCollectionMarkGraph(User user, BookCollection bookCollection, Graph graph) throws ProblemException {
+		List<BookCollection> bookCollectionList = new ArrayList<BookCollection>();
+		bookCollectionList.add(bookCollection);
+		
+		loadBookCollectionMarkGraph(user, bookCollectionList, graph);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void loadBookCollectionMarkGraph(User user, List<BookCollection> bookCollectionList, Graph graph) throws ProblemException {
+		List<Long> bookCollectionIdList = new ArrayList<Long>();
+		for(BookCollection bookCollection: bookCollectionList) {
+			if(bookCollection != null) {
+				bookCollectionIdList.add(bookCollection.getId());
+			}
+		}
+		
+		Query bookCollectionMarkListQuery = entityManager.createQuery("select bcm, bcm.bookCollection.id from BookCollectionMark bcm where bcm.bookCollection.rootBookCollection.id = :rootBookCollectionId and bcm.user.id = :userId and bcm.bookCollection.id in :bookCollectionIdList");
+		bookCollectionMarkListQuery.setParameter("rootBookCollectionId", user.getRootBookCollection().getId());
+		bookCollectionMarkListQuery.setParameter("userId", user.getId());
+		bookCollectionMarkListQuery.setParameter("bookCollectionIdList", bookCollectionIdList);
+		
+		List<Object[]> bookCollectionMarkObjectList = (List<Object[]>) bookCollectionMarkListQuery.getResultList();
+		
+		for(BookCollection bookCollection: bookCollectionList) {
+			if(bookCollection != null) {
+				List<BookCollectionMark> bookCollectionMarkList = new ArrayList<BookCollectionMark>();
+				
+				for(Object[] bookCollectionMarkObject: bookCollectionMarkObjectList) {
+					BookCollectionMark bookCollectionMark = (BookCollectionMark) bookCollectionMarkObject[0];
+					Long bookCollectionId = (Long) bookCollectionMarkObject[1];
+					
+					if(bookCollection.getId().equals(bookCollectionId)) {
+						bookCollectionMarkList.add(bookCollectionMark);
+						
+						break;
+					}
+				}
+				
+				bookCollection.setBookCollectionMarks(bookCollectionMarkList);
+			}
 		}
 	}
 	

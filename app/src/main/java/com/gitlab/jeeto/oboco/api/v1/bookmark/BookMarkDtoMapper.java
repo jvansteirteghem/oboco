@@ -36,6 +36,7 @@ public class BookMarkDtoMapper {
 			if(bookMark != null) {
 				bookMarkDto.setCreateDate(bookMark.getCreateDate());
 				bookMarkDto.setUpdateDate(bookMark.getUpdateDate());
+				bookMarkDto.setNumberOfPages(bookMark.getNumberOfPages());
 				bookMarkDto.setPage(bookMark.getPage());
 			}
 			
