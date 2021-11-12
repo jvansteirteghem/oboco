@@ -21,13 +21,10 @@
 		- server.ssl.keyStore.path: the path of the ssl key store
 		- server.ssl.keyStore.password: the password of the ssl key store
 	- configure applicationService.sh
+		- JAVA_OPTIONS: "-Dos.arch=armv71"
 		- if data needs to be mounted and unmounted
-			- configure
-				- DATA_DEVICE
-				- DATA_DIRECTORY
-			- enable "mount_data" and "unmount_data"
-		- disable "nohup java -cp .."
-		- enable "nohup java -Dos.arch=armv71 -cp .."
+			- DATA_DEVICE: "/dev/sda1"
+			- DATA_DIRECTORY: "/media/pi/data"
 
 ## android device
 

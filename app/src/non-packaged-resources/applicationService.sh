@@ -1,40 +1,46 @@
 #!/bin/bash
 
-PID_FILE=application.pid
-DATA_DEVICE=/dev/sda1
-DATA_DIRECTORY=/media/pi/data
+PID_FILE="application.pid"
+JAVA_OPTIONS=
+DATA_DEVICE=
+DATA_DIRECTORY=
+# raspberry pi
+#JAVA_OPTIONS="-Dos.arch=armv71"
+#DATA_DEVICE="/dev/sda1"
+#DATA_DIRECTORY="/media/pi/data"
 
 mount_data() {
-    if mountpoint -q "$DATA_DIRECTORY"; then
-        echo "data is mounted ..."
-    else
-        echo "data is mounting ..."
-        if [ ! -d "$DATA_DIRECTORY" ]; then
-            sudo mkdir "$DATA_DIRECTORY"
+    if [ ! "$DATA_DEVICE" = "" ]; then
+        if mountpoint -q "$DATA_DIRECTORY"; then
+            echo "data is mounted ..."
+        else
+            echo "data is mounting ..."
+            if [ ! -d "$DATA_DIRECTORY" ]; then
+                sudo mkdir "$DATA_DIRECTORY"
+            fi
+            sudo mount "$DATA_DEVICE" "$DATA_DIRECTORY"
+            echo "data is mounted ..."
         fi
-        sudo mount "$DATA_DEVICE" "$DATA_DIRECTORY"
-        echo "data is mounted ..."
     fi
 }
 
 unmount_data() {
-    if mountpoint -q "$DATA_DIRECTORY"; then
-        echo "data is unmounting ..."
-        sudo umount "$DATA_DIRECTORY"
-        echo "data is unmounted ..."
-    else
-        echo "data is unmounted"
+    if [ ! "$DATA_DEVICE" = "" ]; then
+        if mountpoint -q "$DATA_DIRECTORY"; then
+            echo "data is unmounting ..."
+            sudo umount "$DATA_DIRECTORY"
+            echo "data is unmounted ..."
+        else
+            echo "data is unmounted"
+        fi
     fi
 }
 
 start() {
-    # raspberry pi
-    #mount_data
+    mount_data
     if [ ! -f $PID_FILE ]; then
         echo "application is starting ..."
-        nohup java -cp libs/*:oboco-app-${project.version}.jar com.gitlab.jeeto.oboco.Server >/dev/null 2>&1 &
-        # raspberry pi
-        #nohup java -Dos.arch=armv71 -cp libs/*:oboco-app-${project.version}.jar com.gitlab.jeeto.oboco.Server >/dev/null 2>&1 &
+        nohup java ${JAVA_OPTIONS} -cp libs/*:oboco-app-${project.version}.jar com.gitlab.jeeto.oboco.Server >/dev/null 2>&1 &
         PID=$!
         echo $PID > $PID_FILE
         sleep 5
@@ -55,8 +61,7 @@ stop() {
     else
         echo "application is stopped ..."
     fi
-    # raspberry pi
-    #unmount_data
+    unmount_data
 }
 
 status() {
