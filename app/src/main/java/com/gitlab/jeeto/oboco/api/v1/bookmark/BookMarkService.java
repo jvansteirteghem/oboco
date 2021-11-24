@@ -19,6 +19,7 @@ import com.gitlab.jeeto.oboco.api.v1.book.Book;
 import com.gitlab.jeeto.oboco.api.v1.book.BookService;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.api.v1.user.User;
+import com.gitlab.jeeto.oboco.common.DateHelper;
 import com.gitlab.jeeto.oboco.common.Graph;
 import com.gitlab.jeeto.oboco.common.GraphHelper;
 import com.gitlab.jeeto.oboco.common.PageableList;
@@ -366,7 +367,7 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			Date updateDate = new Date();
+			Date updateDate = DateHelper.getDate();
 			
 			Map<Long, BookCollection> referencedBookCollectionMap = new HashMap<Long, BookCollection>();
 			
@@ -478,7 +479,7 @@ public class BookMarkService {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		try {
-			Date updateDate = new Date();
+			Date updateDate = DateHelper.getDate();
 			
 			Map<Long, BookCollection> referencedBookCollectionMap = new HashMap<Long, BookCollection>();
 			
