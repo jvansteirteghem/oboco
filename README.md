@@ -67,7 +67,7 @@ you are required to configure "application.properties/security.authentication.se
 	- scaleWidth: the scale width (in pixels) or "" (do not scale).
 	- scaleHeight: the scale height (in pixels) or "" (do not scale).
 - configure data.properties
-	- %ROOT_BOOK_COLLECTION%=%DATA_PATH%: the path of the data (books and book collections). you can add more than one path by using a ",". [^1]
+	- ROOT_BOOK_COLLECTION=DATA_PATH: the path of the data (books and book collections). you can add more than one path by using a ",". [^1]
 
 ### database
 
@@ -106,7 +106,7 @@ you are required to configure "application.properties/security.authentication.se
 ## usage
 
 - start the server with application.bat or application.sh
-- open your browser to http://%SERVER_ADDRESS%:%SERVER_PORT% or https://%SERVER_ADDRESS%:%SERVER_SSL_PORT%
+- open your browser to http://SERVER_ADDRESS:SERVER_PORT or https://SERVER_ADDRESS:SERVER_SSL_PORT
 - select "Web"
 - log in
 	- name: administrator
