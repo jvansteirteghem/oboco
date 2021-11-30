@@ -116,7 +116,7 @@ you are required to configure "application.properties/security.authentication.se
 
 ### can I install oboco on a raspberry pi?
 
-yes, but you have to start oboco with additional parameters: "-Dos.arch=armv71"
+yes, but you have to start oboco with additional parameters: "-Dos.arch=armv71". see [README_RASPBERRY_PI.md](README_RASPBERRY_PI.md).
 
 ### can I configure oboco to use another database?
 
