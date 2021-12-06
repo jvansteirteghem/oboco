@@ -5,7 +5,7 @@ JAVA_OPTIONS=
 DATA_DEVICE=
 DATA_DIRECTORY=
 # raspberry pi
-#JAVA_OPTIONS="-Dos.arch=armv71"
+#JAVA_OPTIONS="-Dos.arch=armv71 -Xms1024m -Xmx2048m"
 #DATA_DEVICE="/dev/sda1"
 #DATA_DIRECTORY="/media/pi/data"
 
