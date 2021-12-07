@@ -8,7 +8,7 @@
 	- java –version
 - oboco
 	- download oboco to /home/pi/Downloads
-	- unzip /home/pi/Downloads/artifacts.zip/app/target/oboco-x.x.x.zip to /home/pi/Downloads/oboco
+	- unzip /home/pi/Downloads/oboco-x.x.x.zip to /home/pi/Downloads/oboco
 	- configure ssl
 		- bash /home/pi/Downloads/oboco/tools/ssl.sh
 			- DNS: the dns of the server

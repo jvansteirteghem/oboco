@@ -1,5 +1,6 @@
 # https://blog.deniger.net/post/gitlab-maven-optimize-build/
 # https://forum.gitlab.com/t/getting-mvn-release-to-work-with-gitlab-ci/4904/2
+# https://crypt.codemancers.com/posts/2021-08-31-release-artifacts-using-gitlab-cicd/
 
 # latest: maven:latest
 image: maven:3.6.3-jdk-8
@@ -8,6 +9,7 @@ image: maven:3.6.3-jdk-8
 stages:
   - build
   - test
+  - prepare
   - release
 
 variables:
@@ -28,8 +30,8 @@ test:
   script:
     - mvn $MAVEN_CLI_OPTS test
 
-release:
-  stage: release
+prepareRelease:
+  stage: prepare
   tags:
     # runner tags
     - docker
@@ -49,9 +51,38 @@ release:
     # check out branch in the CI_BUILD_REF_NAME variable
     - git checkout -B "$CI_BUILD_REF_NAME"
     - mvn $MAVEN_CLI_OPTS release:prepare
+    - echo $CI_JOB_ID
+    - echo RELEASE_JOB_ID=$CI_JOB_ID >> release.env
+    - releaseVersion=`awk -F "[><]" '/releaseVersion/{print $3}' pom.xml`
+    - echo $releaseVersion
+    - echo RELEASE_VERSION=$releaseVersion >> release.env
+    - mkdir release
+    - mv app/target/oboco-${releaseVersion}.zip release/oboco-${releaseVersion}.zip
   artifacts:
     paths:
-      - app/target/oboco-*.zip
+      - release/
+    reports:
+      dotenv: release.env
   when: manual
   only:
      - master
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo $RELEASE_JOB_ID
+    - echo $RELEASE_VERSION
+  needs:
+    - job: prepareRelease
+      artifacts: true
+  release:
+    name: "oboco-${RELEASE_VERSION}"
+    description: "oboco-${RELEASE_VERSION}"
+    tag_name: "oboco-${RELEASE_VERSION}"
+    assets:
+      links:
+        - name: "oboco-${RELEASE_VERSION}"
+          url: "https://gitlab.com/jeeto/oboco/-/jobs/${RELEASE_JOB_ID}/artifacts/file/release/oboco-${RELEASE_VERSION}.zip"
+  only:
+    - master
