@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitlab.jeeto.oboco</groupId>
 	<artifactId>oboco</artifactId>
-	<version>1.9.1</version> <!--MOD4DEL-->
+	<version>1.9.2-SNAPSHOT</version> <!--MOD4DEL-->
 	<packaging>pom</packaging>
 	<name>oboco</name>
 	<url>https://gitlab.com/jeeto/oboco</url>
@@ -12,7 +12,7 @@
 		<connection>scm:git:ssh://git@gitlab.com/jeeto/oboco.git</connection>
 		<url>https://gitlab.com/jeeto/oboco</url>
 		<developerConnection>scm:git:ssh://git@gitlab.com/jeeto/oboco.git</developerConnection>
-		<tag>oboco-1.9.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
     <properties>
