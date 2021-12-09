@@ -605,13 +605,11 @@ public class DefaultBookScanner implements BookScanner {
 			ArchiveReaderFactory archiveReaderFactory = pluginManager.getFactory(ArchiveReaderFactory.class);
 	    	ArchiveReader archiveReader = null;
 			try {
-				Integer numberOfPages = book.getNumberOfPages();
-				
 				if(BookScannerMode.CREATE.equals(mode)) {
 					archiveReader = archiveReaderFactory.getArchiveReader(bookInputFile.getFileType());
 					archiveReader.openArchive(bookInputFile);
 		
-					numberOfPages = archiveReader.readSize();
+					Integer numberOfPages = archiveReader.readSize();
 					
 					book.setNumberOfPages(numberOfPages);
 				}
@@ -619,73 +617,75 @@ public class DefaultBookScanner implements BookScanner {
 				List<BookPage> bookPageList = getBookPageList(book);
 				
 				for(BookPage bookPage: bookPageList) {
-					TypeableFile bookPageInputFile = null;
-					try {
-						for(BookPageConfiguration bookPageConfiguration: bookPage.getBookPageConfigurationList()) {
-							TypeableFile bookPageOutputFile = getBookPage(
-				    				book, 
-				    				bookPage.getPage(), 
-				    				bookPageConfiguration.getScaleType(), 
-				    				bookPageConfiguration.getScaleWidth(), 
-				    				bookPageConfiguration.getScaleHeight()
-				    		);
-							
-							if(BookScannerMode.UPDATE.equals(mode)) {
-								if(bookPageOutputFile.isFile()) {
-						    		updateBookPage(bookPageOutputFile);
-						    		
-						    		continue;
-						    	}
-							}
-							
-							if(bookPageInputFile == null) {
-								if(archiveReader == null) {
-									archiveReader = archiveReaderFactory.getArchiveReader(bookInputFile.getFileType());
-									archiveReader.openArchive(bookInputFile);
+					if(bookPage.getPage() >= 1 && bookPage.getPage() <= book.getNumberOfPages()) {
+						TypeableFile bookPageInputFile = null;
+						try {
+							for(BookPageConfiguration bookPageConfiguration: bookPage.getBookPageConfigurationList()) {
+								TypeableFile bookPageOutputFile = getBookPage(
+					    				book, 
+					    				bookPage.getPage(), 
+					    				bookPageConfiguration.getScaleType(), 
+					    				bookPageConfiguration.getScaleWidth(), 
+					    				bookPageConfiguration.getScaleHeight()
+					    		);
+								
+								if(BookScannerMode.UPDATE.equals(mode)) {
+									if(bookPageOutputFile.isFile()) {
+							    		updateBookPage(bookPageOutputFile);
+							    		
+							    		continue;
+							    	}
 								}
 								
-								bookPageInputFile = archiveReader.readFile(bookPage.getPage() - 1);
-							}
-							
-							if(FileType.JPG.equals(bookPageInputFile.getFileType()) 
-									&& bookPageConfiguration.getScaleType() == null 
-									&& bookPageConfiguration.getScaleWidth() == null 
-									&& bookPageConfiguration.getScaleHeight() == null) {
-								createBookPage(bookPageInputFile, bookPageOutputFile);
-							} else {
-								TypeableFile bookPageInputFile2 = null;
-								try {
-									bookPageInputFile2 = createBookPage(
-											bookPageInputFile, 
-											bookPage.getPage(), 
-											bookPageConfiguration.getScaleType(), 
-											bookPageConfiguration.getScaleWidth(), 
-											bookPageConfiguration.getScaleHeight()
-									);
+								if(bookPageInputFile == null) {
+									if(archiveReader == null) {
+										archiveReader = archiveReaderFactory.getArchiveReader(bookInputFile.getFileType());
+										archiveReader.openArchive(bookInputFile);
+									}
 									
-									createBookPage(bookPageInputFile2, bookPageOutputFile);
-								} finally {
+									bookPageInputFile = archiveReader.readFile(bookPage.getPage() - 1);
+								}
+								
+								if(FileType.JPG.equals(bookPageInputFile.getFileType()) 
+										&& bookPageConfiguration.getScaleType() == null 
+										&& bookPageConfiguration.getScaleWidth() == null 
+										&& bookPageConfiguration.getScaleHeight() == null) {
+									createBookPage(bookPageInputFile, bookPageOutputFile);
+								} else {
+									TypeableFile bookPageInputFile2 = null;
 									try {
-										if(bookPageInputFile2 != null) {
-											if(bookPageInputFile2.isFile()) {
-												bookPageInputFile2.delete();
+										bookPageInputFile2 = createBookPage(
+												bookPageInputFile, 
+												bookPage.getPage(), 
+												bookPageConfiguration.getScaleType(), 
+												bookPageConfiguration.getScaleWidth(), 
+												bookPageConfiguration.getScaleHeight()
+										);
+										
+										createBookPage(bookPageInputFile2, bookPageOutputFile);
+									} finally {
+										try {
+											if(bookPageInputFile2 != null) {
+												if(bookPageInputFile2.isFile()) {
+													bookPageInputFile2.delete();
+												}
 											}
+										} catch(Exception e) {
+											// pass
 										}
-									} catch(Exception e) {
-										// pass
 									}
 								}
 							}
-						}
-					} finally {
-						try {
-							if(bookPageInputFile != null) {
-								if(bookPageInputFile.isFile()) {
-									bookPageInputFile.delete();
+						} finally {
+							try {
+								if(bookPageInputFile != null) {
+									if(bookPageInputFile.isFile()) {
+										bookPageInputFile.delete();
+									}
 								}
+							} catch(Exception e) {
+								// pass
 							}
-						} catch(Exception e) {
-							// pass
 						}
 					}
 				}

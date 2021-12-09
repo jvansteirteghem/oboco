@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-        <groupId>com.gitlab.jeeto.oboco</groupId>
-        <artifactId>oboco-plugins</artifactId>
-        <version>1.9.2-SNAPSHOT</version>
-    </parent>
+		<groupId>com.gitlab.jeeto.oboco</groupId>
+		<artifactId>oboco-plugins</artifactId>
+		<version>1.9.2-SNAPSHOT</version>
+	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>oboco-plugin-hash-jdk</artifactId>
@@ -15,9 +15,9 @@
 	
 	<properties>
 		<plugin.id>JDKHashPlugin</plugin.id>
-        <plugin.class>com.gitlab.jeeto.oboco.plugin.hash.jdk.JdkHashPlugin</plugin.class>
-        <plugin.version>1.0.0-SNAPSHOT</plugin.version>
-        <plugin.provider>jeeto</plugin.provider>
-        <plugin.dependencies />
+		<plugin.class>com.gitlab.jeeto.oboco.plugin.hash.jdk.JdkHashPlugin</plugin.class>
+		<plugin.version>1.0.0-SNAPSHOT</plugin.version>
+		<plugin.provider>jeeto</plugin.provider>
+		<plugin.dependencies />
 	</properties>
 </project>

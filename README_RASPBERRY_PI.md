@@ -45,3 +45,20 @@
 - oboco
 	- install
 	- configure
+
+## debug
+
+visualvm over ssh
+
+remote:
+- permissions.txt
+	grant {
+	  permission java.security.AllPermission;
+	};
+- jstatd -J-Djava.security.policy=permissions.txt
+
+local:
+- ssh -D 9696 user@remote
+- visualvm.exe
+	- tools > options > network > socks proxy: localhost 9696
+	- file > add remote host: remote

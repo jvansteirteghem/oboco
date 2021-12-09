@@ -12,8 +12,6 @@
 	<name>oboco-app</name>
 	
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
 		<jetty.version>9.4.41.v20210516</jetty.version>
 		<jersey.version>2.34</jersey.version>
 	</properties>
@@ -59,9 +57,9 @@
 		</dependency>
 		
 		<dependency>
-		    <groupId>org.hibernate</groupId>
-		    <artifactId>hibernate-c3p0</artifactId>
-		    <version>5.3.6.Final</version>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>5.3.6.Final</version>
 		</dependency>
 		
 		<!-- jetty -->
@@ -159,10 +157,10 @@
 		
 		<!-- swagger -->
 		<dependency>
-	      <groupId>io.swagger.core.v3</groupId>
-	      <artifactId>swagger-jaxrs2</artifactId>
-	      <version>2.0.9</version>
-	    </dependency>
+		  <groupId>io.swagger.core.v3</groupId>
+		  <artifactId>swagger-jaxrs2</artifactId>
+		  <version>2.0.9</version>
+		</dependency>
 		
 		<!-- jwt -->
 		<dependency>
@@ -173,9 +171,9 @@
 		
 		<!-- bcrypt -->
 		<dependency>
-		    <groupId>at.favre.lib</groupId>
-		    <artifactId>bcrypt</artifactId>
-		    <version>0.9.0</version>
+			<groupId>at.favre.lib</groupId>
+			<artifactId>bcrypt</artifactId>
+			<version>0.9.0</version>
 		</dependency>
 		
 		<!-- icu -->
@@ -196,20 +194,6 @@
 	
 	<build>
 		<plugins>
-			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-eclipse-plugin</artifactId>
-			  <version>2.9</version>
-			</plugin>
-		 	<plugin>
-				 <groupId>org.apache.maven.plugins</groupId>
-				 <artifactId>maven-compiler-plugin</artifactId>
-				 <version>3.1</version>
-				 <configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -245,10 +229,10 @@
 									<directory>${project.basedir}/src/non-packaged-resources</directory>
 									<filtering>true</filtering>
 									<includes>
-								        <include>**/application.bat</include>
-								        <include>**/application.sh</include>
+										<include>**/application.bat</include>
+										<include>**/application.sh</include>
 										<include>**/applicationService.sh</include>
-								    </includes>
+									</includes>
 								</resource>
 								<resource>
 									<directory>${project.basedir}/src/non-packaged-resources</directory>
@@ -256,9 +240,9 @@
 									<excludes>
 										<exclude>**/.gitignore</exclude>
 										<exclude>**/application.bat</exclude>
-								        <exclude>**/application.sh</exclude>
+										<exclude>**/application.sh</exclude>
 										<include>**/applicationService.sh</include>
-								    </excludes>
+									</excludes>
 								</resource>
 							</resources>
 						</configuration>
@@ -288,94 +272,94 @@
 						<id>copy-web-dependencies</id>
 						<phase>package</phase>
 						<goals>
-						  <goal>copy</goal>
+							<goal>copy</goal>
 						</goals>
 						<configuration>
-						  <artifactItems>
-						  	<artifactItem>
-							  <groupId>com.gitlab.jeeto.oboco</groupId>
-							  <artifactId>oboco-web</artifactId>
-							  <version>${project.version}</version>
-							  <type>war</type>
-							  <overWrite>false</overWrite>
-							</artifactItem>
-						  </artifactItems>
-						  <outputDirectory>${project.build.directory}/web</outputDirectory>
-						  <overWriteReleases>false</overWriteReleases>
-						  <overWriteSnapshots>true</overWriteSnapshots>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.gitlab.jeeto.oboco</groupId>
+									<artifactId>oboco-web</artifactId>
+									<version>${project.version}</version>
+									<type>war</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/web</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
-					  </execution>
-					  <execution>
+					</execution>
+					<execution>
 						<id>copy-plugin-dependencies</id>
 						<phase>package</phase>
 						<goals>
-						  <goal>copy</goal>
+							<goal>copy</goal>
 						</goals>
 						<configuration>
-						  <artifactItems>
-						  	<artifactItem>
-							  <groupId>com.gitlab.jeeto.oboco</groupId>
-							  <artifactId>oboco-plugin-archive-jdk</artifactId>
-							  <version>${project.version}</version>
-							  <type>jar</type>
-							  <overWrite>false</overWrite>
-							</artifactItem>
-							<artifactItem>
-							  <groupId>com.gitlab.jeeto.oboco</groupId>
-							  <artifactId>oboco-plugin-archive-junrar</artifactId>
-							  <version>${project.version}</version>
-							  <type>jar</type>
-							  <overWrite>false</overWrite>
-							</artifactItem>
-							<artifactItem>
-							  <groupId>com.gitlab.jeeto.oboco</groupId>
-							  <artifactId>oboco-plugin-archive-sevenzipjbinding</artifactId>
-							  <version>${project.version}</version>
-							  <type>jar</type>
-							  <overWrite>false</overWrite>
-							</artifactItem>
-							<artifactItem>
-							  <groupId>com.gitlab.jeeto.oboco</groupId>
-							  <artifactId>oboco-plugin-hash-jdk</artifactId>
-							  <version>${project.version}</version>
-							  <type>jar</type>
-							  <overWrite>false</overWrite>
-							</artifactItem>
-							<artifactItem>
-							  <groupId>com.gitlab.jeeto.oboco</groupId>
-							  <artifactId>oboco-plugin-image-jdk</artifactId>
-							  <version>${project.version}</version>
-							  <type>jar</type>
-							  <overWrite>false</overWrite>
-							</artifactItem>
-						  </artifactItems>
-						  <outputDirectory>${project.build.directory}/plugins</outputDirectory>
-						  <overWriteReleases>false</overWriteReleases>
-						  <overWriteSnapshots>true</overWriteSnapshots>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.gitlab.jeeto.oboco</groupId>
+									<artifactId>oboco-plugin-archive-jdk</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gitlab.jeeto.oboco</groupId>
+									<artifactId>oboco-plugin-archive-junrar</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gitlab.jeeto.oboco</groupId>
+									<artifactId>oboco-plugin-archive-sevenzipjbinding</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gitlab.jeeto.oboco</groupId>
+									<artifactId>oboco-plugin-hash-jdk</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gitlab.jeeto.oboco</groupId>
+									<artifactId>oboco-plugin-image-jdk</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/plugins</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
-					  </execution>
+					</execution>
 				</executions>
-		  </plugin>
+			</plugin>
 			<plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-assembly-plugin</artifactId>
-		      <version>2.4.1</version>
-		      <configuration>
-		        <descriptor>src/assembly/bin.xml</descriptor>
-		        <finalName>oboco-${project.version}</finalName>
-		      </configuration>
-		      <executions>
-		        <execution>
-		          <phase>package</phase>
-		          <goals>
-		            <goal>single</goal>
-		          </goals>
-		          <configuration>
-                      <appendAssemblyId>false</appendAssemblyId>
-                  </configuration>
-		        </execution>
-		      </executions>
-		    </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<descriptor>src/assembly/bin.xml</descriptor>
+					<finalName>oboco-${project.version}</finalName>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		 </plugins>
 	</build>
 </project>

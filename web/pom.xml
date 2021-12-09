@@ -13,8 +13,6 @@
 	<name>oboco-web</name>
 	
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
 		<angular.src>src/main/angular</angular.src>
 		<angular.target>target/angular</angular.target>
 	</properties>
@@ -22,31 +20,17 @@
 	<build>
 		<plugins>
 			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-eclipse-plugin</artifactId>
-			  <version>2.9</version>
-			</plugin>
-		 	<plugin>
-				 <groupId>org.apache.maven.plugins</groupId>
-				 <artifactId>maven-compiler-plugin</artifactId>
-				 <version>3.1</version>
-				 <configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.3.1</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<!-- Add frontend folder to war package -->
-		            <webResources>
-		                <resource>
-		                    <directory>${angular.src}/dist/oboco</directory>
-		                </resource>
-		            </webResources>
+					<webResources>
+						<resource>
+							<directory>${angular.src}/dist/oboco</directory>
+						</resource>
+					</webResources>
 				</configuration>
 			</plugin>
 			<!-- https://stackoverflow.com/questions/45915379/how-to-setup-angular-4-inside-a-maven-based-java-war-project -->
@@ -69,7 +53,7 @@
 							<nodeVersion>v14.17.4</nodeVersion>
 						</configuration>
 					</execution>
-	
+
 					<!-- It will execute command "npm install" inside "/e2e-angular2" directory -->
 					<execution>
 						<id>npm install</id>
