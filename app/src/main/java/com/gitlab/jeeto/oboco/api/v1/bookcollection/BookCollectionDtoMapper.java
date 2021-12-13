@@ -6,13 +6,14 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import com.gitlab.jeeto.oboco.api.v1.bookmark.BookCollectionMark;
+import com.gitlab.jeeto.oboco.api.PageableListDto;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookCollectionMarkDto;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookCollectionMarkDtoMapper;
-import com.gitlab.jeeto.oboco.common.Graph;
-import com.gitlab.jeeto.oboco.common.PageableList;
-import com.gitlab.jeeto.oboco.common.PageableListDto;
-import com.gitlab.jeeto.oboco.common.exception.ProblemException;
+import com.gitlab.jeeto.oboco.database.Graph;
+import com.gitlab.jeeto.oboco.database.PageableList;
+import com.gitlab.jeeto.oboco.database.bookcollection.BookCollection;
+import com.gitlab.jeeto.oboco.database.bookmark.BookCollectionMark;
+import com.gitlab.jeeto.oboco.problem.ProblemException;
 
 public class BookCollectionDtoMapper {
 	private BookCollectionMarkDtoMapper bookCollectionMarkDtoMapper;

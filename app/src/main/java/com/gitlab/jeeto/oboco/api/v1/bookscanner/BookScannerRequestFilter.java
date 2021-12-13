@@ -13,7 +13,9 @@ import javax.ws.rs.ext.Provider;
 
 import org.glassfish.hk2.api.IterableProvider;
 
-import com.gitlab.jeeto.oboco.common.exception.ProblemDto;
+import com.gitlab.jeeto.oboco.data.bookscanner.BookScanner;
+import com.gitlab.jeeto.oboco.data.bookscanner.BookScannerStatus;
+import com.gitlab.jeeto.oboco.problem.ProblemDto;
 
 @Provider
 @Priority(Priorities.USER)

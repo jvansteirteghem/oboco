@@ -17,11 +17,13 @@ public class ImageManagerFactory extends FactoryBase {
 			imageManager = getExtension(Jpg2JpgImageManager.class);
 		} else if(FileType.PNG.equals(inputFileType) && FileType.JPG.equals(outputFileType)) {
 			imageManager = getExtension(Png2JpgImageManager.class);
+		} else {
+			throw new Exception("fileType not supported.");
 		}
 		
 		return imageManager;
 	}
-
+	
 	@Override
 	public void start() {
 	}

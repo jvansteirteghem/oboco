@@ -23,8 +23,9 @@ import org.slf4j.LoggerFactory;
 import com.gitlab.jeeto.oboco.api.ApiApplication;
 import com.gitlab.jeeto.oboco.common.configuration.Configuration;
 import com.gitlab.jeeto.oboco.common.configuration.ConfigurationManager;
+import com.gitlab.jeeto.oboco.data.bookreader.BookReaderManager;
 import com.gitlab.jeeto.oboco.opds.OpdsApplication;
-import com.gitlab.jeeto.oboco.plugin.PluginManager;
+import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 
 public class Server {
 	private static Logger logger;
@@ -40,7 +41,8 @@ public class Server {
 		return configuration;
 	}
 	
-	private PluginManager pluginManager;
+	private FactoryManager factoryManager;
+	private BookReaderManager bookReaderManager;
 	private org.eclipse.jetty.server.Server server;
 	
 	public static void main(String[] args) throws Exception {
@@ -88,8 +90,11 @@ public class Server {
 		logger.info("start server");
 		
 		if(server == null) {
-			pluginManager = PluginManager.getInstance();
-			pluginManager.start();
+			factoryManager = FactoryManager.getInstance();
+			factoryManager.start();
+			
+			bookReaderManager = BookReaderManager.getInstance();
+			bookReaderManager.start();
 			
 			server = new org.eclipse.jetty.server.Server();
 			
@@ -179,8 +184,11 @@ public class Server {
             server.stop();
             server = null;
             
-            pluginManager.stop();
-            pluginManager = null;
+            bookReaderManager.stop();
+            bookReaderManager = null;
+            
+            factoryManager.stop();
+            factoryManager = null;
 		}
 	}
 }

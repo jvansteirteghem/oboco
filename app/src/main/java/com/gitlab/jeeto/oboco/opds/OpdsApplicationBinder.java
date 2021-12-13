@@ -5,12 +5,12 @@ import javax.inject.Singleton;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 
-import com.gitlab.jeeto.oboco.api.v1.book.BookService;
-import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionService;
-import com.gitlab.jeeto.oboco.api.v1.user.UserService;
-import com.gitlab.jeeto.oboco.common.database.EntityManagerFactory;
-import com.gitlab.jeeto.oboco.common.database.EntityManagerFactoryFactory;
-import com.gitlab.jeeto.oboco.common.security.authentication.UserTokenService;
+import com.gitlab.jeeto.oboco.database.EntityManagerFactory;
+import com.gitlab.jeeto.oboco.database.EntityManagerFactoryFactory;
+import com.gitlab.jeeto.oboco.database.book.BookService;
+import com.gitlab.jeeto.oboco.database.bookcollection.BookCollectionService;
+import com.gitlab.jeeto.oboco.database.user.UserService;
+import com.gitlab.jeeto.oboco.server.authentication.UserTokenService;
 
 public class OpdsApplicationBinder extends AbstractBinder {
     @Override

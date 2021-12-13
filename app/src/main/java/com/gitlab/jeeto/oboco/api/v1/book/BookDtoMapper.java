@@ -6,18 +6,19 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection;
+import com.gitlab.jeeto.oboco.api.LinkableDto;
+import com.gitlab.jeeto.oboco.api.PageableListDto;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDto;
 import com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollectionDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkDto;
 import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkDtoMapper;
-import com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkReference;
-import com.gitlab.jeeto.oboco.common.Graph;
-import com.gitlab.jeeto.oboco.common.Linkable;
-import com.gitlab.jeeto.oboco.common.LinkableDto;
-import com.gitlab.jeeto.oboco.common.PageableList;
-import com.gitlab.jeeto.oboco.common.PageableListDto;
-import com.gitlab.jeeto.oboco.common.exception.ProblemException;
+import com.gitlab.jeeto.oboco.database.Graph;
+import com.gitlab.jeeto.oboco.database.Linkable;
+import com.gitlab.jeeto.oboco.database.PageableList;
+import com.gitlab.jeeto.oboco.database.book.Book;
+import com.gitlab.jeeto.oboco.database.bookcollection.BookCollection;
+import com.gitlab.jeeto.oboco.database.bookmark.BookMarkReference;
+import com.gitlab.jeeto.oboco.problem.ProblemException;
 
 public class BookDtoMapper {
 	private BookCollectionDtoMapper bookCollectionDtoMapper;

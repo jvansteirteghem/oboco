@@ -7,12 +7,12 @@
 
     <persistence-unit name="default" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>com.gitlab.jeeto.oboco.api.v1.user.User</class>
-        <class>com.gitlab.jeeto.oboco.api.v1.bookmark.BookCollectionMark</class>
-        <class>com.gitlab.jeeto.oboco.api.v1.bookmark.BookMark</class>
-        <class>com.gitlab.jeeto.oboco.api.v1.bookmark.BookMarkReference</class>
-        <class>com.gitlab.jeeto.oboco.api.v1.book.Book</class>
-        <class>com.gitlab.jeeto.oboco.api.v1.bookcollection.BookCollection</class>
+        <class>com.gitlab.jeeto.oboco.database.user.User</class>
+        <class>com.gitlab.jeeto.oboco.database.bookmark.BookCollectionMark</class>
+        <class>com.gitlab.jeeto.oboco.database.bookmark.BookMark</class>
+        <class>com.gitlab.jeeto.oboco.database.bookmark.BookMarkReference</class>
+        <class>com.gitlab.jeeto.oboco.database.book.Book</class>
+        <class>com.gitlab.jeeto.oboco.database.bookcollection.BookCollection</class>
         <properties>
         	<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
 			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>

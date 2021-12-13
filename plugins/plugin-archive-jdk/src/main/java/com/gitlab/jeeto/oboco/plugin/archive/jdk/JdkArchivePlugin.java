@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -14,76 +15,83 @@ import org.pf4j.Extension;
 import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 
-import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
-import com.gitlab.jeeto.oboco.plugin.FileType.Type;
+import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntry;
+import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntryType;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
 
 public class JdkArchivePlugin extends Plugin {
+	public JdkArchivePlugin(PluginWrapper wrapper) {
+		super(wrapper);
+	}
 	
-    public JdkArchivePlugin(PluginWrapper wrapper) {
-        super(wrapper);
-    }
-	
-    @Extension
-    public static class JdkArchiveReader extends ArchiveReaderBase implements ArchiveReader.ZipArchiveReader {
+	@Extension
+	public static class JdkArchiveReader extends ArchiveReaderBase implements ArchiveReader.ZipArchiveReader {
 		private ZipFile zipFile = null;
-        private ArrayList<ZipEntry> zipEntryList;
-        
+		private Map<ArchiveEntry, ZipEntry> zipEntryMap = null;
+		
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			List<FileType> outputFileTypeList = FileType.getFileTypeList(Type.IMAGE);
+			if(zipFile != null) {
+				throw new Exception("archive is open.");
+			}
 			
 			zipFile = new ZipFile(inputFile);
-			zipEntryList = new ArrayList<ZipEntry>();
+			
+			zipEntryMap = new HashMap<ArchiveEntry, ZipEntry>();
 
-	        Enumeration<? extends ZipEntry> e = zipFile.entries();
-	        while (e.hasMoreElements()) {
-	            ZipEntry zipEntry = e.nextElement();
-	            if (zipEntry.isDirectory() == false) {
-	            	FileType outputFileType = FileType.getFileType(zipEntry.getName());
-	            	if(outputFileTypeList.contains(outputFileType)) {
-	            		zipEntryList.add(zipEntry);
-	            	}
-	            }
-	        }
-	        
-	        zipEntryList.sort(new NaturalOrderComparator<ZipEntry>() {
-	        	@Override
-	    		public String toString(ZipEntry o) {
-					return o.getName();
-	        	}
-			});
+			Enumeration<? extends ZipEntry> e = zipFile.entries();
+			while(e.hasMoreElements()) {
+				ZipEntry zipEntry = e.nextElement();
+				
+				String name = zipEntry.getName();
+				
+				ArchiveEntryType type;
+				if(zipEntry.isDirectory()) {
+					type = ArchiveEntryType.DIRECTORY;
+				} else {
+					type = ArchiveEntryType.FILE;
+				}
+				
+				ArchiveEntry archiveEntry = new ArchiveEntry(name, type);
+				
+				zipEntryMap.put(archiveEntry, zipEntry);
+			}
 		}
 
 		@Override
 		public void closeArchive() throws Exception {
-			if(zipFile != null) {
-				zipFile.close();
+			if(zipFile == null) {
+				throw new Exception("archive is closed.");
 			}
+			
+			zipFile.close();
 		}
 		
 		@Override
-		public TypeableFile readFile(Integer index) throws Exception {
+		public TypeableFile getFile(ArchiveEntry archiveEntry) throws Exception {
+			if(zipFile == null) {
+				throw new Exception("archive is closed.");
+			}
+			
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
 			try {
-				ZipEntry zipEntry = zipEntryList.get(index);
+				ZipEntry zipEntry = zipEntryMap.get(archiveEntry);
 				
 				inputStream = zipFile.getInputStream(zipEntry);
 				
 				TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-jdk-", ".tmp"));
 				outputStream = new FileOutputStream(outputFile);
 				
-			    byte[] buffer = new byte[8 * 1024];
-			    int bufferSize;
-			    while ((bufferSize = inputStream.read(buffer)) != -1) {
-			    	outputStream.write(buffer, 0, bufferSize);
-			    }
-			    
-			    return outputFile;
+				byte[] buffer = new byte[8 * 1024];
+				int bufferSize;
+				while ((bufferSize = inputStream.read(buffer)) != -1) {
+					outputStream.write(buffer, 0, bufferSize);
+				}
+				
+				return outputFile;
 			} catch(Exception e) {
 				throw e;
 			} finally {
@@ -106,8 +114,12 @@ public class JdkArchivePlugin extends Plugin {
 		}
 
 		@Override
-		public Integer readSize() throws Exception {
-			return zipEntryList.size();
+		public Set<ArchiveEntry> getArchiveEntrySet() throws Exception {
+			if(zipFile == null) {
+				throw new Exception("archive is closed.");
+			}
+			
+			return zipEntryMap.keySet();
 		}
-    }
+	}
 }

@@ -4,8 +4,8 @@ oboco is a server to help you read the books in your book collection (zip, cbz, 
 oboco is short for "open book collection".
 
 you can:
-- read your books and book collections.
-- search your books and book collections.
+- read your books.
+- search your books.
 - download your books.
 - manage your book marks.
 - manage your users.
@@ -26,7 +26,7 @@ you should use oboco with [oboco for android](https://gitlab.com/jeeto/oboco-and
 
 ## configuration
 
-you are required to configure "application.properties/security.authentication.secret" and "data.properties".
+you are required to configure "application.properties/server.authentication.secret" and "data.properties".
 
 ### logger
 
@@ -39,6 +39,9 @@ you are required to configure "application.properties/security.authentication.se
 
 - configure application.properties
 	- server.port: the port of the server.
+	- server.authentication.secret: the secret of the authentication.
+	- server.authentication.accessToken.age: the age of the access token of the authentication (in seconds).
+	- server.authentication.refreshToken.age: the age of the refresh token of the authentication (in seconds).
 
 ### ssl server
 
@@ -61,6 +64,9 @@ you are required to configure "application.properties/security.authentication.se
 
 - configure application.properties
 	- data.path: the path of the data (book pages). [^1]
+	- data.bookreader.bookReaderPool.size: the size of the book reader pool.
+	- data.bookreader.bookReaderPool.interval: the interval of the book reader pool (in seconds).
+	- data.bookreader.bookReaderPool.age: the age of the book reader pool (in seconds).
 - configure data.csv
 	- page: the page of the book or "" (all book pages).
 	- scaleType: the scale type: "DEFAULT", "FIT", "FILL" or "" (do not scale).
@@ -83,19 +89,8 @@ you are required to configure "application.properties/security.authentication.se
 - configure application.ddl
 - configure application.sql
 
-### security
-
-- configure application.properties
-	- security.authentication.secret: the secret of the authentication.
-	- security.authentication.accessToken.age: the age of the access token of the authentication (in seconds).
-	- security.authentication.refreshToken.age: the age of the refresh token of the authentication (in seconds).
-
 ### plugins
 
-- configure application.properties
-	- plugin.archive.archiveReaderPool.size: the size of the archive reader pool.
-	- plugin.archive.archiveReaderPool.interval: the interval of the archive reader pool (in seconds).
-	- plugin.archive.archiveReaderPool.age: the age of the archive reader pool (in seconds).
 - configure plugins/enabled.txt
 	- JDKArchivePlugin: supports zip.
 	- JUnrarArchivePlugin: supports rar.

@@ -14,12 +14,12 @@ import com.gitlab.jeeto.oboco.plugin.hash.HashType;
 
 public class JdkHashPlugin extends Plugin {
 	
-    public JdkHashPlugin(PluginWrapper wrapper) {
-        super(wrapper);
-    }
+	public JdkHashPlugin(PluginWrapper wrapper) {
+		super(wrapper);
+	}
 	
-    @Extension
-    public static class JdkHashManager implements HashManager.Sha256HashManager {
+	@Extension
+	public static class JdkHashManager implements HashManager.Sha256HashManager {
 
 		@Override
 		public String createHash(TypeableFile inputFile, HashType outputHashType) throws Exception {
@@ -33,15 +33,15 @@ public class JdkHashPlugin extends Plugin {
 				throw new Exception("extension not found.");
 			}
 			
-	        InputStream inputStream = null;
+			InputStream inputStream = null;
 			try {
 				inputStream = new FileInputStream(inputFile);
 				
 				byte[] buffer = new byte[8 * 1024];
-			    int bufferSize;
-			    while ((bufferSize = inputStream.read(buffer)) != -1) {
-			    	md.update(buffer, 0, bufferSize);
-			    }
+				int bufferSize;
+				while ((bufferSize = inputStream.read(buffer)) != -1) {
+					md.update(buffer, 0, bufferSize);
+				}
 			} finally {
 				if(inputStream != null) {
 					try {
@@ -54,12 +54,12 @@ public class JdkHashPlugin extends Plugin {
 			
 			byte[] hash = md.digest();
 			
-	        StringBuilder sb = new StringBuilder();
-	        for(int i = 0; i < hash.length; i = i + 1) {
-	            sb.append(String.format("%02x", hash[i]));
-	        }
-	        return sb.toString();
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < hash.length; i = i + 1) {
+				sb.append(String.format("%02x", hash[i]));
+			}
+			return sb.toString();
 		}
 		
-    }
+	}
 }

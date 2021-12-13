@@ -12,11 +12,13 @@ public class HashManagerFactory extends FactoryBase {
 		
 		if(HashType.SHA256.equals(outputHashType)) {
 			hashManager = getExtension(HashManager.Sha256HashManager.class);
+		} else {
+			throw new Exception("hashType not supported.");
 		}
 		
 		return hashManager;
 	}
-
+	
 	@Override
 	public void start() {
 	}

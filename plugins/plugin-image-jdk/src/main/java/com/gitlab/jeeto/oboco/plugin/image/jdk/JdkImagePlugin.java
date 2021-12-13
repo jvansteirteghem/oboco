@@ -47,18 +47,18 @@ public class JdkImagePlugin extends Plugin {
 			registry.registerServiceProvider(imageReaderSpi);
 			
 			Iterator<ImageReader> imageReaders = ImageIO.getImageReadersByFormatName("jpg");
-		    while(imageReaders.hasNext()) {
-		    	logger.debug("imageReader: " + imageReaders.next());
-		    }
+			while(imageReaders.hasNext()) {
+				logger.debug("imageReader: " + imageReaders.next());
+			}
 			
 			ImageWriterSpi imageWriterSpi = new JPEGImageWriterSpi();
 			
 			registry.registerServiceProvider(imageWriterSpi);
-		    
-		    Iterator<ImageWriter> imageWriters = ImageIO.getImageWritersByFormatName("jpg");
-		    while(imageWriters.hasNext()) {
-		    	logger.debug("imageWriter: " + imageWriters.next());
-		    }
+			
+			Iterator<ImageWriter> imageWriters = ImageIO.getImageWritersByFormatName("jpg");
+			while(imageWriters.hasNext()) {
+				logger.debug("imageWriter: " + imageWriters.next());
+			}
 		} catch(Exception e) {
 			throw new PluginRuntimeException(e);
 		}
@@ -135,9 +135,19 @@ public class JdkImagePlugin extends Plugin {
 				
 				outputBufferedImage = new BufferedImage(scaleWidth, scaleHeight, BufferedImage.TYPE_INT_RGB);
 				
-				Graphics2D g2d = outputBufferedImage.createGraphics();
-				g2d.drawImage(scaledInputImage, 0, 0, null);
-				g2d.dispose();
+				Graphics2D graphics2D = null;
+				try {
+					graphics2D = outputBufferedImage.createGraphics();
+					graphics2D.drawImage(scaledInputImage, 0, 0, null);
+				} finally {
+					try {
+						if(graphics2D != null) {
+							graphics2D.dispose();
+						}
+					} catch(Exception e) {
+						// pass
+					}
+				}
 				
 				scaledInputImage.flush();
 			} else if(ScaleType.FIT.equals(outputScaleType) || ScaleType.FILL.equals(outputScaleType)) {
@@ -161,9 +171,19 @@ public class JdkImagePlugin extends Plugin {
 				  
 				outputBufferedImage = new BufferedImage(outputScaleWidth, outputScaleHeight, BufferedImage.TYPE_INT_RGB);
 				
-				Graphics2D g2d = outputBufferedImage.createGraphics();
-				g2d.drawImage(scaledInputImage, x, y, null);
-				g2d.dispose();
+				Graphics2D graphics2D = null;
+				try {
+					graphics2D = outputBufferedImage.createGraphics();
+					graphics2D.drawImage(scaledInputImage, x, y, null);
+				} finally {
+					try {
+						if(graphics2D != null) {
+							graphics2D.dispose();
+						}
+					} catch(Exception e) {
+						// pass
+					}
+				}
 				
 				scaledInputImage.flush();
 			} else {
@@ -174,40 +194,47 @@ public class JdkImagePlugin extends Plugin {
 		}
 		
 		private BufferedImage read(TypeableFile inputFile) throws Exception {
-			FileType inputFileType = inputFile.getFileType();
+			BufferedImage bufferedImage = null;
 			
 			ImageReader imageReader = null;
 			ImageReadParam imageReadParam = null;
-			
-			if(FileType.JPG.equals(inputFileType)) {
-				imageReader = getImageReader("jpg");
-			} else if(FileType.PNG.equals(inputFileType)) {
-				imageReader = getImageReader("png");
-			}
-			
-			if(imageReader == null) {
-				throw new Exception("inputFileType not supported.");
-			}
-			
-			if(imageReadParam == null) {
-				imageReadParam = imageReader.getDefaultReadParam();
-			}
-			
-			BufferedImage bufferedImage = null;
-			
-			FileImageInputStream fileImageInputStream = null;
 			try {
-				fileImageInputStream = new FileImageInputStream(inputFile);
+				FileType inputFileType = inputFile.getFileType();
 				
-				imageReader.setInput(fileImageInputStream);
+				if(FileType.JPG.equals(inputFileType)) {
+					imageReader = getImageReader("jpg");
+				} else if(FileType.PNG.equals(inputFileType)) {
+					imageReader = getImageReader("png");
+				}
 				
-				bufferedImage = imageReader.read(0, imageReadParam);
+				if(imageReader == null) {
+					throw new Exception("inputFileType not supported.");
+				}
 				
-				imageReader.dispose();
+				if(imageReadParam == null) {
+					imageReadParam = imageReader.getDefaultReadParam();
+				}
+				
+				FileImageInputStream fileImageInputStream = null;
+				try {
+					fileImageInputStream = new FileImageInputStream(inputFile);
+					
+					imageReader.setInput(fileImageInputStream);
+					
+					bufferedImage = imageReader.read(0, imageReadParam);
+				} finally {
+					try {
+						if(fileImageInputStream != null) {
+							fileImageInputStream.close();
+						}
+					} catch(Exception e) {
+						// pass
+					}
+				}
 			} finally {
 				try {
-					if(fileImageInputStream != null) {
-						fileImageInputStream.close();
+					if(imageReader != null) {
+						imageReader.dispose();
 					}
 				} catch(Exception e) {
 					// pass
@@ -218,42 +245,49 @@ public class JdkImagePlugin extends Plugin {
 		}
 		
 		private void write(TypeableFile outputFile, BufferedImage outputImage) throws Exception {
-			FileType outputFileType = outputFile.getFileType();
-			
 			ImageWriter imageWriter = null;
 			ImageWriteParam imageWriteParam = null;
-			
-			if(FileType.JPG.equals(outputFileType)) {
-				imageWriter = getImageWriter("jpg");
-				
-				JPEGImageWriteParam jpegImageWriteParam = new JPEGImageWriteParam(null);
-				jpegImageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-				jpegImageWriteParam.setCompressionQuality(0.9f);
-				
-				imageWriteParam = jpegImageWriteParam;
-			}
-			
-			if(imageWriter == null) {
-				throw new Exception("outputFileType not supported.");
-			}
-			
-			if(imageWriteParam == null) {
-				imageWriteParam = imageWriter.getDefaultWriteParam();
-			}
-			
-			FileImageOutputStream fileImageOutputStream = null;
 			try {
-				fileImageOutputStream = new FileImageOutputStream(outputFile);
+				FileType outputFileType = outputFile.getFileType();
 				
-				imageWriter.setOutput(fileImageOutputStream);
-				 
-				imageWriter.write(null, new IIOImage(outputImage, null, null), imageWriteParam);
+				if(FileType.JPG.equals(outputFileType)) {
+					imageWriter = getImageWriter("jpg");
+					
+					JPEGImageWriteParam jpegImageWriteParam = new JPEGImageWriteParam(null);
+					jpegImageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					jpegImageWriteParam.setCompressionQuality(0.9f);
+					
+					imageWriteParam = jpegImageWriteParam;
+				}
 				
-				imageWriter.dispose();
+				if(imageWriter == null) {
+					throw new Exception("outputFileType not supported.");
+				}
+				
+				if(imageWriteParam == null) {
+					imageWriteParam = imageWriter.getDefaultWriteParam();
+				}
+				
+				FileImageOutputStream fileImageOutputStream = null;
+				try {
+					fileImageOutputStream = new FileImageOutputStream(outputFile);
+					
+					imageWriter.setOutput(fileImageOutputStream);
+					 
+					imageWriter.write(null, new IIOImage(outputImage, null, null), imageWriteParam);
+				} finally {
+					try {
+						if(fileImageOutputStream != null) {
+							fileImageOutputStream.close();
+						}
+					} catch(Exception e) {
+						// pass
+					}
+				}
 			} finally {
 				try {
-					if(fileImageOutputStream != null) {
-						fileImageOutputStream.close();
+					if(imageWriter != null) {
+						imageWriter.dispose();
 					}
 				} catch(Exception e) {
 					// pass

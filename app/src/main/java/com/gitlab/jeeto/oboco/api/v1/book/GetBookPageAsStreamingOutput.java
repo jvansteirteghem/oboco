@@ -11,11 +11,12 @@ import org.slf4j.LoggerFactory;
 
 import com.gitlab.jeeto.oboco.common.configuration.Configuration;
 import com.gitlab.jeeto.oboco.common.configuration.ConfigurationManager;
+import com.gitlab.jeeto.oboco.data.bookreader.BookReader;
+import com.gitlab.jeeto.oboco.data.bookreader.BookReaderManager;
+import com.gitlab.jeeto.oboco.database.book.Book;
+import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.PluginManager;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderFactory;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManagerFactory;
 import com.gitlab.jeeto.oboco.plugin.image.ScaleType;
@@ -97,12 +98,12 @@ public class GetBookPageAsStreamingOutput extends GetAsStreamingOutput {
 		return isWritten;
 	}
 	
-	private boolean writeBookPage3(OutputStream outputStream, ArchiveReader archiveReader) throws Exception {
+	private boolean writeBookPage3(OutputStream outputStream, BookReader bookReader) throws Exception {
 		boolean isWritten = false;
 		
 		TypeableFile bookPageInputFile = null;
 		try {
-			bookPageInputFile = archiveReader.readFile(page - 1);
+			bookPageInputFile = bookReader.getBookPage(page - 1);
 			
 			if(FileType.JPG.equals(bookPageInputFile.getFileType()) 
 					&& scaleType == null 
@@ -149,7 +150,7 @@ public class GetBookPageAsStreamingOutput extends GetAsStreamingOutput {
 	@Override
 	public void write(OutputStream outputStream) throws IOException, WebApplicationException {
 		try {
-			ArchiveReader archiveReader = null;
+			BookReader bookReader = null;
 			try {
 				boolean isWritten = writeBookPage(outputStream);
 				
@@ -157,24 +158,22 @@ public class GetBookPageAsStreamingOutput extends GetAsStreamingOutput {
 					isWritten = writeBookPage2(outputStream);
 					
 					if(isWritten == false) {
-						if(archiveReader == null) {
+						if(bookReader == null) {
 							TypeableFile bookInputFile = new TypeableFile(book.getFilePath());
 							
-							PluginManager pluginManager = PluginManager.getInstance();
+							BookReaderManager bookReaderManager = BookReaderManager.getInstance();
 							
-							ArchiveReaderFactory archiveReaderFactory = pluginManager.getFactory(ArchiveReaderFactory.class);
-							
-							archiveReader = archiveReaderFactory.getArchiveReader(bookInputFile.getFileType());
-							archiveReader.openArchive(bookInputFile);
+							bookReader = bookReaderManager.getBookReader();
+							bookReader.openBook(bookInputFile);
 						}
 						
-						writeBookPage3(outputStream, archiveReader);
+						writeBookPage3(outputStream, bookReader);
 					}
 				}
 			} finally {
 				try {
-					if(archiveReader != null) {
-						archiveReader.closeArchive();
+					if(bookReader != null) {
+						bookReader.closeBook();
 					}
 				} catch(Exception e) {
 					// pass
@@ -220,9 +219,9 @@ public class GetBookPageAsStreamingOutput extends GetAsStreamingOutput {
     }
 	
 	private TypeableFile createBookPage(TypeableFile bookPageInputFile) throws Exception {
-		PluginManager pluginManager = PluginManager.getInstance();
+		FactoryManager factoryManager = FactoryManager.getInstance();
 		
-		ImageManagerFactory imageManagerFactory = pluginManager.getFactory(ImageManagerFactory.class);
+		ImageManagerFactory imageManagerFactory = factoryManager.getFactory(ImageManagerFactory.class);
     	ImageManager imageManager = imageManagerFactory.getImageManager(bookPageInputFile.getFileType(), FileType.JPG);
 		
     	TypeableFile bookPageOutputFile = imageManager.createImage(bookPageInputFile, FileType.JPG, scaleType, scaleWidth, scaleHeight);

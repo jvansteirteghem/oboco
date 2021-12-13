@@ -3,7 +3,7 @@ package com.gitlab.jeeto.oboco.api.v1.book;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.gitlab.jeeto.oboco.common.LinkableDto;
+import com.gitlab.jeeto.oboco.api.LinkableDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
