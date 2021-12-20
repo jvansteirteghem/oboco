@@ -12,10 +12,8 @@ import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginWrapper;
 
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntry;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntryType;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
+import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderEntry;
 
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
@@ -40,92 +38,138 @@ public class SevenZipJBindingArchivePlugin extends Plugin {
 	}
 	
 	@Extension
-	public static class SevenZipJBindingArchiveReader extends ArchiveReaderBase implements ArchiveReader.ZipArchiveReader, ArchiveReader.RarArchiveReader, ArchiveReader.Rar5ArchiveReader, ArchiveReader.SevenZipArchiveReader {
-		private RandomAccessFile randomAccessFileIn = null;
-		private Map<ArchiveEntry, ISimpleInArchiveItem> simpleInArchiveItemMap = null;
+	public static class SevenZipJBindingArchiveReader implements ArchiveReader.ZipArchiveReader, ArchiveReader.RarArchiveReader, ArchiveReader.Rar5ArchiveReader, ArchiveReader.SevenZipArchiveReader {
+		private Boolean archiveOpen = false;
+		private RandomAccessFile archiveInputFile = null;
+		private IInArchive archive = null;
+		private Map<ArchiveReaderEntry, ISimpleInArchiveItem> archiveEntryMap = null;
 		
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			if(randomAccessFileIn != null) {
-				throw new Exception("archive is open.");
+			if(archiveOpen) {
+				throw new Exception("archive open.");
 			}
 			
-			randomAccessFileIn = new RandomAccessFile(inputFile, "r");
-			
-			RandomAccessFileInStream randomAccessFileInStream = new RandomAccessFileInStream(randomAccessFileIn);
-			
-			IInArchive inArchive = SevenZip.openInArchive(null, randomAccessFileInStream);
-			ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
-			
-			simpleInArchiveItemMap = new HashMap<ArchiveEntry, ISimpleInArchiveItem>();
-			
-			for(ISimpleInArchiveItem simpleInArchiveItem: simpleInArchive.getArchiveItems()) {
-				String name = simpleInArchiveItem.getPath();
+			try {
+				archiveInputFile = new RandomAccessFile(inputFile, "r");
 				
-				ArchiveEntryType type;
-				if(simpleInArchiveItem.isFolder()) {
-					type = ArchiveEntryType.DIRECTORY;
-				} else {
-					type = ArchiveEntryType.FILE;
+				archive = SevenZip.openInArchive(null, new RandomAccessFileInStream(archiveInputFile));
+				
+				ISimpleInArchive s = archive.getSimpleInterface();
+				
+				archiveEntryMap = new HashMap<ArchiveReaderEntry, ISimpleInArchiveItem>();
+				
+				for(ISimpleInArchiveItem archiveEntry: s.getArchiveItems()) {
+					String name = archiveEntry.getPath();
+					
+					ArchiveReaderEntry.Type type;
+					if(archiveEntry.isFolder()) {
+						type = ArchiveReaderEntry.Type.DIRECTORY;
+					} else {
+						type = ArchiveReaderEntry.Type.FILE;
+					}
+					
+					ArchiveReaderEntry archiveReaderEntry = new ArchiveReaderEntry(name, type);
+					
+					archiveEntryMap.put(archiveReaderEntry, archiveEntry);
 				}
 				
-				ArchiveEntry archiveEntry = new ArchiveEntry(name, type);
-				
-				simpleInArchiveItemMap.put(archiveEntry, simpleInArchiveItem);
+				archiveOpen = true;
+			} finally {
+				if(archiveOpen == false) {
+					archiveEntryMap = null;
+					
+					try {
+						if(archive != null) {
+							archive.close();
+							archive = null;
+						}
+					} catch(Exception e) {
+						// pass
+					}
+					
+					try {
+						if(archiveInputFile != null) {
+							archiveInputFile.close();
+							archiveInputFile = null;
+						}
+					} catch(Exception e) {
+						// pass
+					}
+				}
 			}
 		}
 
 		@Override
 		public void closeArchive() throws Exception {
-			if(randomAccessFileIn == null) {
-				throw new Exception("archive is closed.");
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			randomAccessFileIn.close();
+			archiveEntryMap = null;
+			
+			try {
+				if(archive != null) {
+					archive.close();
+					archive = null;
+				}
+			} catch(Exception e) {
+				// pass
+			}
+			
+			try {
+				if(archiveInputFile != null) {
+					archiveInputFile.close();
+					archiveInputFile = null;
+				}
+			} catch(Exception e) {
+				// pass
+			}
+			
+			archiveOpen = false;
 		}
 
 		@Override
-		public TypeableFile getFile(ArchiveEntry archiveEntry) throws Exception {
-			if(randomAccessFileIn == null) {
-				throw new Exception("archive is closed.");
+		public TypeableFile getFile(ArchiveReaderEntry archiveReaderEntry) throws Exception {
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			RandomAccessFile randomAccessFileOut = null;
+			TypeableFile outputFile;
+			
+			RandomAccessFile archiveOutputFile = null;
 			try {
-				ISimpleInArchiveItem simpleInArchiveItem = simpleInArchiveItemMap.get(archiveEntry);
+				ISimpleInArchiveItem archiveEntry = archiveEntryMap.get(archiveReaderEntry);
 				
-				TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-sevenzipjbinding-", ".tmp"));
-				randomAccessFileOut = new RandomAccessFile(outputFile, "rw");
+				outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-sevenzipjbinding-", ".tmp"));
 				
-				RandomAccessFileOutStream randomAccessFileOutStream = new RandomAccessFileOutStream(randomAccessFileOut);
+				archiveOutputFile = new RandomAccessFile(outputFile, "rw");
 				
-				ExtractOperationResult extractOperationResult = simpleInArchiveItem.extractSlow(randomAccessFileOutStream);
+				ExtractOperationResult result = archiveEntry.extractSlow(new RandomAccessFileOutStream(archiveOutputFile));
 				
-				if (extractOperationResult != ExtractOperationResult.OK) {
-					throw new Exception("extractOperationResult != ExtractOperationResult.OK");
+				if(result != ExtractOperationResult.OK) {
+					throw new Exception("archiveOutputFile not ok.");
 				}
-				
-				return outputFile;
-			} catch(Exception e) {
-				throw e;
 			} finally {
 				try {
-					if(randomAccessFileOut != null) {
-						randomAccessFileOut.close();
+					if(archiveOutputFile != null) {
+						archiveOutputFile.close();
 					}
 				} catch(Exception e) {
 					// pass
 				}
 			}
+			
+			return outputFile;
 		}
 
 		@Override
-		public Set<ArchiveEntry> getArchiveEntrySet() throws Exception {
-			if(randomAccessFileIn == null) {
-				throw new Exception("archive is closed.");
+		public Set<ArchiveReaderEntry> getArchiveReaderEntrySet() throws Exception {
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			return simpleInArchiveItemMap.keySet();
+			return archiveEntryMap.keySet();
 		}
 	}
 }

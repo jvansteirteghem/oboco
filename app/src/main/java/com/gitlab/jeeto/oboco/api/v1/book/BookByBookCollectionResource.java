@@ -177,7 +177,7 @@ public class BookByBookCollectionResource {
 	@Path("FIRST/pages/1.jpg")
 	@GET
 	public Response getBookPageAsByBookCollection(
-			@Parameter(name = "scaleType", description = "The scaleType. The scaleType is DEFAULT, FIT or FILL.", required = false) @QueryParam("scaleType") ScaleType scaleType, 
+			@Parameter(name = "scaleType", description = "The scaleType. The scaleType is DEFAULT.", required = false) @QueryParam("scaleType") ScaleType scaleType, 
 			@Parameter(name = "scaleWidth", description = "The scaleWidth.", required = false) @QueryParam("scaleWidth") Integer scaleWidth, 
 			@Parameter(name = "scaleHeight", description = "The scaleHeight.", required = false) @QueryParam("scaleHeight") Integer scaleHeight, 
 			@Context Request request) throws ProblemException {

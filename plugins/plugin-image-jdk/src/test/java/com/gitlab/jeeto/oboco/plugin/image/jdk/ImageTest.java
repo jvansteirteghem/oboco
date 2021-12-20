@@ -24,7 +24,7 @@ public class ImageTest extends TestCase {
 		
 		JdkImageManager imageManager = Mockito.spy(JdkImagePlugin.JdkImageManager.class);
 		
-		TypeableFile outputFile = imageManager.createImage(inputFile, outputFileType, ScaleType.FILL, 250, 450);
+		TypeableFile outputFile = imageManager.createImage(inputFile, outputFileType, ScaleType.DEFAULT, 250, 450);
 		
 		System.out.println(outputFile.getPath());
 	}

@@ -16,10 +16,8 @@ import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntry;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntryType;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
+import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderEntry;
 
 public class JdkArchivePlugin extends Plugin {
 	public JdkArchivePlugin(PluginWrapper wrapper) {
@@ -27,99 +25,129 @@ public class JdkArchivePlugin extends Plugin {
 	}
 	
 	@Extension
-	public static class JdkArchiveReader extends ArchiveReaderBase implements ArchiveReader.ZipArchiveReader {
-		private ZipFile zipFile = null;
-		private Map<ArchiveEntry, ZipEntry> zipEntryMap = null;
+	public static class JdkArchiveReader implements ArchiveReader.ZipArchiveReader {
+		private Boolean archiveOpen = false;
+		private ZipFile archive = null;
+		private Map<ArchiveReaderEntry, ZipEntry> archiveEntryMap = null;
 		
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			if(zipFile != null) {
-				throw new Exception("archive is open.");
+			if(archiveOpen) {
+				throw new Exception("archive open.");
 			}
 			
-			zipFile = new ZipFile(inputFile);
-			
-			zipEntryMap = new HashMap<ArchiveEntry, ZipEntry>();
-
-			Enumeration<? extends ZipEntry> e = zipFile.entries();
-			while(e.hasMoreElements()) {
-				ZipEntry zipEntry = e.nextElement();
+			try {
+				archive = new ZipFile(inputFile);
 				
-				String name = zipEntry.getName();
-				
-				ArchiveEntryType type;
-				if(zipEntry.isDirectory()) {
-					type = ArchiveEntryType.DIRECTORY;
-				} else {
-					type = ArchiveEntryType.FILE;
+				archiveEntryMap = new HashMap<ArchiveReaderEntry, ZipEntry>();
+	
+				Enumeration<? extends ZipEntry> e = archive.entries();
+				while(e.hasMoreElements()) {
+					ZipEntry archiveEntry = e.nextElement();
+					
+					String name = archiveEntry.getName();
+					
+					ArchiveReaderEntry.Type type;
+					if(archiveEntry.isDirectory()) {
+						type = ArchiveReaderEntry.Type.DIRECTORY;
+					} else {
+						type = ArchiveReaderEntry.Type.FILE;
+					}
+					
+					ArchiveReaderEntry archiveReaderEntry = new ArchiveReaderEntry(name, type);
+					
+					archiveEntryMap.put(archiveReaderEntry, archiveEntry);
 				}
 				
-				ArchiveEntry archiveEntry = new ArchiveEntry(name, type);
-				
-				zipEntryMap.put(archiveEntry, zipEntry);
+				archiveOpen = true;
+			} finally {
+				if(archiveOpen == false) {
+					archiveEntryMap = null;
+					
+					try {
+						if(archive != null) {
+							archive.close();
+							archive = null;
+						}
+					} catch(Exception e) {
+						// pass
+					}
+				}
 			}
 		}
 
 		@Override
 		public void closeArchive() throws Exception {
-			if(zipFile == null) {
-				throw new Exception("archive is closed.");
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			zipFile.close();
+			archiveEntryMap = null;
+			
+			try {
+				if(archive != null) {
+					archive.close();
+					archive = null;
+				}
+			} catch(Exception e) {
+				// pass
+			}
+			
+			archiveOpen = false;
 		}
 		
 		@Override
-		public TypeableFile getFile(ArchiveEntry archiveEntry) throws Exception {
-			if(zipFile == null) {
-				throw new Exception("archive is closed.");
+		public TypeableFile getFile(ArchiveReaderEntry archiveReaderEntry) throws Exception {
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			InputStream inputStream = null;
-			OutputStream outputStream = null;
+			TypeableFile outputFile;
+			
+			InputStream archiveInputStream = null;
+			OutputStream archiveOutputStream = null;
 			try {
-				ZipEntry zipEntry = zipEntryMap.get(archiveEntry);
+				ZipEntry archiveEntry = archiveEntryMap.get(archiveReaderEntry);
 				
-				inputStream = zipFile.getInputStream(zipEntry);
+				archiveInputStream = archive.getInputStream(archiveEntry);
 				
-				TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-jdk-", ".tmp"));
-				outputStream = new FileOutputStream(outputFile);
+				outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-jdk-", ".tmp"));
+				
+				archiveOutputStream = new FileOutputStream(outputFile);
 				
 				byte[] buffer = new byte[8 * 1024];
 				int bufferSize;
-				while ((bufferSize = inputStream.read(buffer)) != -1) {
-					outputStream.write(buffer, 0, bufferSize);
+				while ((bufferSize = archiveInputStream.read(buffer)) != -1) {
+					archiveOutputStream.write(buffer, 0, bufferSize);
 				}
-				
-				return outputFile;
-			} catch(Exception e) {
-				throw e;
 			} finally {
 				try {
-					if(inputStream != null) {
-						inputStream.close();
+					if(archiveOutputStream != null) {
+						archiveOutputStream.close();
 					}
 				} catch(Exception e) {
 					// pass
 				}
 				
 				try {
-					if(outputStream != null) {
-						outputStream.close();
+					if(archiveInputStream != null) {
+						archiveInputStream.close();
 					}
 				} catch(Exception e) {
 					// pass
 				}
 			}
+			
+			return outputFile;
 		}
 
 		@Override
-		public Set<ArchiveEntry> getArchiveEntrySet() throws Exception {
-			if(zipFile == null) {
-				throw new Exception("archive is closed.");
+		public Set<ArchiveReaderEntry> getArchiveReaderEntrySet() throws Exception {
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			return zipEntryMap.keySet();
+			return archiveEntryMap.keySet();
 		}
 	}
 }

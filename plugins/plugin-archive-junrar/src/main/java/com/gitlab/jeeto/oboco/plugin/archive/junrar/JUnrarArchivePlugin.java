@@ -16,10 +16,8 @@ import org.pf4j.PluginWrapper;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntry;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveEntryType;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
-import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderBase;
+import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderEntry;
 
 public class JUnrarArchivePlugin extends Plugin {
 	public JUnrarArchivePlugin(PluginWrapper wrapper) {
@@ -27,106 +25,134 @@ public class JUnrarArchivePlugin extends Plugin {
 	}
 	
 	@Extension
-	public static class JUnrarArchiveReader extends ArchiveReaderBase implements ArchiveReader.RarArchiveReader {
+	public static class JUnrarArchiveReader implements ArchiveReader.RarArchiveReader {
+		private Boolean archiveOpen = false;
 		private Archive archive = null;
-		private Map<ArchiveEntry, FileHeader> fileHeaderMap = null;
+		private Map<ArchiveReaderEntry, FileHeader> archiveEntryMap = null;
 		
 		@Override
 		public void openArchive(TypeableFile inputFile) throws Exception {
-			if(archive != null) {
-				throw new Exception("archive is open.");
+			if(archiveOpen) {
+				throw new Exception("archive open.");
 			}
 			
-			FileInputStream fileInputStream = new FileInputStream(inputFile);
-			
-			archive = new Archive(fileInputStream);
-			
-			fileHeaderMap = new HashMap<ArchiveEntry, FileHeader>();
-			
-			FileHeader fileHeader = archive.nextFileHeader();
-			while(fileHeader != null) {
-				String name;
-				if(fileHeader.isUnicode()) {
-					name = fileHeader.getFileNameW();
-				} else {
-					name = fileHeader.getFileNameString();
+			try {
+				archive = new Archive(new FileInputStream(inputFile));
+				
+				archiveEntryMap = new HashMap<ArchiveReaderEntry, FileHeader>();
+				
+				FileHeader archiveEntry = archive.nextFileHeader();
+				while(archiveEntry != null) {
+					String name;
+					if(archiveEntry.isUnicode()) {
+						name = archiveEntry.getFileNameW();
+					} else {
+						name = archiveEntry.getFileNameString();
+					}
+					
+					ArchiveReaderEntry.Type type;
+					if(archiveEntry.isDirectory()) {
+						type = ArchiveReaderEntry.Type.DIRECTORY;
+					} else {
+						type = ArchiveReaderEntry.Type.FILE;
+					}
+					
+					ArchiveReaderEntry archiveReaderEntry = new ArchiveReaderEntry(name, type);
+					
+					archiveEntryMap.put(archiveReaderEntry, archiveEntry);
+	
+					archiveEntry = archive.nextFileHeader();
 				}
 				
-				ArchiveEntryType type;
-				if(fileHeader.isDirectory()) {
-					type = ArchiveEntryType.DIRECTORY;
-				} else {
-					type = ArchiveEntryType.FILE;
+				archiveOpen = true;
+			} finally {
+				if(archiveOpen == false) {
+					archiveEntryMap = null;
+					
+					try {
+						if(archive != null) {
+							archive.close();
+							archive = null;
+						}
+					} catch(Exception e) {
+						// pass
+					}
 				}
-				
-				ArchiveEntry archiveEntry = new ArchiveEntry(name, type);
-				
-				fileHeaderMap.put(archiveEntry, fileHeader);
-
-				fileHeader = archive.nextFileHeader();
 			}
 		}
 
 		@Override
 		public void closeArchive() throws Exception {
-			if(archive == null) {
-				throw new Exception("archive is closed.");
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			archive.close();
+			archiveEntryMap = null;
+			
+			try {
+				if(archive != null) {
+					archive.close();
+					archive = null;
+				}
+			} catch(Exception e) {
+				// pass
+			}
+			
+			archiveOpen = false;
 		}
 
 		@Override
-		public TypeableFile getFile(ArchiveEntry archiveEntry) throws Exception {
-			if(archive == null) {
-				throw new Exception("archive is closed.");
+		public TypeableFile getFile(ArchiveReaderEntry archiveReaderEntry) throws Exception {
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			InputStream inputStream = null;
-			OutputStream outputStream = null;
+			TypeableFile outputFile;
+			
+			InputStream archiveInputStream = null;
+			OutputStream archiveOutputStream = null;
 			try {
-				FileHeader fileHeader = fileHeaderMap.get(archiveEntry);
+				FileHeader archiveEntry = archiveEntryMap.get(archiveReaderEntry);
 				
-				inputStream = archive.getInputStream(fileHeader);
+				archiveInputStream = archive.getInputStream(archiveEntry);
 				
-				TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-junrar-", ".tmp"));
-				outputStream = new FileOutputStream(outputFile);
+				outputFile = new TypeableFile(File.createTempFile("oboco-plugin-archive-junrar-", ".tmp"));
+				
+				archiveOutputStream = new FileOutputStream(outputFile);
 				
 				byte[] buffer = new byte[8 * 1024];
 				int bufferSize;
-				while((bufferSize = inputStream.read(buffer)) != -1) {
-					outputStream.write(buffer, 0, bufferSize);
+				while((bufferSize = archiveInputStream.read(buffer)) != -1) {
+					archiveOutputStream.write(buffer, 0, bufferSize);
 				}
-				
-				return outputFile;
-			} catch(Exception e) {
-				throw e;
 			} finally {
 				try {
-					if(inputStream != null) {
-						inputStream.close();
+					if(archiveOutputStream != null) {
+						archiveOutputStream.close();
 					}
 				} catch(Exception e) {
 					// pass
 				}
 				
 				try {
-					if(outputStream != null) {
-						outputStream.close();
+					if(archiveInputStream != null) {
+						archiveInputStream.close();
 					}
 				} catch(Exception e) {
 					// pass
 				}
 			}
+			
+			return outputFile;
 		}
 
 		@Override
-		public Set<ArchiveEntry> getArchiveEntrySet() throws Exception {
-			if(archive == null) {
-				throw new Exception("archive is closed.");
+		public Set<ArchiveReaderEntry> getArchiveReaderEntrySet() throws Exception {
+			if(archiveOpen == false) {
+				throw new Exception("archive not open.");
 			}
 			
-			return fileHeaderMap.keySet();
+			return archiveEntryMap.keySet();
 		}
 	}
 }

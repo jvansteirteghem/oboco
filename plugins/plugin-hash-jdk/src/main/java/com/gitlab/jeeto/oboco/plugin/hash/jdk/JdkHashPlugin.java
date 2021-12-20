@@ -27,10 +27,8 @@ public class JdkHashPlugin extends Plugin {
 			
 			if(HashType.SHA256.equals(outputHashType)) {
 				md = MessageDigest.getInstance("SHA-256");
-			}
-			
-			if(md == null) {
-				throw new Exception("extension not found.");
+			} else {
+				throw new Exception("hashType not supported.");
 			}
 			
 			InputStream inputStream = null;

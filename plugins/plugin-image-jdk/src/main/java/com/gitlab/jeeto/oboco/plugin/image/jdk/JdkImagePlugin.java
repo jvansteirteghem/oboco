@@ -1,9 +1,7 @@
 package com.gitlab.jeeto.oboco.plugin.image.jdk;
 
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.io.File;
 import java.util.Iterator;
 
@@ -30,8 +28,8 @@ import org.slf4j.LoggerFactory;
 import com.gitlab.jeeto.oboco.plugin.FileType;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager;
-import com.gitlab.jeeto.oboco.plugin.image.ImageManagerBase;
 import com.gitlab.jeeto.oboco.plugin.image.ScaleType;
+import com.twelvemonkeys.image.ResampleOp;
 import com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageReaderSpi;
 import com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriterSpi;
 
@@ -46,18 +44,18 @@ public class JdkImagePlugin extends Plugin {
 			
 			registry.registerServiceProvider(imageReaderSpi);
 			
-			Iterator<ImageReader> imageReaders = ImageIO.getImageReadersByFormatName("jpg");
-			while(imageReaders.hasNext()) {
-				logger.debug("imageReader: " + imageReaders.next());
+			Iterator<ImageReader> imageReaderIterator = ImageIO.getImageReadersByFormatName("jpg");
+			while(imageReaderIterator.hasNext()) {
+				logger.debug("imageReader: " + imageReaderIterator.next());
 			}
 			
 			ImageWriterSpi imageWriterSpi = new JPEGImageWriterSpi();
 			
 			registry.registerServiceProvider(imageWriterSpi);
 			
-			Iterator<ImageWriter> imageWriters = ImageIO.getImageWritersByFormatName("jpg");
-			while(imageWriters.hasNext()) {
-				logger.debug("imageWriter: " + imageWriters.next());
+			Iterator<ImageWriter> imageWriterIterator = ImageIO.getImageWritersByFormatName("jpg");
+			while(imageWriterIterator.hasNext()) {
+				logger.debug("imageWriter: " + imageWriterIterator.next());
 			}
 		} catch(Exception e) {
 			throw new PluginRuntimeException(e);
@@ -85,134 +83,71 @@ public class JdkImagePlugin extends Plugin {
 	}
 	
 	@Extension
-	public static class JdkImageManager extends ImageManagerBase implements ImageManager.Jpg2JpgImageManager, ImageManager.Png2JpgImageManager {
+	public static class JdkImageManager implements ImageManager.Jpg2JpgImageManager, ImageManager.Png2JpgImageManager {
 		// https://stackoverflow.com/questions/11959758/java-maintaining-aspect-ratio-of-jpanel-background-image/11959928#11959928
+		// https://github.com/rkalla/imgscalr
+		// https://github.com/haraldk/TwelveMonkeys
 		
-		private double calculateScaleFactor(int originalSize, int targetSize) {
-			double scaleFactor = 1;
+		private double calculateFactor(int inputDimension, int outputDimension) {
+			double factor;
 			
-			if(originalSize > targetSize) {
-				scaleFactor = (double) targetSize / (double) originalSize;
-			}
-			
-			return scaleFactor;
-
-		}
-		
-		private double getScaleFactor(Dimension originalSize, Dimension targetSize, ScaleType scaleType) {
-			double scaleFactor = 1d;
-			
-			if(originalSize != null && targetSize != null) {
-				double scaleWidth = calculateScaleFactor(originalSize.width, targetSize.width);
-				double scaleHeight = calculateScaleFactor(originalSize.height, targetSize.height);
-				
-				if(ScaleType.FIT.equals(scaleType)) {
-					scaleFactor = Math.min(scaleWidth, scaleHeight);
-				} else if(ScaleType.FILL.equals(scaleType)) {
-					scaleFactor = Math.max(scaleWidth, scaleHeight);
-				}
-			}
-
-			return scaleFactor;
-		}
-		
-		private BufferedImage scale(BufferedImage inputImage, ScaleType outputScaleType, Integer outputScaleWidth, Integer outputScaleHeight) throws Exception {
-			BufferedImage outputBufferedImage = null;
-			
-			if(ScaleType.DEFAULT.equals(outputScaleType)) {
-				double scaleFactor = 1d;
-				
-				if(outputScaleWidth != null) {
-					scaleFactor = calculateScaleFactor(inputImage.getWidth(), outputScaleWidth);
-				} else if(outputScaleHeight != null) {
-					scaleFactor = calculateScaleFactor(inputImage.getHeight(), outputScaleHeight);
-				}
-				
-				int scaleWidth = (int) Math.round(inputImage.getWidth() * scaleFactor);
-				int scaleHeight = (int) Math.round(inputImage.getHeight() * scaleFactor);
-				
-				Image scaledInputImage = inputImage.getScaledInstance(scaleWidth, scaleHeight, Image.SCALE_SMOOTH);
-				
-				outputBufferedImage = new BufferedImage(scaleWidth, scaleHeight, BufferedImage.TYPE_INT_RGB);
-				
-				Graphics2D graphics2D = null;
-				try {
-					graphics2D = outputBufferedImage.createGraphics();
-					graphics2D.drawImage(scaledInputImage, 0, 0, null);
-				} finally {
-					try {
-						if(graphics2D != null) {
-							graphics2D.dispose();
-						}
-					} catch(Exception e) {
-						// pass
-					}
-				}
-				
-				scaledInputImage.flush();
-			} else if(ScaleType.FIT.equals(outputScaleType) || ScaleType.FILL.equals(outputScaleType)) {
-				if(outputScaleWidth == null) {
-					outputScaleWidth = inputImage.getWidth();
-				}
-				
-				if(outputScaleHeight == null) {
-					outputScaleHeight = inputImage.getHeight();
-				}
-				
-				double scaleFactor = Math.min(1d, getScaleFactor(new Dimension(inputImage.getWidth(), inputImage.getHeight()), new Dimension(outputScaleWidth, outputScaleHeight), outputScaleType));
-				
-				int scaleWidth = (int) Math.round(inputImage.getWidth() * scaleFactor);
-				int scaleHeight = (int) Math.round(inputImage.getHeight() * scaleFactor);
-
-				Image scaledInputImage = inputImage.getScaledInstance(scaleWidth, scaleHeight, Image.SCALE_SMOOTH);
-
-				int x = (outputScaleWidth - 1 - scaledInputImage.getWidth(null)) / 2;
-				int y = (outputScaleHeight - 1 - scaledInputImage.getHeight(null)) / 2;
-				  
-				outputBufferedImage = new BufferedImage(outputScaleWidth, outputScaleHeight, BufferedImage.TYPE_INT_RGB);
-				
-				Graphics2D graphics2D = null;
-				try {
-					graphics2D = outputBufferedImage.createGraphics();
-					graphics2D.drawImage(scaledInputImage, x, y, null);
-				} finally {
-					try {
-						if(graphics2D != null) {
-							graphics2D.dispose();
-						}
-					} catch(Exception e) {
-						// pass
-					}
-				}
-				
-				scaledInputImage.flush();
+			if(inputDimension > outputDimension) {
+				factor = (double) outputDimension / (double) inputDimension;
 			} else {
-				outputBufferedImage = inputImage;
+				factor = 1d;
 			}
 			
-			return outputBufferedImage;
+			return factor;
+		}
+		
+		private BufferedImage scale(BufferedImage inputImage, ScaleType outputType, Integer outputWidth, Integer outputHeight) throws Exception {
+			BufferedImage outputImage = inputImage;
+			
+			if(ScaleType.DEFAULT.equals(outputType)) {
+				double factor;
+				
+				if(outputWidth != null && outputHeight == null) {
+					factor = calculateFactor(inputImage.getWidth(), outputWidth);
+				} else if(outputWidth == null && outputHeight != null) {
+					factor = calculateFactor(inputImage.getHeight(), outputHeight);
+				} else if(outputWidth != null && outputHeight != null) {
+					factor = Math.max(calculateFactor(inputImage.getWidth(), outputWidth), calculateFactor(inputImage.getHeight(), outputHeight));
+				} else {
+					factor = 1d;
+				}
+				
+				if(factor < 1d) {
+					int width = (int) Math.round(inputImage.getWidth() * factor);
+					int height = (int) Math.round(inputImage.getHeight() * factor);
+					
+					BufferedImageOp op = new ResampleOp(width, height, ResampleOp.FILTER_LANCZOS);
+					
+					outputImage = op.filter(inputImage, null);
+				}
+			} else {
+				throw new Exception("scaleType not supported.");
+			}
+			
+			return outputImage;
 		}
 		
 		private BufferedImage read(TypeableFile inputFile) throws Exception {
-			BufferedImage bufferedImage = null;
-			
 			ImageReader imageReader = null;
-			ImageReadParam imageReadParam = null;
 			try {
+				ImageReadParam imageReadParameter = null;
+				
 				FileType inputFileType = inputFile.getFileType();
 				
 				if(FileType.JPG.equals(inputFileType)) {
 					imageReader = getImageReader("jpg");
+					
+					imageReadParameter = imageReader.getDefaultReadParam();
 				} else if(FileType.PNG.equals(inputFileType)) {
 					imageReader = getImageReader("png");
-				}
-				
-				if(imageReader == null) {
-					throw new Exception("inputFileType not supported.");
-				}
-				
-				if(imageReadParam == null) {
-					imageReadParam = imageReader.getDefaultReadParam();
+					
+					imageReadParameter = imageReader.getDefaultReadParam();
+				} else {
+					throw new Exception("fileType not supported.");
 				}
 				
 				FileImageInputStream fileImageInputStream = null;
@@ -221,7 +156,9 @@ public class JdkImagePlugin extends Plugin {
 					
 					imageReader.setInput(fileImageInputStream);
 					
-					bufferedImage = imageReader.read(0, imageReadParam);
+					BufferedImage outputImage = imageReader.read(0, imageReadParameter);
+					
+					return outputImage;
 				} finally {
 					try {
 						if(fileImageInputStream != null) {
@@ -240,32 +177,25 @@ public class JdkImagePlugin extends Plugin {
 					// pass
 				}
 			}
-			
-			return bufferedImage;
 		}
 		
 		private void write(TypeableFile outputFile, BufferedImage outputImage) throws Exception {
 			ImageWriter imageWriter = null;
-			ImageWriteParam imageWriteParam = null;
 			try {
+				ImageWriteParam imageWriteParameter = null;
+				
 				FileType outputFileType = outputFile.getFileType();
 				
 				if(FileType.JPG.equals(outputFileType)) {
 					imageWriter = getImageWriter("jpg");
 					
-					JPEGImageWriteParam jpegImageWriteParam = new JPEGImageWriteParam(null);
-					jpegImageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-					jpegImageWriteParam.setCompressionQuality(0.9f);
+					JPEGImageWriteParam jpegImageWriteParameter = new JPEGImageWriteParam(null);
+					jpegImageWriteParameter.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					jpegImageWriteParameter.setCompressionQuality(0.9f);
 					
-					imageWriteParam = jpegImageWriteParam;
-				}
-				
-				if(imageWriter == null) {
-					throw new Exception("outputFileType not supported.");
-				}
-				
-				if(imageWriteParam == null) {
-					imageWriteParam = imageWriter.getDefaultWriteParam();
+					imageWriteParameter = jpegImageWriteParameter;
+				} else {
+					throw new Exception("fileType not supported.");
 				}
 				
 				FileImageOutputStream fileImageOutputStream = null;
@@ -274,7 +204,7 @@ public class JdkImagePlugin extends Plugin {
 					
 					imageWriter.setOutput(fileImageOutputStream);
 					 
-					imageWriter.write(null, new IIOImage(outputImage, null, null), imageWriteParam);
+					imageWriter.write(null, new IIOImage(outputImage, null, null), imageWriteParameter);
 				} finally {
 					try {
 						if(fileImageOutputStream != null) {
@@ -296,18 +226,27 @@ public class JdkImagePlugin extends Plugin {
 		}
 		
 		@Override
+		public TypeableFile createImage(TypeableFile inputFile, FileType outputFileType) throws Exception {
+			return createImage(inputFile, outputFileType, null, null, null);
+		}
+		
+		@Override
 		public TypeableFile createImage(TypeableFile inputFile, FileType outputFileType, ScaleType outputScaleType, Integer outputScaleWidth, Integer outputScaleHeight) throws Exception {
-			BufferedImage inputBufferedImage = read(inputFile);
+			BufferedImage inputImage = read(inputFile);
 			
-			BufferedImage outputBufferedImage = scale(inputBufferedImage, outputScaleType, outputScaleWidth, outputScaleHeight);
+			BufferedImage outputImage = inputImage;
 			
-			inputBufferedImage.flush();
+			if(outputScaleType != null) {
+				outputImage = scale(inputImage, outputScaleType, outputScaleWidth, outputScaleHeight);
+				
+				inputImage.flush();
+			}
 			
 			TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-image-jdk-", ".tmp"), outputFileType);
 			
-			write(outputFile, outputBufferedImage);
+			write(outputFile, outputImage);
 			
-			outputBufferedImage.flush();
+			outputImage.flush();
 			
 			return outputFile;
 		}
