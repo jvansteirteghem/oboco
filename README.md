@@ -1,6 +1,6 @@
 # oboco
 
-oboco is a server to help you read the books in your book collection (zip, cbz, cbr, rar, rar5).
+oboco is a server to help you read the books in your book collection (cbz, zip, cbr, rar, rar5, cb7, 7zip).
 oboco is short for "open book collection".
 
 you can:
@@ -69,7 +69,7 @@ you are required to configure "application.properties/server.authentication.secr
 	- data.bookreader.bookReaderPool.age: the age of the book reader pool (in seconds).
 - configure data.csv
 	- page: the page of the book or "" (all book pages).
-	- scaleType: the scale type: "DEFAULT", "FIT", "FILL" or "" (do not scale).
+	- scaleType: the scale type: "DEFAULT" or "" (do not scale).
 	- scaleWidth: the scale width (in pixels) or "" (do not scale).
 	- scaleHeight: the scale height (in pixels) or "" (do not scale).
 - configure data.properties
@@ -92,11 +92,11 @@ you are required to configure "application.properties/server.authentication.secr
 ### plugins
 
 - configure plugins/enabled.txt
-	- JDKArchivePlugin: supports zip.
+	- JdkArchivePlugin: supports zip.
 	- JUnrarArchivePlugin: supports rar.
-	- SevenZipJBindingArchivePlugin: supports zip, rar and rar5.
-	- JDKHashPlugin: supports sha256.
-	- JDKImagePlugin: supports jpg and png.
+	- SevenZipJBindingArchivePlugin: supports zip, rar, rar5 and 7zip.
+	- JdkHashPlugin: supports sha256.
+	- TwelveMonkeysImagePlugin: supports jpg and png.
 
 ## usage
 

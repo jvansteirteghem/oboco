@@ -14,7 +14,7 @@
 	<url>https://gitlab.com/jeeto/oboco</url>
 	
 	<properties>
-		<plugin.id>JDKHashPlugin</plugin.id>
+		<plugin.id>JdkHashPlugin</plugin.id>
 		<plugin.class>com.gitlab.jeeto.oboco.plugin.hash.jdk.JdkHashPlugin</plugin.class>
 		<plugin.version>1.0.0-SNAPSHOT</plugin.version>
 		<plugin.provider>jeeto</plugin.provider>

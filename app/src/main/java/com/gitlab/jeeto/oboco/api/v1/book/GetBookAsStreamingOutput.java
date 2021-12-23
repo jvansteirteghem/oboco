@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.gitlab.jeeto.oboco.common.configuration.Configuration;
 import com.gitlab.jeeto.oboco.common.configuration.ConfigurationManager;
 import com.gitlab.jeeto.oboco.data.bookreader.BookReader;
-import com.gitlab.jeeto.oboco.data.bookreader.BookReaderManager;
+import com.gitlab.jeeto.oboco.data.bookreader.BookReaderPoolManager;
 import com.gitlab.jeeto.oboco.database.book.Book;
 import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 import com.gitlab.jeeto.oboco.plugin.FileType;
@@ -118,9 +118,9 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 						if(bookReader == null) {
 							TypeableFile bookInputFile = new TypeableFile(book.getFilePath());
 							
-							BookReaderManager bookReaderManager = BookReaderManager.getInstance();
+							BookReaderPoolManager bookReaderPoolManager = BookReaderPoolManager.getInstance();
 							
-							bookReader = bookReaderManager.getBookReader();
+							bookReader = bookReaderPoolManager.getBookReader();
 							bookReader.openBook(bookInputFile);
 						}
 						

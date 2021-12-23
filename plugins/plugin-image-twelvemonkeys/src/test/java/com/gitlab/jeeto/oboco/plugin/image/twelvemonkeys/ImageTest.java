@@ -1,4 +1,4 @@
-package com.gitlab.jeeto.oboco.plugin.image.jdk;
+package com.gitlab.jeeto.oboco.plugin.image.twelvemonkeys;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.gitlab.jeeto.oboco.plugin.FileType;
 import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.image.ScaleType;
-import com.gitlab.jeeto.oboco.plugin.image.jdk.JdkImagePlugin.JdkImageManager;
+import com.gitlab.jeeto.oboco.plugin.image.twelvemonkeys.TwelveMonkeysImagePlugin.TwelveMonkeysImageManager;
 
 import junit.framework.TestCase;
 
@@ -22,7 +22,7 @@ public class ImageTest extends TestCase {
 		TypeableFile inputFile = new TypeableFile("src/test/resources/java-duke-large.jpg");
 		FileType outputFileType = FileType.JPG;
 		
-		JdkImageManager imageManager = Mockito.spy(JdkImagePlugin.JdkImageManager.class);
+		TwelveMonkeysImageManager imageManager = Mockito.spy(TwelveMonkeysImagePlugin.TwelveMonkeysImageManager.class);
 		
 		TypeableFile outputFile = imageManager.createImage(inputFile, outputFileType, ScaleType.DEFAULT, 250, 450);
 		

@@ -327,7 +327,7 @@
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.gitlab.jeeto.oboco</groupId>
-									<artifactId>oboco-plugin-image-jdk</artifactId>
+									<artifactId>oboco-plugin-image-twelvemonkeys</artifactId>
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>

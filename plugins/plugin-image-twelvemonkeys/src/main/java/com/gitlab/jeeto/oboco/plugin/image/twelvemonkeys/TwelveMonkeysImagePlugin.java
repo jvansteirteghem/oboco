@@ -1,4 +1,4 @@
-package com.gitlab.jeeto.oboco.plugin.image.jdk;
+package com.gitlab.jeeto.oboco.plugin.image.twelvemonkeys;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -33,8 +33,8 @@ import com.twelvemonkeys.image.ResampleOp;
 import com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageReaderSpi;
 import com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriterSpi;
 
-public class JdkImagePlugin extends Plugin {
-	private static Logger logger = LoggerFactory.getLogger(JdkImagePlugin.class.getName());
+public class TwelveMonkeysImagePlugin extends Plugin {
+	private static Logger logger = LoggerFactory.getLogger(TwelveMonkeysImagePlugin.class.getName());
 	
 	static {
 		try {
@@ -78,12 +78,12 @@ public class JdkImagePlugin extends Plugin {
 		return imageWriter;
 	}
 	
-	public JdkImagePlugin(PluginWrapper wrapper) {
+	public TwelveMonkeysImagePlugin(PluginWrapper wrapper) {
 		super(wrapper);
 	}
 	
 	@Extension
-	public static class JdkImageManager implements ImageManager.Jpg2JpgImageManager, ImageManager.Png2JpgImageManager {
+	public static class TwelveMonkeysImageManager implements ImageManager.Jpg2JpgImageManager, ImageManager.Png2JpgImageManager {
 		// https://stackoverflow.com/questions/11959758/java-maintaining-aspect-ratio-of-jpanel-background-image/11959928#11959928
 		// https://github.com/rkalla/imgscalr
 		// https://github.com/haraldk/TwelveMonkeys
@@ -242,7 +242,7 @@ public class JdkImagePlugin extends Plugin {
 				inputImage.flush();
 			}
 			
-			TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-image-jdk-", ".tmp"), outputFileType);
+			TypeableFile outputFile = new TypeableFile(File.createTempFile("oboco-plugin-image-twelvemonkeys-", ".tmp"), outputFileType);
 			
 			write(outputFile, outputImage);
 			

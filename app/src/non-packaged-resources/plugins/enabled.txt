@@ -1,5 +1,5 @@
-#JDKArchivePlugin
+#JdkArchivePlugin
 #JUnrarArchivePlugin
 SevenZipJBindingArchivePlugin
-JDKHashPlugin
-JDKImagePlugin
+JdkHashPlugin
+TwelveMonkeysImagePlugin

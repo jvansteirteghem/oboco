@@ -6,16 +6,16 @@
 	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>oboco-plugin-image-jdk</artifactId>
+	<artifactId>oboco-plugin-image-twelvemonkeys</artifactId>
 	<version>1.9.2-SNAPSHOT</version> <!--MOD4DEL-->
 	<packaging>jar</packaging>
 
-	<name>oboco-plugin-image-jdk</name>
+	<name>oboco-plugin-image-twelvemonkeys</name>
 	<url>https://gitlab.com/jeeto/oboco</url>
 	
 	<properties>
-		<plugin.id>JDKImagePlugin</plugin.id>
-		<plugin.class>com.gitlab.jeeto.oboco.plugin.image.jdk.JdkImagePlugin</plugin.class>
+		<plugin.id>TwelveMonkeysImagePlugin</plugin.id>
+		<plugin.class>com.gitlab.jeeto.oboco.plugin.image.twelvemonkeys.TwelveMonkeysImagePlugin</plugin.class>
 		<plugin.version>1.0.0-SNAPSHOT</plugin.version>
 		<plugin.provider>jeeto</plugin.provider>
 		<plugin.dependencies />

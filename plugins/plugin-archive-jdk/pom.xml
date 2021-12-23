@@ -14,7 +14,7 @@
 	<url>https://gitlab.com/jeeto/oboco</url>
 	
 	<properties>
-		<plugin.id>JDKArchivePlugin</plugin.id>
+		<plugin.id>JdkArchivePlugin</plugin.id>
 		<plugin.class>com.gitlab.jeeto.oboco.plugin.archive.jdk.JdkArchivePlugin</plugin.class>
 		<plugin.version>1.0.0-SNAPSHOT</plugin.version>
 		<plugin.provider>jeeto</plugin.provider>
