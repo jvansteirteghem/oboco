@@ -1,6 +1,6 @@
 package com.gitlab.jeeto.oboco.data.bookreader;
 
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 
 public interface BookReader {
 	public void openBook(TypeableFile inputFile) throws Exception;

@@ -1,6 +1,6 @@
 package com.gitlab.jeeto.oboco.data.bookreader;
 
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 
 public class BookReaderPoolDelegator implements BookReader {
 	private BookReaderPool bookReaderPool;
@@ -18,7 +18,9 @@ public class BookReaderPoolDelegator implements BookReader {
 		
 		BookReader bookReader = bookReaderPool.removeBookReader(bookPath);
 		if(bookReader == null) {
-			bookReader = new DefaultBookReader();
+			BookReaderFactory bookReaderFactory = BookReaderFactory.getInstance();
+			
+			bookReader = bookReaderFactory.getBookReader(inputFile.getExtension());
 			bookReader.openBook(inputFile);
 		}
 		

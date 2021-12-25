@@ -25,8 +25,8 @@ import org.pf4j.PluginWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.FileType;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager;
 import com.gitlab.jeeto.oboco.plugin.image.ScaleType;
 import com.twelvemonkeys.image.ResampleOp;
@@ -136,7 +136,7 @@ public class TwelveMonkeysImagePlugin extends Plugin {
 			try {
 				ImageReadParam imageReadParameter = null;
 				
-				FileType inputFileType = inputFile.getFileType();
+				FileType inputFileType = inputFile.getType();
 				
 				if(FileType.JPG.equals(inputFileType)) {
 					imageReader = getImageReader("jpg");
@@ -184,7 +184,7 @@ public class TwelveMonkeysImagePlugin extends Plugin {
 			try {
 				ImageWriteParam imageWriteParameter = null;
 				
-				FileType outputFileType = outputFile.getFileType();
+				FileType outputFileType = outputFile.getType();
 				
 				if(FileType.JPG.equals(outputFileType)) {
 					imageWriter = getImageWriter("jpg");

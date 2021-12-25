@@ -1,6 +1,6 @@
 # oboco
 
-oboco is a server to help you read the books in your book collection (cbz, zip, cbr, rar, rar5, cb7, 7zip).
+oboco is a server to help you read the books in your book collection (cbz, zip, cbr, rar, rar5, cb7, 7z).
 oboco is short for "open book collection".
 
 you can:
@@ -94,7 +94,7 @@ you are required to configure "application.properties/server.authentication.secr
 - configure plugins/enabled.txt
 	- JdkArchivePlugin: supports zip.
 	- JUnrarArchivePlugin: supports rar.
-	- SevenZipJBindingArchivePlugin: supports zip, rar, rar5 and 7zip.
+	- SevenZipJBindingArchivePlugin: supports zip, rar, rar5 and 7z.
 	- JdkHashPlugin: supports sha256.
 	- TwelveMonkeysImagePlugin: supports jpg and png.
 

@@ -15,7 +15,7 @@ import org.pf4j.PluginWrapper;
 
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderEntry;
 

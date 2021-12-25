@@ -6,8 +6,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.FileType;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.image.ScaleType;
 import com.gitlab.jeeto.oboco.plugin.image.twelvemonkeys.TwelveMonkeysImagePlugin.TwelveMonkeysImageManager;
 

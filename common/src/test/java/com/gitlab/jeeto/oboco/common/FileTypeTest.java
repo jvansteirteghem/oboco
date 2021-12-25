@@ -1,4 +1,4 @@
-package com.gitlab.jeeto.oboco.plugin;
+package com.gitlab.jeeto.oboco.common;
 
 import java.io.File;
 

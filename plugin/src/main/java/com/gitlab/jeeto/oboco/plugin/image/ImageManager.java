@@ -2,8 +2,8 @@ package com.gitlab.jeeto.oboco.plugin.image;
 
 import org.pf4j.ExtensionPoint;
 
-import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.FileType;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 
 public interface ImageManager extends ExtensionPoint  {
 	public TypeableFile createImage(TypeableFile inputFile, FileType outputFileType) throws Exception;

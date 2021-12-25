@@ -11,14 +11,14 @@ import org.eclipse.jetty.io.EofException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gitlab.jeeto.oboco.common.FileType;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 import com.gitlab.jeeto.oboco.common.configuration.Configuration;
 import com.gitlab.jeeto.oboco.common.configuration.ConfigurationManager;
 import com.gitlab.jeeto.oboco.data.bookreader.BookReader;
 import com.gitlab.jeeto.oboco.data.bookreader.BookReaderPoolManager;
 import com.gitlab.jeeto.oboco.database.book.Book;
 import com.gitlab.jeeto.oboco.plugin.FactoryManager;
-import com.gitlab.jeeto.oboco.plugin.FileType;
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManagerFactory;
 
@@ -60,7 +60,7 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 		try {
 			bookPageInputFile = bookReader.getBookPage(page - 1);
 			
-			if(FileType.JPG.equals(bookPageInputFile.getFileType())) {
+			if(FileType.JPG.equals(bookPageInputFile.getType())) {
 				write(outputStream, bookPageInputFile);
 				
 				isWritten = true;
@@ -171,7 +171,7 @@ public class GetBookAsStreamingOutput extends GetAsStreamingOutput {
 		FactoryManager factoryManager = FactoryManager.getInstance();
 		
 		ImageManagerFactory imageManagerFactory = factoryManager.getFactory(ImageManagerFactory.class);
-    	ImageManager imageManager = imageManagerFactory.getImageManager(bookPageInputFile.getFileType(), FileType.JPG);
+    	ImageManager imageManager = imageManagerFactory.getImageManager(bookPageInputFile.getType(), FileType.JPG);
 		
     	TypeableFile bookPageOutputFile = imageManager.createImage(bookPageInputFile, FileType.JPG);
 		

@@ -1,7 +1,7 @@
 package com.gitlab.jeeto.oboco.plugin.archive;
 
+import com.gitlab.jeeto.oboco.common.FileType;
 import com.gitlab.jeeto.oboco.plugin.FactoryBase;
-import com.gitlab.jeeto.oboco.plugin.FileType;
 
 public class ArchiveReaderFactory extends FactoryBase {
 	public ArchiveReaderFactory() {

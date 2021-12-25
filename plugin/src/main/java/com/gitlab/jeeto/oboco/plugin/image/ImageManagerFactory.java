@@ -1,7 +1,7 @@
 package com.gitlab.jeeto.oboco.plugin.image;
 
+import com.gitlab.jeeto.oboco.common.FileType;
 import com.gitlab.jeeto.oboco.plugin.FactoryBase;
-import com.gitlab.jeeto.oboco.plugin.FileType;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager.Jpg2JpgImageManager;
 import com.gitlab.jeeto.oboco.plugin.image.ImageManager.Png2JpgImageManager;
 

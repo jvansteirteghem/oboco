@@ -6,7 +6,7 @@ import java.io.OutputStream;
 
 import javax.ws.rs.core.StreamingOutput;
 
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 
 public abstract class GetAsStreamingOutput implements StreamingOutput {
 	public void write(OutputStream outputStream, TypeableFile inputFile) throws Exception {

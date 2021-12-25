@@ -15,7 +15,7 @@ import org.pf4j.Extension;
 import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderEntry;
 

@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.pf4j.ExtensionPoint;
 
-import com.gitlab.jeeto.oboco.plugin.TypeableFile;
+import com.gitlab.jeeto.oboco.common.TypeableFile;
 
 public interface ArchiveReader extends ExtensionPoint {
 	public void openArchive(TypeableFile inputFile) throws Exception;
