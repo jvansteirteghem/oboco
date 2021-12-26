@@ -219,8 +219,8 @@ public class OpdsV12Resource {
 		            .withUpdateDate(new Date())
 		            .withContents(Contents.builder().withType(ContentType.builder("text").build()).withContents(book.getName()).build())
 		            .addLink(Link.builder("/opds/v1.2/books/" + book.getId() + ".cbz").withRel("http://opds-spec.org/acquisition").withType("application/octet-stream").build())
-		            .addLink(Link.builder("/opds/v1.2/books/" + book.getId() + "/pages/1.jpg?scaleType=FILL&scaleWidth=240&scaleHeight=330").withRel("http://opds-spec.org/image").withType("image/jpeg").build())
-		            .addLink(Link.builder("/opds/v1.2/books/" + book.getId() + "/pages/1.jpg?scaleType=FILL&scaleWidth=240&scaleHeight=330").withRel("http://opds-spec.org/image/thumbnail").withType("image/jpeg").build());
+		            .addLink(Link.builder("/opds/v1.2/books/" + book.getId() + "/pages/1.jpg?scaleType=DEFAULT&scaleWidth=200&scaleHeight=300").withRel("http://opds-spec.org/image").withType("image/jpeg").build())
+		            .addLink(Link.builder("/opds/v1.2/books/" + book.getId() + "/pages/1.jpg?scaleType=DEFAULT&scaleWidth=200&scaleHeight=300").withRel("http://opds-spec.org/image/thumbnail").withType("image/jpeg").build());
 		        
 		        feedBuilder.addEntry(entryBuilder.build());
 	        }

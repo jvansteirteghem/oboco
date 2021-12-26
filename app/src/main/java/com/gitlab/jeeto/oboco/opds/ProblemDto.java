@@ -1,15 +1,12 @@
-package com.gitlab.jeeto.oboco.problem;
+package com.gitlab.jeeto.oboco.opds;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "Problem", description = "A problem.")
 @XmlRootElement(name = "Problem")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProblemDto {
 	private Integer statusCode;
 	private String code;

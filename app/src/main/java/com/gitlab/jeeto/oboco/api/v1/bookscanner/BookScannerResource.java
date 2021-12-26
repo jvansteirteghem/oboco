@@ -19,13 +19,13 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.glassfish.hk2.api.IterableProvider;
 
+import com.gitlab.jeeto.oboco.api.ProblemDto;
 import com.gitlab.jeeto.oboco.data.bookscanner.BookScanner;
 import com.gitlab.jeeto.oboco.data.bookscanner.BookScannerMode;
 import com.gitlab.jeeto.oboco.data.bookscanner.BookScannerStatus;
 import com.gitlab.jeeto.oboco.database.Graph;
 import com.gitlab.jeeto.oboco.database.GraphHelper;
 import com.gitlab.jeeto.oboco.problem.Problem;
-import com.gitlab.jeeto.oboco.problem.ProblemDto;
 import com.gitlab.jeeto.oboco.problem.ProblemException;
 import com.gitlab.jeeto.oboco.server.authentication.Authentication;
 import com.gitlab.jeeto.oboco.server.authorization.Authorization;

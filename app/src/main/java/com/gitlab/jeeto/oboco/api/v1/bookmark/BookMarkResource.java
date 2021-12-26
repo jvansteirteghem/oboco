@@ -15,6 +15,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import com.gitlab.jeeto.oboco.api.PageableListDto;
 import com.gitlab.jeeto.oboco.api.PageableListDtoHelper;
+import com.gitlab.jeeto.oboco.api.ProblemDto;
 import com.gitlab.jeeto.oboco.api.v1.book.BookDto;
 import com.gitlab.jeeto.oboco.api.v1.book.BookDtoMapper;
 import com.gitlab.jeeto.oboco.api.v1.book.BookPageableListDto;
@@ -28,7 +29,6 @@ import com.gitlab.jeeto.oboco.database.bookmark.BookMarkReference;
 import com.gitlab.jeeto.oboco.database.bookmark.BookMarkService;
 import com.gitlab.jeeto.oboco.database.user.User;
 import com.gitlab.jeeto.oboco.problem.Problem;
-import com.gitlab.jeeto.oboco.problem.ProblemDto;
 import com.gitlab.jeeto.oboco.problem.ProblemException;
 import com.gitlab.jeeto.oboco.server.authentication.Authentication;
 import com.gitlab.jeeto.oboco.server.authentication.UserPrincipal;
