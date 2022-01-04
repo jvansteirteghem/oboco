@@ -14,8 +14,8 @@
 	<url>https://gitlab.com/jeeto/oboco</url>
 	
 	<properties>
-		<plugin.id>SevenZipJBindingArchivePlugin</plugin.id>
-		<plugin.class>com.gitlab.jeeto.oboco.plugin.archive.sevenzipjbinding.SevenZipJBindingArchivePlugin</plugin.class>
+		<plugin.id>SevenZipJBindingArchiveIOPlugin</plugin.id>
+		<plugin.class>com.gitlab.jeeto.oboco.plugin.archive.sevenzipjbinding.SevenZipJBindingArchiveIOPlugin</plugin.class>
 		<plugin.version>1.0.0-SNAPSHOT</plugin.version>
 		<plugin.provider>jeeto</plugin.provider>
 		<plugin.dependencies />

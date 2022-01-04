@@ -183,6 +183,12 @@
 			<version>67.1</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>com.twelvemonkeys.common</groupId>
+			<artifactId>common-image</artifactId>
+			<version>3.5</version>
+		</dependency>
+		
 		<!-- test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -321,6 +327,13 @@
 								<artifactItem>
 									<groupId>com.gitlab.jeeto.oboco</groupId>
 									<artifactId>oboco-plugin-hash-jdk</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gitlab.jeeto.oboco</groupId>
+									<artifactId>oboco-plugin-image-jdk</artifactId>
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>

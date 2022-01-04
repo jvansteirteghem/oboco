@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.gitlab.jeeto.oboco.api.ApiApplication;
 import com.gitlab.jeeto.oboco.common.configuration.Configuration;
 import com.gitlab.jeeto.oboco.common.configuration.ConfigurationManager;
-import com.gitlab.jeeto.oboco.data.bookreader.BookReaderPoolManager;
+import com.gitlab.jeeto.oboco.data.book.BookReaderPoolManager;
 import com.gitlab.jeeto.oboco.opds.OpdsApplication;
 import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 

@@ -20,16 +20,16 @@ public abstract class FactoryBase {
 	}
 	
 	public <T> T getExtension(Class<T> extensionClass) throws Exception {
-		List<Class<? extends T>> listExtensionClass = getPluginManager().getExtensionClasses(extensionClass);
+		List<Class<? extends T>> extensionClassList = getPluginManager().getExtensionClasses(extensionClass);
 		
 		T extension = null;
 		
-		if(listExtensionClass.size() != 0) {
-			extension = getPluginManager().getExtensionFactory().create(listExtensionClass.get(0));
+		if(extensionClassList.size() != 0) {
+			extension = getPluginManager().getExtensionFactory().create(extensionClassList.get(0));
 		}
 		
 		if(extension == null) {
-			throw new Exception("extension not found.");
+			throw new Exception("extension not supported.");
 		}
 		
 		return extension;

@@ -64,9 +64,9 @@ you are required to configure "application.properties/server.authentication.secr
 
 - configure application.properties
 	- data.path: the path of the data (book pages). [^1]
-	- data.bookreader.bookReaderPool.size: the size of the book reader pool.
-	- data.bookreader.bookReaderPool.interval: the interval of the book reader pool (in seconds).
-	- data.bookreader.bookReaderPool.age: the age of the book reader pool (in seconds).
+	- data.book.bookReaderPool.size: the size of the book reader pool.
+	- data.book.bookReaderPool.interval: the interval of the book reader pool (in seconds).
+	- data.book.bookReaderPool.age: the age of the book reader pool (in seconds).
 - configure data.csv
 	- page: the page of the book or "" (all book pages).
 	- scaleType: the scale type: "DEFAULT" or "" (do not scale).
@@ -92,11 +92,12 @@ you are required to configure "application.properties/server.authentication.secr
 ### plugins
 
 - configure plugins/enabled.txt
-	- JdkArchivePlugin: supports zip.
-	- JUnrarArchivePlugin: supports rar.
-	- SevenZipJBindingArchivePlugin: supports zip, rar, rar5 and 7z.
+	- JdkArchiveIOPlugin: supports zip.
+	- JUnrarArchiveIOPlugin: supports rar.
+	- SevenZipJBindingArchiveIOPlugin: supports zip, rar, rar5 and 7z.
 	- JdkHashPlugin: supports sha256.
-	- TwelveMonkeysImagePlugin: supports jpg and png.
+	- JdkImageIOPlugin: supports jpeg and png.
+	- TwelveMonkeysImageIOPlugin: supports jpeg.
 
 ## usage
 

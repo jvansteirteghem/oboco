@@ -14,11 +14,11 @@
 	<url>https://gitlab.com/jeeto/oboco</url>
 	
 	<properties>
-		<plugin.id>TwelveMonkeysImagePlugin</plugin.id>
-		<plugin.class>com.gitlab.jeeto.oboco.plugin.image.twelvemonkeys.TwelveMonkeysImagePlugin</plugin.class>
+		<plugin.id>TwelveMonkeysImageIOPlugin</plugin.id>
+		<plugin.class>com.gitlab.jeeto.oboco.plugin.image.twelvemonkeys.TwelveMonkeysImageIOPlugin</plugin.class>
 		<plugin.version>1.0.0-SNAPSHOT</plugin.version>
 		<plugin.provider>jeeto</plugin.provider>
-		<plugin.dependencies />
+		<plugin.dependencies>JdkImageIOPlugin</plugin.dependencies>
 	</properties>
 	
 	<dependencies>
@@ -26,6 +26,13 @@
 			<groupId>com.twelvemonkeys.imageio</groupId>
 			<artifactId>imageio-jpeg</artifactId>
 			<version>3.5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.gitlab.jeeto.oboco</groupId>
+			<artifactId>oboco-plugin-image-jdk</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<!-- test -->

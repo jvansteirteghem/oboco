@@ -90,6 +90,7 @@
 		<module>plugin-archive-junrar</module>
 		<module>plugin-archive-sevenzipjbinding</module>
 		<module>plugin-hash-jdk</module>
+		<module>plugin-image-jdk</module>
 		<module>plugin-image-twelvemonkeys</module>
 	</modules>
 
