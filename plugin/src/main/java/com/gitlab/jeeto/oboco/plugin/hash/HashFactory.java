@@ -1,10 +1,27 @@
 package com.gitlab.jeeto.oboco.plugin.hash;
 
-import com.gitlab.jeeto.oboco.plugin.FactoryBase;
+import com.gitlab.jeeto.oboco.plugin.Factory;
+import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 import com.gitlab.jeeto.oboco.plugin.hash.Hash.Sha256Hash;
 
-public class HashFactory extends FactoryBase {
-	public HashFactory() {
+public class HashFactory extends Factory {
+	private static HashFactory instance;
+	
+	public static HashFactory getInstance() {
+		if(instance == null) {
+			synchronized(HashFactory.class) {
+				if(instance == null) {
+					instance = new HashFactory();
+					
+					FactoryManager factoryManager = FactoryManager.getInstance();
+					factoryManager.addFactory(instance);
+				}
+			}
+		}
+		return instance;
+	}
+	
+	private HashFactory() {
 		super();
 	}
 	
@@ -18,13 +35,5 @@ public class HashFactory extends FactoryBase {
 		}
 		
 		return hash;
-	}
-	
-	@Override
-	public void start() {
-	}
-
-	@Override
-	public void stop() {
 	}
 }

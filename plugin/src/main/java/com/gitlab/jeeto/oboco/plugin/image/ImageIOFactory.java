@@ -1,13 +1,30 @@
 package com.gitlab.jeeto.oboco.plugin.image;
 
-import com.gitlab.jeeto.oboco.plugin.FactoryBase;
+import com.gitlab.jeeto.oboco.plugin.Factory;
+import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 import com.gitlab.jeeto.oboco.plugin.image.ImageReader.JpegImageReader;
 import com.gitlab.jeeto.oboco.plugin.image.ImageReader.PngImageReader;
 import com.gitlab.jeeto.oboco.plugin.image.ImageWriter.JpegImageWriter;
 import com.gitlab.jeeto.oboco.plugin.image.ImageWriter.PngImageWriter;
 
-public class ImageIOFactory extends FactoryBase {
-	public ImageIOFactory() {
+public class ImageIOFactory extends Factory {
+	private static ImageIOFactory instance;
+	
+	public static ImageIOFactory getInstance() {
+		if(instance == null) {
+			synchronized(ImageIOFactory.class) {
+				if(instance == null) {
+					instance = new ImageIOFactory();
+					
+					FactoryManager factoryManager = FactoryManager.getInstance();
+					factoryManager.addFactory(instance);
+				}
+			}
+		}
+		return instance;
+	}
+	
+	private ImageIOFactory() {
 		super();
 	}
 	
@@ -37,13 +54,5 @@ public class ImageIOFactory extends FactoryBase {
 		}
 		
 		return imageWriter;
-	}
-	
-	@Override
-	public void start() {
-	}
-
-	@Override
-	public void stop() {
 	}
 }

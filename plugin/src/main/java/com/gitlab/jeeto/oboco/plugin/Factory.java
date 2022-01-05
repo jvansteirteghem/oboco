@@ -4,8 +4,12 @@ import java.util.List;
 
 import org.pf4j.PluginManager;
 
-public abstract class FactoryBase {
+public abstract class Factory {
 	private PluginManager pluginManager;
+
+	public Factory() {
+		super();
+	}
 	
 	public PluginManager getPluginManager() {
 		return pluginManager;
@@ -14,18 +18,14 @@ public abstract class FactoryBase {
 	public void setPluginManager(PluginManager pluginManager) {
 		this.pluginManager = pluginManager;
 	}
-
-	public FactoryBase() {
-		super();
-	}
 	
 	public <T> T getExtension(Class<T> extensionClass) throws Exception {
-		List<Class<? extends T>> extensionClassList = getPluginManager().getExtensionClasses(extensionClass);
+		List<Class<? extends T>> extensionClassList = pluginManager.getExtensionClasses(extensionClass);
 		
 		T extension = null;
 		
 		if(extensionClassList.size() != 0) {
-			extension = getPluginManager().getExtensionFactory().create(extensionClassList.get(0));
+			extension = pluginManager.getExtensionFactory().create(extensionClassList.get(0));
 		}
 		
 		if(extension == null) {
@@ -35,6 +35,11 @@ public abstract class FactoryBase {
 		return extension;
 	}
 	
-	public abstract void start();
-	public abstract void stop();
+	public void start() {
+		
+	}
+	
+	public void stop() {
+		
+	}
 }

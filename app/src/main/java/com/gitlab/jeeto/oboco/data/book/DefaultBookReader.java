@@ -7,7 +7,6 @@ import java.util.List;
 import com.gitlab.jeeto.oboco.common.FileHelper;
 import com.gitlab.jeeto.oboco.data.NaturalOrderComparator;
 import com.gitlab.jeeto.oboco.data.bookpage.BookPageType;
-import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveIOFactory;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReader;
 import com.gitlab.jeeto.oboco.plugin.archive.ArchiveReaderEntry;
@@ -32,9 +31,7 @@ public class DefaultBookReader implements BookReader {
 		}
 		
 		try {
-			FactoryManager factoryManager = FactoryManager.getInstance();
-			
-			ArchiveIOFactory archiveIOFactory = factoryManager.getFactory(ArchiveIOFactory.class);
+			ArchiveIOFactory archiveIOFactory = ArchiveIOFactory.getInstance();
 			ArchiveType archiveType = ArchiveType.getArchiveType(inputFile);
 			archiveReader = archiveIOFactory.getArchiveReader(archiveType);
 			archiveReader.openArchive(inputFile);

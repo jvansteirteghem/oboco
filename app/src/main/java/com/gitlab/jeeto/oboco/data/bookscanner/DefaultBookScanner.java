@@ -38,7 +38,6 @@ import com.gitlab.jeeto.oboco.database.book.BookService;
 import com.gitlab.jeeto.oboco.database.bookcollection.BookCollection;
 import com.gitlab.jeeto.oboco.database.bookcollection.BookCollectionService;
 import com.gitlab.jeeto.oboco.database.bookmark.BookMarkService;
-import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 import com.gitlab.jeeto.oboco.plugin.hash.Hash;
 import com.gitlab.jeeto.oboco.plugin.hash.HashFactory;
 import com.gitlab.jeeto.oboco.plugin.hash.HashType;
@@ -472,9 +471,7 @@ public class DefaultBookScanner implements BookScanner {
 	}
 	
 	private String getFileId(File bookInputFile) throws Exception {
-		FactoryManager factoryManager = FactoryManager.getInstance();
-
-		HashFactory hashFactory = factoryManager.getFactory(HashFactory.class);
+		HashFactory hashFactory = HashFactory.getInstance();
 		Hash hash = hashFactory.getHash(HashType.SHA256);
 
 		return hash.calculate(bookInputFile);

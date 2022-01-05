@@ -1,9 +1,26 @@
 package com.gitlab.jeeto.oboco.plugin.archive;
 
-import com.gitlab.jeeto.oboco.plugin.FactoryBase;
+import com.gitlab.jeeto.oboco.plugin.Factory;
+import com.gitlab.jeeto.oboco.plugin.FactoryManager;
 
-public class ArchiveIOFactory extends FactoryBase {
-	public ArchiveIOFactory() {
+public class ArchiveIOFactory extends Factory {
+	private static ArchiveIOFactory instance;
+	
+	public static ArchiveIOFactory getInstance() {
+		if(instance == null) {
+			synchronized(ArchiveIOFactory.class) {
+				if(instance == null) {
+					instance = new ArchiveIOFactory();
+					
+					FactoryManager factoryManager = FactoryManager.getInstance();
+					factoryManager.addFactory(instance);
+				}
+			}
+		}
+		return instance;
+	}
+	
+	private ArchiveIOFactory() {
 		super();
 	}
 	
@@ -23,13 +40,5 @@ public class ArchiveIOFactory extends FactoryBase {
 		}
 		
         return archiveReader;
-	}
-	
-	@Override
-	public void start() {
-	}
-
-	@Override
-	public void stop() {
 	}
 }
