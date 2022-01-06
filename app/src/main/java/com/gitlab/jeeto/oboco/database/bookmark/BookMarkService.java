@@ -403,20 +403,22 @@ public class BookMarkService {
 						referencedBookCollectionMap.put(referencedBook.getBookCollection().getId(), referencedBook.getBookCollection());
 					}
 				} else {
-					bookMark.setUpdateDate(updateDate);
-					bookMark.setNumberOfPages(book.getNumberOfPages());
-					if(bookPage == -1) {
-						bookMark.setPage(book.getNumberOfPages());
-					} else {
-						bookMark.setPage(bookPage);
-					}
-					
-					bookMark = entityManager.merge(bookMark);
-					
-					List<Book> referencedBookList = getBookService().getBooksByFile(book.getFileId());
-					
-					for(Book referencedBook: referencedBookList) {
-						referencedBookCollectionMap.put(referencedBook.getBookCollection().getId(), referencedBook.getBookCollection());
+					if(bookPage != 0) {
+						bookMark.setUpdateDate(updateDate);
+						bookMark.setNumberOfPages(book.getNumberOfPages());
+						if(bookPage == -1) {
+							bookMark.setPage(book.getNumberOfPages());
+						} else {
+							bookMark.setPage(bookPage);
+						}
+						
+						bookMark = entityManager.merge(bookMark);
+						
+						List<Book> referencedBookList = getBookService().getBooksByFile(book.getFileId());
+						
+						for(Book referencedBook: referencedBookList) {
+							referencedBookCollectionMap.put(referencedBook.getBookCollection().getId(), referencedBook.getBookCollection());
+						}
 					}
 				}
 				
@@ -512,20 +514,22 @@ public class BookMarkService {
 					referencedBookCollectionMap.put(referencedBook.getBookCollection().getId(), referencedBook.getBookCollection());
 				}
 			} else {
-				bookMark.setUpdateDate(updateDate);
-				bookMark.setNumberOfPages(book.getNumberOfPages());
-				if(bookPage == -1) {
-					bookMark.setPage(book.getNumberOfPages());
-				} else {
-					bookMark.setPage(bookPage);
-				}
-				
-				bookMark = entityManager.merge(bookMark);
-				
-				List<Book> referencedBookList = getBookService().getBooksByFile(book.getFileId());
-				
-				for(Book referencedBook: referencedBookList) {
-					referencedBookCollectionMap.put(referencedBook.getBookCollection().getId(), referencedBook.getBookCollection());
+				if(bookPage != 0) {
+					bookMark.setUpdateDate(updateDate);
+					bookMark.setNumberOfPages(book.getNumberOfPages());
+					if(bookPage == -1) {
+						bookMark.setPage(book.getNumberOfPages());
+					} else {
+						bookMark.setPage(bookPage);
+					}
+					
+					bookMark = entityManager.merge(bookMark);
+					
+					List<Book> referencedBookList = getBookService().getBooksByFile(book.getFileId());
+					
+					for(Book referencedBook: referencedBookList) {
+						referencedBookCollectionMap.put(referencedBook.getBookCollection().getId(), referencedBook.getBookCollection());
+					}
 				}
 			}
 			
