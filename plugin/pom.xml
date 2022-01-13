@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>com.gitlab.jeeto.oboco</groupId>
 		<artifactId>oboco</artifactId>
-		<version>1.10.0</version>
+		<version>1.10.1-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>oboco-plugin</artifactId>
-	<version>1.10.0</version>
+	<version>1.10.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>oboco-plugin</name>
 	
