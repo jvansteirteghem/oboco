@@ -26,6 +26,7 @@ public class BookCollectionDto {
 	private Integer numberOfBookCollections;
 	private List<BookDto> books;
 	private Integer numberOfBooks;
+	private Integer numberOfBookPages;
 	private BookCollectionMarkDto bookCollectionMark;
 	public BookCollectionDto() {
 		super();
@@ -101,6 +102,14 @@ public class BookCollectionDto {
 	}
 	public void setNumberOfBooks(Integer numberOfBooks) {
 		this.numberOfBooks = numberOfBooks;
+	}
+	@Schema(name = "numberOfBookPages")
+	@XmlElement(name = "numberOfBookPages")
+	public Integer getNumberOfBookPages() {
+		return numberOfBookPages;
+	}
+	public void setNumberOfBookPages(Integer numberOfBookPages) {
+		this.numberOfBookPages = numberOfBookPages;
 	}
 	@Schema(name = "bookCollectionMark")
 	@XmlElement(name = "bookCollectionMark")
