@@ -59,6 +59,7 @@ prepareRelease:
     - mkdir release
     - mv app/target/oboco-${releaseVersion}.zip release/oboco-${releaseVersion}.zip
   artifacts:
+    expire_in: never
     paths:
       - release/
     reports:
