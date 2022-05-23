@@ -30,7 +30,7 @@ then
 	# generate a certificate for ca signed by root (root -> ca)
 
 	keytool -keystore server-ca.jks -storepass "$PASSWORD" -certreq -alias ca \
-	| keytool -keystore server-root.jks -storepass "$PASSWORD" -gencert -alias root -ext "bc=0" -ext "san=dns:ca" -rfc > server-ca.pem
+	| keytool -keystore server-root.jks -storepass "$PASSWORD" -gencert -alias root -ext "bc=0" -ext "san=dns:ca" -validity 10000 -rfc > server-ca.pem
 
 	# import ca cert chain into server-ca.jks
 
@@ -52,7 +52,7 @@ keytool -genkeypair -alias server -dname "cn=oboco-server" -validity 10000 -keya
 # generate a certificate for server signed by ca (root -> ca -> server)
 
 keytool -keystore server.jks -storepass "$PASSWORD" -certreq -alias server \
-| keytool -keystore server-ca.jks -storepass "$PASSWORD" -gencert -alias ca -ext "ku:c=dig,keyEnc" -ext "san=dns:$DNS,ip:$IP" -ext "eku=sa,ca" -rfc > server.pem
+| keytool -keystore server-ca.jks -storepass "$PASSWORD" -gencert -alias ca -ext "ku:c=dig,keyEnc" -ext "san=dns:$DNS,ip:$IP" -ext "eku=sa,ca" -validity 10000 -rfc > server.pem
 
 # import server cert chain into server.jks
 
