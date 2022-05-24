@@ -57,9 +57,9 @@
 				<version>2.5.3</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<tagNameFormat>${project.artifactId}-1.10.2</tagNameFormat>
-					<releaseVersion>1.10.2</releaseVersion>
-					<developmentVersion>1.10.3-SNAPSHOT</developmentVersion>
+					<tagNameFormat>${project.artifactId}-1.10.3</tagNameFormat>
+					<releaseVersion>1.10.3</releaseVersion>
+					<developmentVersion>1.10.4-SNAPSHOT</developmentVersion>
 					<scmCommentPrefix>[skip ci]</scmCommentPrefix>
 				</configuration>
 			</plugin>
