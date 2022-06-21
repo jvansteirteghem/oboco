@@ -18,6 +18,12 @@
 		  <include>database.sql</include>
 		  <include>data.csv</include>
 		  <include>data.properties</include>
+		  <include>server.jks</include>
+		  <include>server.pem</include>
+		  <include>server-ca.jks</include>
+		  <include>server-ca.pem</include>
+		  <include>server-root.jks</include>
+		  <include>server-root.pem</include>
 		  <include>*.jar</include>
 		</includes>
 	  </fileSet>

@@ -247,7 +247,7 @@
 										<exclude>**/.gitignore</exclude>
 										<exclude>**/application.bat</exclude>
 										<exclude>**/application.sh</exclude>
-										<include>**/applicationService.sh</include>
+										<exclude>**/applicationService.sh</exclude>
 									</excludes>
 								</resource>
 							</resources>

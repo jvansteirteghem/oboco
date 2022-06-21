@@ -1,7 +1,29 @@
 @echo off
 
+set SAN_DNS=
+:set_dns
+set DNS=
 set /p DNS=Enter DNS: 
+if "%DNS%" NEQ "" (
+	if "%SAN_DNS%" EQU "" (
+		set SAN_DNS=dns:%DNS%
+	) else (
+		set SAN_DNS=%SAN_DNS%,dns:%DNS%
+	)
+	goto set_dns
+)
+set SAN_IP=
+:set_ip
+set IP=
 set /p IP=Enter IP: 
+if "%IP%" NEQ "" (
+	if "%SAN_IP%" EQU "" (
+		set SAN_IP=ip:%IP%
+	) else (
+		set SAN_IP=%SAN_IP%,ip:%IP%
+	)
+	goto set_ip
+)
 set /p PASSWORD=Enter password: 
 
 if exist server-root.jks if exist server-root.pem if exist server-ca.jks if exist server-ca.pem goto part2
@@ -48,7 +70,7 @@ keytool -genkeypair -alias server -dname "cn=oboco-server" -validity 10000 -keya
 
 rem generate a certificate for server signed by ca (root -> ca -> server)
 
-keytool -keystore server.jks -storepass "%PASSWORD%" -certreq -alias server | keytool -keystore server-ca.jks -storepass "%PASSWORD%" -gencert -alias ca -ext "ku:c=dig,keyEnc" -ext "san=dns:%DNS%,ip:%IP%" -ext "eku=sa,ca" -validity 10000 -rfc > server.pem
+keytool -keystore server.jks -storepass "%PASSWORD%" -certreq -alias server | keytool -keystore server-ca.jks -storepass "%PASSWORD%" -gencert -alias ca -ext "ku:c=dig,keyEnc" -ext "san=%SAN_DNS%,%SAN_IP%" -ext "eku=sa,ca" -validity 10000 -rfc > server.pem
 
 rem import server cert chain into server.jks
 

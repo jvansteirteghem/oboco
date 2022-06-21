@@ -1,9 +1,39 @@
 #!/bin/bash
 
-echo -n "Enter DNS: "
-read DNS
-echo -n "Enter IP: "
-read IP
+SAN_DNS=
+while : ; do
+	DNS=
+	echo -n "Enter DNS: "
+	read DNS
+	if [[ "$DNS" != "" ]]
+	then
+		if [[ "$SAN_DNS" == "" ]]
+		then
+			SAN_DNS="dns:$DNS"
+		else
+			SAN_DNS="$SAN_DNS,dns:$DNS"
+		fi
+	else
+		break
+	fi
+done
+SAN_IP=
+while : ; do
+	IP=
+	echo -n "Enter IP: "
+	read IP
+	if [[ "$IP" != "" ]]
+	then
+		if [[ "$SAN_IP" == "" ]]
+		then
+			SAN_IP="ip:$IP"
+		else
+			SAN_IP="$SAN_IP,ip:$IP"
+		fi
+	else
+		break
+	fi
+done
 echo -n "Enter password: "
 read PASSWORD
 
@@ -52,7 +82,7 @@ keytool -genkeypair -alias server -dname "cn=oboco-server" -validity 10000 -keya
 # generate a certificate for server signed by ca (root -> ca -> server)
 
 keytool -keystore server.jks -storepass "$PASSWORD" -certreq -alias server \
-| keytool -keystore server-ca.jks -storepass "$PASSWORD" -gencert -alias ca -ext "ku:c=dig,keyEnc" -ext "san=dns:$DNS,ip:$IP" -ext "eku=sa,ca" -validity 10000 -rfc > server.pem
+| keytool -keystore server-ca.jks -storepass "$PASSWORD" -gencert -alias ca -ext "ku:c=dig,keyEnc" -ext "san=$SAN_DNS,$SAN_IP" -ext "eku=sa,ca" -validity 10000 -rfc > server.pem
 
 # import server cert chain into server.jks
 
